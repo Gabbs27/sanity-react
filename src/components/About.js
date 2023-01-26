@@ -9,7 +9,7 @@ function urlFor(source) {
   return builder.image(source);
 }
 
-export default function OnePost() {
+export default function About() {
   const [postData, setPostData] = useState(null);
   const { slug } = useParams();
 
@@ -17,16 +17,16 @@ export default function OnePost() {
     sanityClient
       .fetch(
         `*[slug.current == "${slug}"]{
-           title,
+           author->name,
            slug,
-           mainImage{
+           image{
            asset->{
               _id,
               url
             }
           },
           body,
-          "name": author->name,
+          "bio": author->bio,
           "authorImage": author->image
        }`
       )
@@ -44,7 +44,7 @@ export default function OnePost() {
             {/* Title Section */}
             <div className='bg-white bg-opacity-75 rounded p-12'>
               <h2 className='cursive text-3xl lg:text-6xl mb-4'>
-                {postData.title}
+                {postData.name}
               </h2>
               <div className='flex justify-center text-gray-800'>
                 <img
@@ -60,7 +60,7 @@ export default function OnePost() {
           </div>
           <img
             className='w-full object-cover rounded-t'
-            src={urlFor(postData.mainImage).url()}
+            src={urlFor(postData.image).url()}
             alt=''
             style={{ height: "400px" }}
           />
