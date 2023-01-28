@@ -11,7 +11,8 @@ export const data = [
   {
     id: 2,
     image: "https://via.placeholder.com/200x200",
-    title: "Project 2",
+    url: "https://gabbs27.github.io/calendar-reminder/",
+    title: "My React Calendar",
     description:
       "A web application that connects users with local volunteer opportunities.",
     languages: ["reactjs", "typescript"],

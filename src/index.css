@@ -79,8 +79,7 @@ body{
 
 
 .nav--li{
-  left:3020px;
-  right:1000px;
+  
   float:left;
   border-right: 1px solid #bbb;
   border-left: 1px solid #bbb;
@@ -94,6 +93,9 @@ body{
   padding: 14px 16px;
   text-decoration: none;
   
+}
+.nav--li-a.selected {
+  color: blue !important;
 }
 
  a:hover {
