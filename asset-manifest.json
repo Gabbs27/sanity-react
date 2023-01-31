@@ -1,16 +1,16 @@
 {
   "files": {
     "main.css": "/sanity-react/static/css/main.9fc4d0bf.css",
-    "main.js": "/sanity-react/static/js/main.01894b39.js",
+    "main.js": "/sanity-react/static/js/main.d5288db3.js",
     "static/js/787.abf1e461.chunk.js": "/sanity-react/static/js/787.abf1e461.chunk.js",
     "static/media/head.png": "/sanity-react/static/media/head.e61732bd9d6edf4439d9.png",
     "index.html": "/sanity-react/index.html",
     "main.9fc4d0bf.css.map": "/sanity-react/static/css/main.9fc4d0bf.css.map",
-    "main.01894b39.js.map": "/sanity-react/static/js/main.01894b39.js.map",
+    "main.d5288db3.js.map": "/sanity-react/static/js/main.d5288db3.js.map",
     "787.abf1e461.chunk.js.map": "/sanity-react/static/js/787.abf1e461.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.9fc4d0bf.css",
-    "static/js/main.01894b39.js"
+    "static/js/main.d5288db3.js"
   ]
 }
