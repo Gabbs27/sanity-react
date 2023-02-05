@@ -1,19 +1,27 @@
 import React from "react";
-
 import ReactDOM from "react-dom/client";
+import { HashRouter } from "react-router-dom";
+import { BaseProvider, LightTheme } from "baseui";
+import { Provider as StyletronProvider } from "styletron-react";
+import { Client as Styletron } from "styletron-engine-atomic";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import Footer from "./components/Footer";
-import Header from "./components/Header";
+import Navbar from "./components/navheader/NavHeader";
 
+const engine = new Styletron();
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <React.StrictMode>
-    <Header />
-    <App />
-    <Footer />
-  </React.StrictMode>
+  <HashRouter>
+    <StyletronProvider value={engine}>
+      <BaseProvider theme={LightTheme}>
+        <Navbar />
+        <App />
+        <Footer />
+      </BaseProvider>
+    </StyletronProvider>
+  </HashRouter>
 );
 
 // If you want to start measuring performance in your app, pass a function

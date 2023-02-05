@@ -1,6 +1,6 @@
 import React from "react";
 import Card from "./card/Card";
-import { data } from "../assets/data"; // double check the path here
+import { data } from "../assets/data";
 
 const Portfolio = () => {
   if (!data) return <div>Loading...</div>; // this will show loading message until data is loaded
