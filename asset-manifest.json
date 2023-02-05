@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/sanity-react/static/css/main.4a870eb7.css",
-    "main.js": "/sanity-react/static/js/main.768d06f8.js",
+    "main.css": "/sanity-react/static/css/main.1aa2dd0c.css",
+    "main.js": "/sanity-react/static/js/main.e311a4e8.js",
     "static/js/787.abf1e461.chunk.js": "/sanity-react/static/js/787.abf1e461.chunk.js",
     "static/media/head.png": "/sanity-react/static/media/head.e61732bd9d6edf4439d9.png",
     "index.html": "/sanity-react/index.html",
-    "main.4a870eb7.css.map": "/sanity-react/static/css/main.4a870eb7.css.map",
-    "main.768d06f8.js.map": "/sanity-react/static/js/main.768d06f8.js.map",
+    "main.1aa2dd0c.css.map": "/sanity-react/static/css/main.1aa2dd0c.css.map",
+    "main.e311a4e8.js.map": "/sanity-react/static/js/main.e311a4e8.js.map",
     "787.abf1e461.chunk.js.map": "/sanity-react/static/js/787.abf1e461.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.4a870eb7.css",
-    "static/js/main.768d06f8.js"
+    "static/css/main.1aa2dd0c.css",
+    "static/js/main.e311a4e8.js"
   ]
 }
