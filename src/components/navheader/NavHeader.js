@@ -9,31 +9,47 @@ const NavBar = () => {
   return (
     <Fade>
       <div>
-        <header className='header'>
+        <header className='header mb-0 '>
           <NavLink to='/' tag={Link} className='logo'>
-            <img className='header--img' src={head} alt='header' />
+            <img
+              className='header--img ml-10'
+              src={head}
+              alt='Code with Gabo'
+            />
           </NavLink>
-          <ul className='menu'>
-            <li>
-              <NavLink to='/portfolio'>Portfolio</NavLink>
-            </li>
-            <li>
-              <NavLink className='nav-link' to='/allpost'>
-                All Posts
-              </NavLink>
-            </li>
-            <li>
-              <NavLink className='nav-link' to='/about'>
-                About
-              </NavLink>
-            </li>
-            <li>
-              <NavLink className='nav-link' to='/gabriel-abreu'>
-                Gabriel Abreu
-              </NavLink>
-            </li>
+          <div className='mr-10'>
+            <ul className='menu'>
+              <li>
+                <NavLink to='/portfolio'>Portfolio</NavLink>
+              </li>
+              <li>
+                <NavLink className='nav-link' to='/allpost'>
+                  All Posts
+                </NavLink>
+              </li>
+              <li>
+                <NavLink className='nav-link' to='/about'>
+                  About
+                </NavLink>
+              </li>
+              <li>
+                <NavLink className='nav-link' to='/gabriel-abreu'>
+                  Gabriel Abreu
+                </NavLink>
+              </li>
 
-            {/* 
+              <li>
+                <NavLink className='nav-link' to='/gabriel-abreu'>
+                  Repositorios
+                </NavLink>
+              </li>
+              <li>
+                <NavLink className='nav-link' to='/gabriel-abreu'>
+                  Educacion
+                </NavLink>
+              </li>
+
+              {/* 
             <NavItem>
               <Link
                 className={`nav-link ${
@@ -43,7 +59,8 @@ const NavBar = () => {
                 Gabriel Abreu
               </Link>
             </NavItem> */}
-          </ul>
+            </ul>
+          </div>
         </header>
       </div>
     </Fade>

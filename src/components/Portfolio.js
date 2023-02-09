@@ -1,27 +1,29 @@
 import React from "react";
 import Card from "./card/Card";
+import Fade from "react-reveal/Fade";
 import { data } from "../assets/data";
 
+import Greeting from "./Greeting/Greeting";
+
 const Portfolio = () => {
-  if (!data) return <div>Loading...</div>; // this will show loading message until data is loaded
+  if (!data) return <div>Loading...</div>;
   return (
     <div className='min-h-screen p-12'>
       <div className='container mx-auto'>
-        <h2 className='text-3xl flex justify-center'>Portfolio</h2>
-        <h3 className='text-lg text-gray-600 flex justify-center mb-12'>
-          My projects!
-        </h3>
+        <Greeting />
+
         <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-8'>
           {data.map((item) => {
             return (
-              <Card
-                key={item.id}
-                image={item.image}
-                title={item.title}
-                description={item.description}
-                url={item.url}
-                languages={item.languages}
-              />
+              <Fade key={item.id}>
+                <Card
+                  image={item.image}
+                  title={item.title}
+                  description={item.description}
+                  url={item.url}
+                  languages={item.languages}
+                />
+              </Fade>
             );
           })}
         </div>

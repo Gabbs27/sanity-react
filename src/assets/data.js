@@ -1,21 +1,21 @@
 export const data = [
   {
     id: 1,
-    image: "images/invoice_generator.png",
+    image: "/images/invoice_generator.png",
     url: "https://gabbs27.github.io/invoice-generator/",
     title: "Invoice Generator",
     description:
       "This project is an invoice generator built using ReactJS, TypeScript and SASS. It simplifies invoicing process for businesses.",
-    languages: ["reactjs", "typescript"],
+    languages: ["reactjs", "typescript", ""],
   },
   {
     id: 2,
-    image: "https://via.placeholder.com/200x200",
+    image: "/images/calendar.png",
     url: "https://gabbs27.github.io/calendar-reminder/",
     title: "My React Calendar",
     description:
       "A web application that connects users with local volunteer opportunities.",
-    languages: ["reactjs", "typescript"],
+    languages: ["reactjs", "Axios", "html", "OpenWeather"],
   },
   {
     id: 3,

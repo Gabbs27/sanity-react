@@ -1,16 +1,17 @@
 /* header */
 
 .header {
-    display: block;
+    display: flex;
     max-width: 90%;
     padding: 20px 10px;
     margin: 0px auto;
-    background-color: #EDE6DB; /* add a background color */
+    background-color: #f6f4f0; /* add a background color */
   }
+  /* EDE6DB */
   
   .header--img {
-    height: 160px;
-    width: 360px;
+    height: 100px;
+    width: 200px;
     object-fit: cover; /* make sure the image fills the container */
     border-radius: 10px; /* add some rounded corners */
   }
@@ -30,7 +31,7 @@
   
   .header li a {
     display: block;
-    padding: 20px 20px;
+    padding: 2px 20px;
     /* color: black; */
     text-decoration: none;
   }
@@ -62,6 +63,8 @@
     font-family: 'Bebas Neue', sans-serif;
     color:#276461;
     font-size: large;
+    margin-top: 0;
+    margin-bottom: 40px;
   }
   
   .header .menu {

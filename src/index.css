@@ -2,6 +2,10 @@
 @import url("https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css");
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,200;1,100&display=swap");
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Gudea:ital@1&family=Inter&display=swap');
+
+
 
 .cursive {
   font-family: "Amatic SC", cursive;
@@ -22,7 +26,7 @@
   right:0;
   text-align: center;
   background-color:#276461;
-  color:#EDE6DB;
+  color:#fbfaf8;
   }
 .footer--button{
   position: none;
@@ -40,13 +44,13 @@
 }
 
 body{
-  background-color: #EDE6DB;
+  background-color: #f6f4f0;
 }
 
 
 .navbar{
    background-color: #276461;
-  color: #EDE6DB;
+  color: #f3f0eb;
   /* position: sticky; */
   top: 0;
   right:0;
