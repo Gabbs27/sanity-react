@@ -1,16 +1,17 @@
 {
   "files": {
-    "main.css": "/sanity-react/static/css/main.1aa2dd0c.css",
-    "main.js": "/sanity-react/static/js/main.e311a4e8.js",
+    "main.css": "/sanity-react/static/css/main.b9a53569.css",
+    "main.js": "/sanity-react/static/js/main.4f985724.js",
     "static/js/787.abf1e461.chunk.js": "/sanity-react/static/js/787.abf1e461.chunk.js",
-    "static/media/head.png": "/sanity-react/static/media/head.e61732bd9d6edf4439d9.png",
+    "static/media/p-red.png": "/sanity-react/static/media/p-red.42f62f3caa7a4eb03479.png",
+    "static/media/head.png": "/sanity-react/static/media/head.573bbd62ae21e5c47baa.png",
     "index.html": "/sanity-react/index.html",
-    "main.1aa2dd0c.css.map": "/sanity-react/static/css/main.1aa2dd0c.css.map",
-    "main.e311a4e8.js.map": "/sanity-react/static/js/main.e311a4e8.js.map",
+    "main.b9a53569.css.map": "/sanity-react/static/css/main.b9a53569.css.map",
+    "main.4f985724.js.map": "/sanity-react/static/js/main.4f985724.js.map",
     "787.abf1e461.chunk.js.map": "/sanity-react/static/js/787.abf1e461.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.1aa2dd0c.css",
-    "static/js/main.e311a4e8.js"
+    "static/css/main.b9a53569.css",
+    "static/js/main.4f985724.js"
   ]
 }
