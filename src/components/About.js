@@ -1,78 +1,62 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import sanityClient from "../client.js";
-import BlockContent from "@sanity/block-content-to-react";
-import imageUrlBuilder from "@sanity/image-url";
+import React from "react";
+import Fade from "react-reveal/Fade";
+import p from "../assets/p-red.png";
 
-const builder = imageUrlBuilder(sanityClient);
-function urlFor(source) {
-  return builder.image(source);
-}
-
-export default function About() {
-  const [postData, setPostData] = useState(null);
-  const { slug } = useParams();
-
-  useEffect(() => {
-    sanityClient
-      .fetch(
-        `*[slug.current == "${slug}"]{
-           author->name,
-           slug,
-           image{
-           asset->{
-              _id,
-              url
-            }
-          },
-          body,
-          "bio": author->bio,
-          "authorImage": author->image
-       }`
-      )
-      .then((data) => setPostData(data[0]))
-      .catch(console.error);
-  }, [slug]);
-
-  if (!postData) return <div>Loading...</div>;
-
+const About = () => {
   return (
-    <div className='bg-gray-200 min-h-screen p-12'>
-      <div className='container shadow-lg mx-auto bg-green-100 rounded-lg'>
-        <div className='relative'>
-          <div className='absolute h-full w-full flex items-center justify-center p-8'>
-            {/* Title Section */}
-            <div className='bg-white bg-opacity-75 rounded p-12'>
-              <h2 className='cursive text-3xl lg:text-6xl mb-4'>
-                {postData.name}
-              </h2>
-              <div className='flex justify-center text-gray-800'>
-                <img
-                  src={urlFor(postData.authorImage).url()}
-                  className='w-10 h-10 rounded-full'
-                  alt='Author is Kap'
-                />
-                <h4 className='cursive flex items-center pl-2 text-2xl'>
-                  {postData.name}
-                </h4>
+    <div className='min-h-screen p-12'>
+      <div className='container mx-auto'>
+        <Fade bottom duration={2000} distance='40px'>
+          <div className='greet-main mb-10'>
+            <div className='greeting-main'>
+              <div className='greeting-text-div'>
+                <div>
+                  <h1 className='greeting-text mb-6'>About Code with Gabo</h1>
+                  <h2 className='greeting-nickname mb-6'>By Gabbs279</h2>
+                  <p className='greeting-text-p text-base mt-6'>
+                    Our goal at Code with Gabo is to bridge the gap between
+                    those who are intimidated by technology and the exciting
+                    world of coding. We understand that starting in this field
+                    can be challenging, which is why we are here to provide
+                    support and guidance.
+                  </p>
+                  <p className='greeting-text-p subTitle mt-6'>
+                    Our platform is designed to be inclusive and empowering,
+                    offering quality education and practical advice to help you
+                    reach your goals. We believe that everyone should have
+                    access to the resources they need to succeed in the world of
+                    technology, regardless of their background or experience
+                    level.
+                  </p>
+                  <p className='greeting-text-p subTitle mt-6'>
+                    At Code with Gabo, we are passionate about coding and the
+                    positive impact it can have on people's lives. That's why we
+                    are dedicated to sharing our knowledge and experience with
+                    those who are eager to learn. By fostering a supportive and
+                    collaborative community, we believe that together, we can
+                    achieve great things.
+                  </p>
+                  <p className='greeting-text-p subTitle mt-6'>
+                    So, if you are ready to embark on your coding journey, join
+                    us at Code with Gabo. Let's learn, grow, and make a
+                    difference together.
+                  </p>
+                </div>
               </div>
+              {/* <div className='greeting-image-div ml-20'>
+                <img
+                  className=''
+                  src={p}
+                  alt='professional work collection illustration'
+                  style={{ width: "80%" }}
+                />
+              </div> */}
             </div>
           </div>
-          <img
-            className='w-full object-cover rounded-t'
-            src={urlFor(postData.image).url()}
-            alt=''
-            style={{ height: "400px" }}
-          />
-        </div>
-        <div className='px-16 lg:px-48 py-12 lg:py-20 prose lg:prose-xl max-w-full'>
-          <BlockContent
-            blocks={postData.body}
-            projectId={sanityClient.clientConfig.projectId}
-            dataset={sanityClient.clientConfig.dataset}
-          />
-        </div>
+        </Fade>
       </div>
     </div>
   );
-}
+};
+
+export default About;

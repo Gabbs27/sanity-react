@@ -10,7 +10,7 @@ function App() {
     <Routes>
       <Route element={<AllPosts />} exact path='/allpost' />
       <Route element={<OnePost />} path='/:slug' />
-      <Route element={<About />} path='/:slug' />
+      <Route element={<About />} exact path='/About' />
       <Route element={<Portfolio />} exact path='/Portfolio' />
     </Routes>
   );
