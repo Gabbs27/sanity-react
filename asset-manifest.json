@@ -1,17 +1,18 @@
 {
   "files": {
     "main.css": "/sanity-react/static/css/main.b9a53569.css",
-    "main.js": "/sanity-react/static/js/main.a9abfbdd.js",
+    "main.js": "/sanity-react/static/js/main.da4f135f.js",
     "static/js/787.abf1e461.chunk.js": "/sanity-react/static/js/787.abf1e461.chunk.js",
     "static/media/p-red.png": "/sanity-react/static/media/p-red.42f62f3caa7a4eb03479.png",
+    "static/media/github.png": "/sanity-react/static/media/github.7aa294843dbfe6272f8e.png",
     "static/media/head.png": "/sanity-react/static/media/head.573bbd62ae21e5c47baa.png",
     "index.html": "/sanity-react/index.html",
     "main.b9a53569.css.map": "/sanity-react/static/css/main.b9a53569.css.map",
-    "main.a9abfbdd.js.map": "/sanity-react/static/js/main.a9abfbdd.js.map",
+    "main.da4f135f.js.map": "/sanity-react/static/js/main.da4f135f.js.map",
     "787.abf1e461.chunk.js.map": "/sanity-react/static/js/787.abf1e461.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.b9a53569.css",
-    "static/js/main.a9abfbdd.js"
+    "static/js/main.da4f135f.js"
   ]
 }
