@@ -39,7 +39,7 @@ const NavBar = () => {
               </li>
 
               <li>
-                <NavLink className='nav-link' to='/gabriel-abreu'>
+                <NavLink className='nav-link' to='/Repositorios'>
                   Repositorios
                 </NavLink>
               </li>

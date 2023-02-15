@@ -50,13 +50,13 @@ export default function AllPosts() {
     <div className='min-h-screen p-12'>
       <div className='container mx-auto'>
         <PostGreeting />
-        <div className='flex  mt-6'>
+        <div className='flex mt-6'>
           <input
             type='text'
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder='Search posts'
-            className='w-64 p-2 mt-2 border border-gray-400 rounded-md focus:z-10  ring-pink-500 focus:ring-2 focus:ring-gray-500'
+            className='ml-auto w-64 p-2 mt-2 border border-gray-400 rounded-md focus:ring-pink-500'
           />
         </div>
         <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-8 mt-6'>
