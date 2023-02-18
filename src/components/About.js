@@ -1,78 +1,41 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import sanityClient from "../client.js";
-import BlockContent from "@sanity/block-content-to-react";
-import imageUrlBuilder from "@sanity/image-url";
-
-const builder = imageUrlBuilder(sanityClient);
-function urlFor(source) {
-  return builder.image(source);
-}
-
-export default function About() {
-  const [postData, setPostData] = useState(null);
-  const { slug } = useParams();
-
-  useEffect(() => {
-    sanityClient
-      .fetch(
-        `*[slug.current == "${slug}"]{
-           author->name,
-           slug,
-           image{
-           asset->{
-              _id,
-              url
-            }
-          },
-          body,
-          "bio": author->bio,
-          "authorImage": author->image
-       }`
-      )
-      .then((data) => setPostData(data[0]))
-      .catch(console.error);
-  }, [slug]);
-
-  if (!postData) return <div>Loading...</div>;
-
+import React from "react";
+import Fade from "react-reveal/Fade";
+import p from "../assets/p-red.png";
+import aboutdata from "../assets/about";
+import about from "../assets/about";
+const About = () => {
   return (
-    <div className='bg-gray-200 min-h-screen p-12'>
-      <div className='container shadow-lg mx-auto bg-green-100 rounded-lg'>
-        <div className='relative'>
-          <div className='absolute h-full w-full flex items-center justify-center p-8'>
-            {/* Title Section */}
-            <div className='bg-white bg-opacity-75 rounded p-12'>
-              <h2 className='cursive text-3xl lg:text-6xl mb-4'>
-                {postData.name}
-              </h2>
-              <div className='flex justify-center text-gray-800'>
-                <img
-                  src={urlFor(postData.authorImage).url()}
-                  className='w-10 h-10 rounded-full'
-                  alt='Author is Kap'
-                />
-                <h4 className='cursive flex items-center pl-2 text-2xl'>
-                  {postData.name}
-                </h4>
+    <div className='min-h-screen p-12'>
+      <div className='container mx-auto'>
+        <Fade bottom duration={2000} distance='40px'>
+          <div className='greet-main mb-10'>
+            <div className='greeting-main'>
+              <div className='greeting-text-div'>
+                <div>
+                  <h1 className='greeting-text mb-6'>{aboutdata.title}</h1>
+                  <h2 className='greeting-nickname mb-6'>
+                    {aboutdata.subtitle}
+                  </h2>
+                  <p className='greeting-text-p text-base mt-6'>
+                    {aboutdata.first_paragraph}
+                  </p>
+                  <p className='greeting-text-p subTitle mt-6'>
+                    {aboutdata.second_paragraph}
+                  </p>
+                  <p className='greeting-text-p subTitle mt-6'>
+                    {aboutdata.third_paragraph}
+                  </p>
+                  <p className='greeting-text-p subTitle mt-6'>
+                    {aboutdata.fourth_paragraph}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-          <img
-            className='w-full object-cover rounded-t'
-            src={urlFor(postData.image).url()}
-            alt=''
-            style={{ height: "400px" }}
-          />
-        </div>
-        <div className='px-16 lg:px-48 py-12 lg:py-20 prose lg:prose-xl max-w-full'>
-          <BlockContent
-            blocks={postData.body}
-            projectId={sanityClient.clientConfig.projectId}
-            dataset={sanityClient.clientConfig.dataset}
-          />
-        </div>
+        </Fade>
       </div>
     </div>
   );
-}
+};
+
+export default About;

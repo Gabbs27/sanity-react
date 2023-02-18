@@ -1,6 +1,6 @@
 import React from "react";
 
-const Card = (props) => {
+const PostCard = (props) => {
   return (
     <div
       className='block h-64 relative rounded  hover:shadow-lg leading-snug bg-white
@@ -12,7 +12,7 @@ const Card = (props) => {
         target='_blank'
         rel='noopener noreferrer'>
         <img
-          src={process.env.PUBLIC_URL + props.image}
+          src={props.image}
           alt={props.title}
           className='w-full h-full rounded-r object-cover absolute'
         />
@@ -43,7 +43,7 @@ const Card = (props) => {
   );
 };
 
-export default Card;
+export default PostCard;
 
 // <span
 //   className='block h-64 relative rounded shadow leading-snug bg-white
