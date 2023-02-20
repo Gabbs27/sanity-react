@@ -2,6 +2,7 @@ import React from "react";
 import Fade from "react-reveal/Fade";
 import p from "../assets/p-red.png";
 import PresentationCard from "./card/MeCard";
+import medata from "../assets/gabriel";
 
 const Me = () => {
   return (
@@ -12,15 +13,10 @@ const Me = () => {
             <div className='greeting-main'>
               <div className='greeting-text-div'>
                 <PresentationCard
-                  name={"Francisco Gabriel Abreu Cornelio"}
-                  description={
-                    "I'm a Full Stack Software Developer with 5+ years of applicable experience in designing and implementing software solutions with ReactJs, C#, and JavaScript, I enjoy working in teams and also can stand alone." +
-                    "Motivated by the creation of IT solutions, I always aspire to personal development, both human and professional, improving my qualities daily, learning languages ​​and agile techniques for growth in my area."
-                  }
+                  name={medata.title}
+                  description={medata.description}
                   image={p}
-                  title={
-                    "Full Stack Developer (Remote) | ReactJs | C# | JavaScript | Challenge-aholic"
-                  }
+                  title={medata.subtitle}
                 />
               </div>
             </div>

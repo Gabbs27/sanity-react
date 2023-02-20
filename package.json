@@ -2,7 +2,7 @@
   "name": "sanity-react",
   "version": "0.1.0",
   "private": true,
-  "homepage": "http://codewithgabo.com/sanity-react/#/portfolio",
+  "homepage": "http://codewithgabo.com/#/portfolio",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.2.1",
     "@fortawesome/free-brands-svg-icons": "^6.2.1",
