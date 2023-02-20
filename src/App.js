@@ -13,7 +13,7 @@ function App() {
       <Route element={<AllPosts />} exact path='/allpost' />
       <Route element={<OnePost />} path='/:slug' />
       <Route element={<About />} exact path='/About' />
-      <Route element={<Portfolio />} exact path='/Portfolio' />
+      <Route element={<Portfolio />} exact path='/' />
       <Route element={<Me />} exact path='/Gabriel-Abreu' />
       <Route element={<Repos />} exact path='/Repositorios' />
     </Routes>

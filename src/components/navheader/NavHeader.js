@@ -20,7 +20,7 @@ const NavBar = () => {
           <div className='mr-10'>
             <ul className='menu'>
               <li>
-                <NavLink to='/portfolio'>Portfolio</NavLink>
+                <NavLink to='/'>Portfolio</NavLink>
               </li>
               <li>
                 <NavLink className='nav-link' to='/allpost'>
