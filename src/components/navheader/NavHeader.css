@@ -16,6 +16,11 @@
     border-radius: 10px; /* add some rounded corners */
   }
   
+  .active {
+    color: red;
+    font-weight: bold;
+  }
+  
   
   
   .header ul {
