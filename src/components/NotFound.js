@@ -1,10 +1,8 @@
 import React from "react";
 import Fade from "react-reveal/Fade";
-import p from "../assets/p-red.png";
-import PresentationCard from "./card/MeCard";
-import medata from "../assets/gabriel";
+import NotFoundCard from "./card/NotFoundCard";
 
-const Me = () => {
+export default function NotFound() {
   return (
     <div className='min-h-screen p-12'>
       <div className='container'>
@@ -12,11 +10,11 @@ const Me = () => {
           <div className='greet-main mb-10'>
             <div className='greeting-main'>
               <div className='greeting-text-div'>
-                <PresentationCard
-                  name={medata.title}
-                  description={medata.description}
-                  image={p}
-                  title={medata.subtitle}
+                <NotFoundCard
+                  name='Not Found'
+                  description="Definitely Something's wrong"
+                  image=''
+                  title="Something's wrong"
                 />
               </div>
             </div>
@@ -25,6 +23,4 @@ const Me = () => {
       </div>
     </div>
   );
-};
-
-export default Me;
+}

@@ -19,12 +19,16 @@ export default function Footer() {
           <FontAwesomeIcon icon={faTwitter} />
         </button>
 
-        <button
-          className='bg-white text-lightBlue-600 shadow-lg font-normal h-10 w-10 items-center justify-center align-center rounded-full outline-none focus:outline-none mr-2'
-          type='button'>
-          <FontAwesomeIcon icon={faInstagram} />
-        </button>
-
+        <a
+          href='https://www.instagram.com/codewithgabo/'
+          target='_blank'
+          rel='noopener noreferrer'>
+          <button
+            className='bg-white text-lightBlue-600 shadow-lg font-normal h-10 w-10 items-center justify-center align-center rounded-full outline-none focus:outline-none mr-2'
+            type='button'>
+            <FontAwesomeIcon icon={faInstagram} />
+          </button>
+        </a>
         <a
           href='https://www.linkedin.com/in/francisco-gabriel-abreu-cornelio/'
           target='_blank'
