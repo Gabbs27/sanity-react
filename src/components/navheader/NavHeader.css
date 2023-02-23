@@ -1,158 +1,93 @@
 /* header */
 
 .header {
-    display: flex;
-    max-width: 90%;
-    padding: 20px 10px;
-    margin: 0px auto;
-    background-color: #f6f4f0; /* add a background color */
-  }
-  /* EDE6DB */
-  
-  .header--img {
-    height: 100px;
-    width: 200px;
-    object-fit: cover; /* make sure the image fills the container */
-    border-radius: 10px; /* add some rounded corners */
-  }
-  
-  .active {
-    color: red;
-    font-weight: bold;
-  }
-  
-  
-  
-  .header ul {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    overflow: hidden;
-    /* background-color: #fff; */
-  }
-  .grey-color {
-    color: #868e96;
-  }
-  
-  .header li a {
-    display: block;
-    padding: 2px 20px;
-    /* color: black; */
-    text-decoration: none;
-  }
-  
-   .header li a:hover,
-  .header .menu-btn:hover {
-    background-color: rgb(198, 207, 211); 
-    border-radius: 10px;
-  } 
-  
-  .header .logo {
-    display: block;
+  display: flex;
+  max-width: 90%;
+  padding: 20px 10px;
+  margin: 0px auto;
+  background-color: #f6f4f0; /* add a background color */
+}
+
+.header--img {
+  height: 100px;
+  width: 200px;
+  object-fit: cover; /* make sure the image fills the container */
+  border-radius: 10px; /* add some rounded corners */
+}
+
+.active {
+  color: red;
+  font-weight: bold;
+}
+
+.header ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow: hidden;
+}
+
+.grey-color {
+  color: #868e96;
+}
+
+.header li a {
+  display: block;
+  padding: 2px 20px;
+  text-decoration: none;
+}
+
+.header li a:hover,
+.header .menu-btn:hover {
+  background-color: rgb(198, 207, 211); 
+  border-radius: 10px;
+} 
+
+.header .logo {
+  display: block;
+  float: left;
+  font-size: 1.5em;
+  text-decoration: none;
+  margin-top: 10px;
+  line-height: normal;
+}
+
+.header .logo-name {
+  font-family: "Agustina Regular";
+  font-weight: bold;
+  padding: 0 10px;
+}
+
+/* menu */
+
+.menu {
+  font-family: 'Bebas Neue', sans-serif;
+  color:#276461;
+  font-size: large;
+  margin-top: 0;
+  margin-bottom: 40px;
+  z-index: 3; /* add a z-index */
+}
+
+
+.header .menu {
+  clear: both;
+  max-height: 0;
+  transition: max-height 0.2s ease-out;
+  z-index: 1;
+
+}
+
+/* 48em = 768px */
+
+@media (min-width: 48em) {
+  .header li {
     float: left;
-    font-size: 1.5em;
-    text-decoration: none;
-    margin-top: 10px;
-    line-height: normal;
   }
-  .header .logo-name {
-    font-family: "Agustina Regular";
-    font-weight: bold;
-    padding: 0 10px;
-    /* color: #55198b; */
-  }
-  
-  /* menu */
-  
-  .menu {
-    font-family: 'Bebas Neue', sans-serif;
-    color:#276461;
-    font-size: large;
-    margin-top: 0;
-    margin-bottom: 40px;
-  }
-  
-  .header .menu {
-    clear: both;
-    max-height: 0;
-    transition: max-height 0.2s ease-out;
-  }
-  
-  /* menu icon */
-  
-  .header .menu-icon {
-    cursor: pointer;
-    display: inline-block;
-    padding: 28px 20px;
-    position: relative;
-    user-select: none;
-  }
-  
-  .header .menu-icon .navicon {
-    background: #333;
-    display: block;
-    height: 2px;
-    position: relative;
-    transition: background 0.2s ease-out;
-    width: 18px;
-  }
-  
-  .header .menu-icon .navicon:before,
-  .header .menu-icon .navicon:after {
-    background: #333;
-    content: "";
-    display: block;
-    height: 100%;
-    position: absolute;
-    transition: all 0.2s ease-out;
-    width: 100%;
-  }
-  
-  .header .menu-icon .navicon:before {
-    top: 5px;
-  }
-  
-  .header .menu-icon .navicon:after {
-    top: -5px;
-  }
-  
-  /* menu btn */
-  
-  .header .menu-btn {
-    display: none;
-  }
-  
-  .header .menu-btn:checked ~ .menu {
-    max-height: 370px;
-  }
-  
-  .header .menu-btn:checked ~ .menu-icon .navicon {
-    background: transparent;
-  }
-  
-  .header .menu-btn:checked ~ .menu-icon .navicon:before {
-    transform: rotate(-45deg);
-  }
-  
-  .header .menu-btn:checked ~ .menu-icon .navicon:after {
-    transform: rotate(45deg);
-  }
-  
-  .header .menu-btn:checked ~ .menu-icon:not(.steps) .navicon:before,
-  .header .menu-btn:checked ~ .menu-icon:not(.steps) .navicon:after {
-    top: 0;
-  }
-  
-  /* 48em = 768px */
-  
-  @media (min-width: 48em) {
-    .header li {
-      float: left;
-    }
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     }
     .header .menu {
       max-height: none;
@@ -166,3 +101,69 @@
       font-size: 12px;
     }
   }
+
+  @media (max-width: 48em) {
+    .header {
+      flex-direction: column;
+    }
+  
+    .header .menu {
+      max-height: none;
+      display: flex;
+      flex-direction: column;
+    }
+  
+    .header li {
+      margin: 10px 0;
+      display: block;
+    }
+  }
+
+  .menu-btn {
+    display: block;
+    position: relative;
+    z-index: 1;
+    user-select: none;
+    cursor: pointer;
+    margin-right: 15px;
+  }
+  
+  .menu-btn span {
+    display: block;
+    width: 25px;
+    height: 3px;
+    margin-bottom: 5px;
+    position: relative;
+    background: #000;
+    border-radius: 3px;
+    z-index: 1;
+  }
+  
+  .menu-btn span:last-child {
+    margin-bottom: 0;
+  }
+
+  .header .menu {
+    display: none;
+    margin-top: 10px;
+  }
+  
+  @media (min-width: 48em) {
+    .header .menu {
+      display: block;
+      margin: 0;
+      max-height: none;
+    }
+  
+    .header .menu-btn {
+      display: none;
+    }
+    
+  }
+  .menu.open{
+    display: inline-flex;
+    box-shadow: #276461;
+   }
+
+
+  

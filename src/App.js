@@ -6,10 +6,12 @@ import About from "./components/About.js";
 import Portfolio from "./components/Portfolio.js";
 import Me from "./components/Me.js";
 import Repos from "./components/Repos";
+import NotFound from "./components/NotFound.js";
 
 function App() {
   return (
     <Routes>
+      <Route exact path='*' element={<NotFound />} />
       <Route element={<AllPosts />} exact path='/allpost' />
       <Route element={<OnePost />} path='/:slug' />
       <Route element={<About />} exact path='/About' />

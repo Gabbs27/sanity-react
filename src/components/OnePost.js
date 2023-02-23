@@ -4,6 +4,7 @@ import sanityClient from "../client.js";
 import BlockContent from "@sanity/block-content-to-react";
 import imageUrlBuilder from "@sanity/image-url";
 import { Fade } from "react-reveal";
+import NotFound from "./NotFound.js";
 
 const builder = imageUrlBuilder(sanityClient);
 function urlFor(source) {
@@ -35,7 +36,12 @@ export default function OnePost() {
       .catch(console.error);
   }, [slug]);
 
-  if (!postData) return <div>Loading...</div>;
+  if (!postData)
+    return (
+      <div>
+        <NotFound />
+      </div>
+    );
 
   return (
     <Fade>

@@ -6,7 +6,16 @@ import { data } from "../assets/data";
 import Greeting from "./Greeting/Greeting";
 
 const Portfolio = () => {
-  if (!data) return <div>Loading...</div>;
+  if (!data)
+    return (
+      <div>
+        <div className='min-h-screen p-12'>
+          <div className='container mx-auto'>
+            <Greeting />
+          </div>
+        </div>
+      </div>
+    );
   return (
     <div className='min-h-screen p-12'>
       <div className='container mx-auto'>
