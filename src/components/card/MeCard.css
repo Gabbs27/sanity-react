@@ -21,3 +21,30 @@
     font-family: "Inter", sans-serif;
     color: #5f9491;
   }
+
+
+  @media (max-width: 768px) {
+    .me-name {
+      margin-top: 10px;
+      font-size: 22px;
+      font-family: 'Bebas Neue', sans-serif;
+      color: #276461;
+      line-height: 1.1;
+    }
+    
+    .me-subtitle {
+      margin-top: 15px;
+      font-size: 18px;
+      font-family: 'Bebas Neue', sans-serif;
+      color: #54928f;
+      line-height: 1.2;
+    }
+    
+    .me-description {
+      font-size: 13px;
+      margin-right: 7px;
+      font-family: 'Inter', sans-serif;
+      color: #5f9491;
+      line-height: 1.2;
+    }
+  }

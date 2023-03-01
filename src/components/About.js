@@ -6,7 +6,7 @@ import aboutdata from "../assets/about";
 const About = () => {
   return (
     <div className='min-h-screen p-12'>
-      <div className='container shadow-lg mx-auto bg-green-100 rounded-lg'>
+      <div className='container shadow-lg mx-auto bg-green-100 rounded-lg py-12'>
         <Fade bottom duration={2000} distance='40px'>
           <div className='greet-main mb-10'>
             <div className='greeting-main'>

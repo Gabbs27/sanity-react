@@ -8,8 +8,8 @@ import Greeting from "./Greeting/Greeting";
 const Portfolio = () => {
   if (!data)
     return (
-      <div>
-        <div className='min-h-screen p-12'>
+      <div className='py-12'>
+        <div className='min-h-screen p-12 '>
           <div className='container mx-auto'>
             <Greeting />
           </div>
@@ -18,7 +18,7 @@ const Portfolio = () => {
     );
   return (
     <div className='min-h-screen p-12'>
-      <div className='container mx-auto'>
+      <div className='container mx-auto py-12'>
         <Greeting />
 
         <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-8'>

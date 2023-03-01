@@ -48,7 +48,7 @@ export default function AllPosts() {
 
   return (
     <div className='min-h-screen p-12'>
-      <div className='container mx-auto'>
+      <div className='container mx-auto py-12'>
         <PostGreeting />
         <div className='flex mt-6'>
           <input

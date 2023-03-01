@@ -43,7 +43,7 @@ const Repos = () => {
 
   return (
     <div className='min-h-screen p-12'>
-      <div className='container mx-auto'>
+      <div className='container mx-auto py-12'>
         <Greeting />
         <div className='flex mt-6'>
           <input
