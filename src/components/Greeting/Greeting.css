@@ -84,6 +84,7 @@
     .greeting-text-p {
       font-size: 14px;
       text-align: center;
+      margin-left: 40px;
       line-height: 1.5; /* Set line height to a numeric value to improve readability */
     }
     

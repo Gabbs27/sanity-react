@@ -70,7 +70,7 @@ const NavBar = () => {
               className='nav-link'
               to='/Repositorios'
               onClick={handleMenuItemClick}>
-              Repositorios
+              Repositories
             </NavLink>
           </li>
           <li>
@@ -78,7 +78,7 @@ const NavBar = () => {
               className='nav-link'
               to='/educacion'
               onClick={handleMenuItemClick}>
-              Educacion
+              Education
             </NavLink>
           </li>
         </ul>

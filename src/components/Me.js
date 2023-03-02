@@ -5,6 +5,8 @@ import PresentationCard from "./card/MeCard";
 import medata from "../assets/gabriel";
 
 const Me = () => {
+  
+
   return (
     <div className='min-h-screen p-12'>
       <div className='container py-10'>
@@ -18,6 +20,7 @@ const Me = () => {
                   image={p}
                   title={medata.subtitle}
                 />
+               
               </div>
             </div>
           </div>

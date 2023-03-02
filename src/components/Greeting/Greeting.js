@@ -12,7 +12,7 @@ const Greeting = () => {
             <div>
               <h1 className='greeting-text mb-6'>Gabriel Abreu</h1>
               <h2 className='greeting-nickname mb-6'>( Gabbs279)</h2>
-              <p className='greeting-text-p subTitle mt-'>
+              <p className='greeting-text-p'>
                 A driven individual who strives to develop sustainable, scalable
                 solutions for both social and technical systems, always seeking
                 to create a lasting impact.
