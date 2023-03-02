@@ -9,7 +9,6 @@ const Repos = () => {
   const [allrepos, setallRepos] = useState([]);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [showMoreButton, setShowMoreButton] = useState(false);
 
   const reposPerPage = 6;
   const indexOfLastRepo = currentPage * reposPerPage;
@@ -51,7 +50,7 @@ const Repos = () => {
             type='text'
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder='Search posts'
+            placeholder='Search Repos'
             className='ml-auto w-full md:w-64 p-2 mt-2 border border-gray-400 rounded-md focus:ring-pink-500'
             style={{ maxWidth: "100%" }}
           />
