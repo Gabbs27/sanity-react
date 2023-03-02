@@ -2,8 +2,11 @@ import React, { useEffect, useState } from "react";
 import Card from "./card/Card";
 import Fade from "react-reveal/Fade";
 import { data } from "../assets/data";
-
+import ReactGA from "react-ga";
 import Greeting from "./Greeting/Greeting";
+
+ReactGA.initialize("G-76H28FJYRY");
+ReactGA.pageview(window.location.pathname + window.location.search);
 
 export default function Portfolio() {
   const [allPostsData, setAllPosts] = useState([]);
