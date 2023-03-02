@@ -107,7 +107,7 @@
 
 .menu li a.active {
   font-weight: bold;
-  color:red;
+  color:#ff8080;
 }
 .menu li a:hover,
 .header .menu-btn:hover {
