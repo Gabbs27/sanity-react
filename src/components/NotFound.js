@@ -4,8 +4,8 @@ import NotFoundCard from "./card/NotFoundCard";
 
 export default function NotFound() {
   return (
-    <div className='min-h-screen p-12'>
-      <div className='container'>
+    <div className='min-h-screen p-12 '>
+      <div className='container py-10'>
         <Fade bottom duration={2000} distance='40px'>
           <div className='greet-main mb-10'>
             <div className='greeting-main'>

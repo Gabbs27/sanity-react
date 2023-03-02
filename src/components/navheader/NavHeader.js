@@ -12,6 +12,13 @@ const NavBar = () => {
     console.log(menuOpen);
   };
 
+  const handleMenuItemClick = () => {
+    if (window.innerWidth < 768) {
+      // Hide the menu on mobile devices
+      setMenuOpen(false);
+    }
+  };
+
   return (
     <Fade>
       <header className='header'>
@@ -26,33 +33,51 @@ const NavBar = () => {
         </div>
         <ul className={`menu ${menuOpen ? "open" : ""}`}>
           <li>
-            <NavLink to='/' activeClassName='active'>
+            <NavLink
+              to='/'
+              activeClassName='active'
+              onClick={handleMenuItemClick}>
               Portfolio
             </NavLink>
           </li>
           <li>
-            <NavLink className='nav-link' to='/allpost'>
+            <NavLink
+              className='nav-link'
+              to='/allpost'
+              onClick={handleMenuItemClick}>
               All Posts
             </NavLink>
           </li>
           <li>
-            <NavLink className='nav-link' to='/about'>
+            <NavLink
+              className='nav-link'
+              to='/about'
+              onClick={handleMenuItemClick}>
               About
             </NavLink>
           </li>
           <li>
-            <NavLink className='nav-link' to='/gabriel-abreu'>
+            <NavLink
+              className='nav-link'
+              to='/gabriel-abreu'
+              onClick={handleMenuItemClick}>
               Gabriel Abreu
             </NavLink>
           </li>
 
           <li>
-            <NavLink className='nav-link' to='/Repositorios'>
+            <NavLink
+              className='nav-link'
+              to='/Repositorios'
+              onClick={handleMenuItemClick}>
               Repositorios
             </NavLink>
           </li>
           <li>
-            <NavLink className='nav-link' to='/gabriel-abreu'>
+            <NavLink
+              className='nav-link'
+              to='/educacion'
+              onClick={handleMenuItemClick}>
               Educacion
             </NavLink>
           </li>

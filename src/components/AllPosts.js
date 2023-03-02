@@ -56,7 +56,8 @@ export default function AllPosts() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder='Search posts'
-            className='ml-auto w-64 p-2 mt-2 border border-gray-400 rounded-md focus:ring-pink-500'
+            className='ml-auto w-full md:w-64 p-2 mt-2 border border-gray-400 rounded-md focus:ring-pink-500'
+            style={{ maxWidth: "100%" }}
           />
         </div>
         <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-8 mt-6'>
@@ -76,7 +77,7 @@ export default function AllPosts() {
             </Fade>
           ))}
         </div>
-        <div className='flex justify-center mt-12'>
+        <div className='flex justify-center mt-0 mb-12'>
           {pageNumbers.map((number) => (
             <button
               key={number}
