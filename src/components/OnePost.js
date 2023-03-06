@@ -5,6 +5,9 @@ import BlockContent from "@sanity/block-content-to-react";
 import imageUrlBuilder from "@sanity/image-url";
 import { Fade } from "react-reveal";
 import NotFound from "./NotFound.js";
+import ReactGA from "react-ga";
+ReactGA.initialize("G-76H28FJYRY");
+ReactGA.pageview(window.location.pathname + window.location.search);
 
 const builder = imageUrlBuilder(sanityClient);
 function urlFor(source) {

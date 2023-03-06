@@ -1,8 +1,9 @@
 import React from "react";
 import Fade from "react-reveal/Fade";
-
 import aboutdata from "../assets/about";
-
+import ReactGA from "react-ga";
+ReactGA.initialize("G-76H28FJYRY");
+ReactGA.pageview(window.location.pathname + window.location.search);
 const About = () => {
   return (
     <div className='min-h-screen p-12'>

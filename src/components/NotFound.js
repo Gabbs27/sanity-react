@@ -1,6 +1,9 @@
 import React from "react";
 import Fade from "react-reveal/Fade";
 import NotFoundCard from "./card/NotFoundCard";
+import ReactGA from "react-ga";
+ReactGA.initialize("G-76H28FJYRY");
+ReactGA.pageview(window.location.pathname + window.location.search);
 
 export default function NotFound() {
   return (

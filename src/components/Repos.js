@@ -4,6 +4,9 @@ import PostCard from "./card/PostCard";
 import Fade from "react-reveal/Fade";
 import ReposGreeting from "./Greeting/ReposGreeting";
 import github from "../assets/github.png";
+import ReactGA from "react-ga";
+ReactGA.initialize("G-76H28FJYRY");
+ReactGA.pageview(window.location.pathname + window.location.search);
 
 const Repos = () => {
   const [allrepos, setallRepos] = useState([]);
