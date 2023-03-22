@@ -14,7 +14,7 @@ export const data = [
     url: "https://gabbs27.github.io/calendar-reminder/",
     title: "My React Calendar",
     description:
-      "A web application that connects users with local volunteer opportunities.",
+      "This project is titled My React Calendar and features an image of a calendar on the website. The web application is built using ReactJS, Axios, HTML, and OpenWeather. The main purpose of the application is to help users stay organized by providing a platform to manage and schedule their events and reminders.",
     languages: ["reactjs", "Axios", "html", "OpenWeather"],
   },
   {
