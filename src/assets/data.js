@@ -20,17 +20,16 @@ export const data = [
   {
     id: 3,
     image: "https://via.placeholder.com/200x200",
-    title: "Project 3",
-    description:
-      "A mobile game that teaches users about renewable energy sources.",
-    languages: ["reactjs", "typescript"],
+    title: "Meme Generator",
+    description: "A Meme Generator",
+    languages: ["reactjs"],
   },
   {
     id: 4,
     image: "https://via.placeholder.com/200x200",
-    title: "Project 4",
-    description:
-      "A website for a local small business to showcase their products and services.",
-    languages: ["reactjs", "typescript"],
+    url: "https://gabbs27.github.io/gmovie-app/",
+    title: "GMovie",
+    description: "A website to search movies and score",
+    languages: ["reactjs"],
   },
 ];

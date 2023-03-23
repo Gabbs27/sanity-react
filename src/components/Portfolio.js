@@ -71,7 +71,7 @@ export default function Portfolio() {
             );
           })}
         </div>
-        <div className='flex justify-center mt-0 mb-12'>
+        <div className='flex justify-center mt-40 mb-12'>
           {pageNumbers.map((number) => (
             <button
               key={number}
