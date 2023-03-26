@@ -19,17 +19,26 @@ export const data = [
   },
   {
     id: 3,
-    image: "https://via.placeholder.com/200x200",
-    title: "Meme Generator",
-    description: "A Meme Generator",
-    languages: ["reactjs"],
+    image: "/images/movie.png",
+    url: "https://gabbs27.github.io/gmovie-app/",
+    title: "G-Movie",
+    description:
+      "Discover and explore movies with this user-friendly platform, featuring search functionality, ratings, and the ability to save your favorites for easy access.",
+    languages: [
+      "ReactJS",
+      "react-router-dom",
+      "Bootstrap",
+      "react-bootstrap",
+      "styled-components",
+      "Fetch API",
+      "The Movie Database (TMDB) API",
+    ],
   },
   {
     id: 4,
     image: "https://via.placeholder.com/200x200",
-    url: "https://gabbs27.github.io/gmovie-app/",
-    title: "GMovie",
-    description: "A website to search movies and score",
+    title: "Meme Generator",
+    description: "A Meme Generator",
     languages: ["reactjs"],
   },
 ];
