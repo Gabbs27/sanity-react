@@ -6,7 +6,7 @@ export const data = [
     title: "Invoice Generator",
     description:
       "This project is an invoice generator built using ReactJS, TypeScript and SASS. It simplifies invoicing process for businesses.",
-    languages: ["reactjs", "typescript", ""],
+    languages: ["ReactJS", "typescript"],
   },
   {
     id: 2,
@@ -15,7 +15,7 @@ export const data = [
     title: "My React Calendar",
     description:
       "This project is titled My React Calendar and features an image of a calendar on the website. The web application is built using ReactJS, Axios, HTML, and OpenWeather. The main purpose of the application is to help users stay organized by providing a platform to manage and schedule their events and reminders.",
-    languages: ["reactjs", "Axios", "html", "OpenWeather"],
+    languages: ["ReactJS", "Axios", "HTML", "OpenWeather"],
   },
   {
     id: 3,
@@ -36,9 +36,20 @@ export const data = [
   },
   {
     id: 4,
-    image: "https://via.placeholder.com/200x200",
-    title: "Meme Generator",
-    description: "A Meme Generator",
-    languages: ["reactjs"],
+    image: "/images/todo.png",
+    title: "ToDo-matic",
+    description:
+      "A dynamic and user-friendly Todo List application, built using ReactJS, that helps users effortlessly manage and organize their tasks",
+    url: "https://gabbs27.github.io/todolist/",
+    languages: ["ReactJS"],
+  },
+
+  {
+    id: 5,
+    image: "/images/memegenerator.png",
+    title: "Memelogy",
+    description: "A simple meme generator using ReactJs and ImgFlip API",
+    url: "https://gabbs27.github.io/meme-generator/",
+    languages: ["ReactJS", "ImgFlip API", "React Hooks"],
   },
 ];
