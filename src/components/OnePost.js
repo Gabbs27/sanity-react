@@ -5,6 +5,9 @@ import BlockContent from "@sanity/block-content-to-react";
 import imageUrlBuilder from "@sanity/image-url";
 import { Fade } from "react-reveal";
 import NotFound from "./NotFound.js";
+import ReactGA from "react-ga";
+ReactGA.initialize("G-76H28FJYRY");
+ReactGA.pageview(window.location.pathname + window.location.search);
 
 const builder = imageUrlBuilder(sanityClient);
 function urlFor(source) {
@@ -51,9 +54,10 @@ export default function OnePost() {
             <div className='absolute h-full w-full flex items-center justify-center p-8'>
               {/* Title Section */}
               <div className='bg-white bg-opacity-75 rounded p-12'>
-                <h2 className='cursive text-3xl lg:text-6xl mb-4'>
+                <h2 className='cursive text-3xl lg:text-6xl mb-4 leading-normal lg:leading-relaxed'>
                   {postData.title}
                 </h2>
+
                 <div className='flex justify-center text-gray-800'>
                   <img
                     src={urlFor(postData.authorImage).url()}

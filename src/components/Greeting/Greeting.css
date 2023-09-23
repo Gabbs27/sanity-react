@@ -79,13 +79,15 @@
     .greeting-nickname {
       font-size: 25px;
       text-align: center;
+      font-family: 'Bebas Neue', sans-serif;
     }
     .greeting-text-p {
-      font-size: 16px;
-      margin-right: 0px;
-      line-height: normal;
+      font-size: 14px;
       text-align: center;
+      margin-left: 40px;
+      line-height: 1.5; /* Set line height to a numeric value to improve readability */
     }
+    
     .greeting-main {
       display: block;
     }

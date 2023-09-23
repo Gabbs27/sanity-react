@@ -2,8 +2,11 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import PostCard from "./card/PostCard";
 import Fade from "react-reveal/Fade";
-import Greeting from "./Greeting/PostGreeting";
+import ReposGreeting from "./Greeting/ReposGreeting";
 import github from "../assets/github.png";
+import ReactGA from "react-ga";
+ReactGA.initialize("G-76H28FJYRY");
+ReactGA.pageview(window.location.pathname + window.location.search);
 
 const Repos = () => {
   const [allrepos, setallRepos] = useState([]);
@@ -43,15 +46,16 @@ const Repos = () => {
 
   return (
     <div className='min-h-screen p-12'>
-      <div className='container mx-auto'>
-        <Greeting />
+      <div className='container mx-auto py-12'>
+        <ReposGreeting />
         <div className='flex mt-6'>
           <input
             type='text'
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder='Search posts'
-            className='ml-auto w-64 p-2 mt-2 border border-gray-400 rounded-md focus:ring-pink-500'
+            placeholder='Search Repos'
+            className='ml-auto w-full md:w-64 p-2 mt-2 border border-gray-400 rounded-md focus:ring-pink-500'
+            style={{ maxWidth: "100%" }}
           />
         </div>
         <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-8'>
@@ -69,7 +73,7 @@ const Repos = () => {
             );
           })}
         </div>
-        <div className='flex justify-center mt-12'>
+        <div className='flex justify-center mt-0 mb-12'>
           {pageNumbers.map((number) => (
             <button
               key={number}

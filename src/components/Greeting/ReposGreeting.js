@@ -3,19 +3,20 @@ import "./Greeting.css";
 import { Fade } from "react-reveal";
 import p from "../../assets/p-red.png";
 
-const Greeting = () => {
+const ReposGreeting = () => {
   return (
     <Fade bottom duration={2000} distance='40px'>
       <div className='greet-main mb-10'>
         <div className='greeting-main'>
           <div className='greeting-text-div'>
             <div>
-              <h1 className='greeting-text mb-6'>Gabriel Abreu</h1>
-              <h2 className='greeting-nickname mb-6'>( Gabbs279)</h2>
-              <p className='greeting-text-p'>
-                A driven individual who strives to develop sustainable, scalable
-                solutions for both social and technical systems, always seeking
-                to create a lasting impact.
+              <h1 className='greeting-text mb-6'>Repositories</h1>
+              <h2 className='greeting-nickname mb-6'>(Gabbs279)</h2>
+              <p className='greeting-text-p subTitle mt-'>
+                Explore my public GitHub repositories that showcase my diverse
+                development skills across various projects, from web development
+                to innovative solutions. Get a glimpse of my expertise in
+                software development and see the breadth of my work.
               </p>
             </div>
           </div>
@@ -54,4 +55,4 @@ const Greeting = () => {
 //   </div>
 // </div>
 
-export default Greeting;
+export default ReposGreeting;
