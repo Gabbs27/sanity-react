@@ -25,23 +25,26 @@ export default function AllPosts() {
   useEffect(() => {
     sanityClient
       .fetch(
-        `*[_type == "post"]{
-        title,
-        slug,
-        mainImage{
-        asset->{
-          _id,
-          url
-        }
-      }
-    }`
+        `*[_type == "post"] | order(publishedAt desc){
+            title,
+            slug,
+            mainImage{
+            asset->{
+              _id,
+              url
+            },
+          },
+          publishedAt
+        }`
       )
-      .then((data) => {
-        setAllPosts(data);
-        console.log(data);
-      })
+      .then((data) => setAllPosts(data))
       .catch(console.error);
   }, []);
+
+  const formatDate = (dateString) => {
+    const options = { year: "numeric", month: "long", day: "numeric" }; // Customize the format
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
 
   const pageNumbers = [];
   for (let i = 1; i <= Math.ceil(filteredPosts.length / postsPerPage); i++) {
@@ -70,7 +73,7 @@ export default function AllPosts() {
                   <PostCard
                     image={post.mainImage.asset.url}
                     title={post.title}
-                    description=''
+                    description={formatDate(post.publishedAt)}  
                     url={"/" + post.slug.current}
                     languages={[]}
                   />
