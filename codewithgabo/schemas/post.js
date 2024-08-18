@@ -49,12 +49,19 @@ export default defineType({
       title: 'Body',
       type: 'blockContent',
     }),
+    defineField({
+      name: 'likes',
+      title: 'Likes',
+      type: 'number',
+      description: 'Number of likes this post has received',
+    }),
   ],
 
   preview: {
     select: {
       title: 'title',
       author: 'author.name',
+      likes: 'likes',
       media: 'mainImage',
     },
     prepare(selection) {

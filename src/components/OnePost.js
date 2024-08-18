@@ -6,6 +6,10 @@ import imageUrlBuilder from "@sanity/image-url";
 import { Fade } from "react-reveal";
 import NotFound from "./NotFound.js";
 import ReactGA from "react-ga";
+
+import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
+import { nightOwl } from "react-syntax-highlighter/dist/esm/styles/hljs";
+
 ReactGA.initialize("G-76H28FJYRY");
 ReactGA.pageview(window.location.pathname + window.location.search);
 
@@ -22,20 +26,24 @@ export default function OnePost() {
     sanityClient
       .fetch(
         `*[slug.current == "${slug}"]{
-           title,
-           slug,
-           mainImage{
-           asset->{
+          title,
+          slug,
+          mainImage{
+            asset->{
               _id,
               url
             }
           },
           body,
           "name": author->name,
-          "authorImage": author->image
-       }`
+          "authorImage": author->image,
+          likes
+        }`
       )
-      .then((data) => setPostData(data[0]))
+      .then((data) => {
+        setPostData(data[0]);
+        console.log("Fetched data:", data);
+      })
       .catch(console.error);
   }, [slug]);
 
@@ -45,6 +53,40 @@ export default function OnePost() {
         <NotFound />
       </div>
     );
+
+  // Update your serializers to use the custom style
+  const serializers = {
+    types: {
+      block: (props) => {
+        if (props.node.style === "code") {
+          const codeString = props.node.children
+            .map((child) => child.text)
+            .join("");
+          return (
+            <SyntaxHighlighter
+              style={{ ...nightOwl }}
+              wrapLines={true}
+              className='syntax-highlight'>
+              {codeString}
+            </SyntaxHighlighter>
+          );
+        }
+        return BlockContent.defaultSerializers.types.block(props);
+      },
+    },
+  };
+
+  const handleLike = () => {
+    const currentLikes = postData.likes || 0;
+    sanityClient
+      .patch(postData._id)
+      .set({ likes: currentLikes + 1 })
+      .commit()
+      .then((_updatedPost) => {
+        setPostData({ ...postData, likes: currentLikes + 1 });
+      })
+      .catch((error) => console.error("Error liking post:", error));
+  };
 
   return (
     <Fade>
@@ -77,11 +119,15 @@ export default function OnePost() {
               style={{ height: "300px" }}
             />
           </div>
+          {/* <button onClick={handleLike} className='like-button'>
+            ❤️ {postData.likes || 0}
+          </button> */}
           <div className='px-16 lg:px-48 py-12 lg:py-20 prose lg:prose-xl max-w-full'>
             <BlockContent
               blocks={postData.body}
               projectId={sanityClient.clientConfig.projectId}
               dataset={sanityClient.clientConfig.dataset}
+              serializers={serializers}
             />
           </div>
         </div>
