@@ -76,7 +76,7 @@ const NavBar = () => {
           <li>
             <NavLink
               className='nav-link'
-              to='/educacion'
+              to='/Education'
               onClick={handleMenuItemClick}>
               Education
             </NavLink>
