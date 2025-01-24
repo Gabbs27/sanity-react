@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import sanityClient from "../client.js";
+import sanityClient from "../client";
 import BlockContent from "@sanity/block-content-to-react";
-import imageUrlBuilder from "@sanity/image-url";
-import { Fade } from "react-reveal";
-import NotFound from "./NotFound.js";
+import Fade from "react-reveal/Fade";
+import "./OnePost.css";
 import ReactGA from "react-ga";
 
 import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -13,19 +12,14 @@ import { nightOwl } from "react-syntax-highlighter/dist/esm/styles/hljs";
 ReactGA.initialize("G-76H28FJYRY");
 ReactGA.pageview(window.location.pathname + window.location.search);
 
-const builder = imageUrlBuilder(sanityClient);
-function urlFor(source) {
-  return builder.image(source);
-}
-
-export default function OnePost() {
+const OnePost = () => {
   const [postData, setPostData] = useState(null);
   const { slug } = useParams();
 
   useEffect(() => {
     sanityClient
       .fetch(
-        `*[slug.current == "${slug}"]{
+        `*[slug.current == $slug]{
           title,
           slug,
           mainImage{
@@ -36,23 +30,15 @@ export default function OnePost() {
           },
           body,
           "name": author->name,
-          "authorImage": author->image,
-          likes
-        }`
+          publishedAt
+        }`,
+        { slug }
       )
-      .then((data) => {
-        setPostData(data[0]);
-        console.log("Fetched data:", data);
-      })
+      .then((data) => setPostData(data[0]))
       .catch(console.error);
   }, [slug]);
 
-  if (!postData)
-    return (
-      <div>
-        <NotFound />
-      </div>
-    );
+  if (!postData) return <div>Loading...</div>;
 
   // Update your serializers to use the custom style
   const serializers = {
@@ -90,48 +76,42 @@ export default function OnePost() {
 
   return (
     <Fade>
-      <div className='min-h-screen p-12'>
-        <div className='container shadow-lg mx-auto bg-green-100 rounded-lg'>
-          <div className='relative'>
-            <div className='absolute h-full w-full flex items-center justify-center p-8'>
-              {/* Title Section */}
-              <div className='bg-white bg-opacity-75 rounded p-12'>
-                <h2 className='cursive text-3xl lg:text-6xl mb-4 leading-normal lg:leading-relaxed'>
-                  {postData.title}
-                </h2>
-
-                <div className='flex justify-center text-gray-800'>
-                  <img
-                    src={urlFor(postData.authorImage).url()}
-                    className='w-10 h-10 rounded-full'
-                    alt='Author is Gabriel'
-                  />
-                  <h4 className='cursive flex items-center pl-2 text-2xl'>
-                    {postData.name}
-                  </h4>
-                </div>
-              </div>
-            </div>
+      <article className='single-post'>
+        <div className='post-header'>
+          {postData.mainImage && (
             <img
-              className='w-full object-cover rounded-t'
-              src={urlFor(postData.mainImage).url()}
-              alt=''
-              style={{ height: "300px" }}
+              src={postData.mainImage.asset.url}
+              alt={postData.title}
+              className='post-main-image'
             />
-          </div>
-          {/* <button onClick={handleLike} className='like-button'>
-            ❤️ {postData.likes || 0}
-          </button> */}
-          <div className='px-16 lg:px-48 py-12 lg:py-20 prose lg:prose-xl max-w-full'>
-            <BlockContent
-              blocks={postData.body}
-              projectId={sanityClient.clientConfig.projectId}
-              dataset={sanityClient.clientConfig.dataset}
-              serializers={serializers}
-            />
+          )}
+          <div className='post-header-content'>
+            <h1 className='post-title'>{postData.title}</h1>
+            <div className='post-meta'>
+              {postData.name && (
+                <span className='post-author'>By {postData.name}</span>
+              )}
+              <span className='post-date'>
+                {new Date(postData.publishedAt).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </span>
+            </div>
           </div>
         </div>
-      </div>
+
+        <div className='post-content'>
+          <BlockContent
+            blocks={postData.body}
+            projectId={process.env.REACT_APP_SANITY_PROJECT_ID}
+            dataset='production'
+          />
+        </div>
+      </article>
     </Fade>
   );
-}
+};
+
+export default OnePost;

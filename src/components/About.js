@@ -2,35 +2,26 @@ import React from "react";
 import Fade from "react-reveal/Fade";
 import aboutdata from "../assets/about";
 import ReactGA from "react-ga";
+
 ReactGA.initialize("G-76H28FJYRY");
 ReactGA.pageview(window.location.pathname + window.location.search);
+
 const About = () => {
   return (
-    <div className='min-h-screen p-12'>
-      <div className='container shadow-lg mx-auto rounded-lg py-12'>
+    <div className='min-h-screen p-12 bg-background'>
+      <div className='container mx-auto'>
         <Fade bottom duration={2000} distance='40px'>
-          <div className='greet-main mb-10'>
-            <div className='greeting-main'>
-              <div className='greeting-text-div'>
-                <div>
-                  <h1 className='greeting-text mb-6 ml-6'>{aboutdata.title}</h1>
-                  <h2 className='greeting-nickname mt-6 mb-10 ml-6'>
-                    {aboutdata.subtitle}
-                  </h2>
-                  <p className='greeting-text-p text-base mt-6 ml-6'>
-                    {aboutdata.first_paragraph}
-                  </p>
-                  <p className='greeting-text-p subTitle mt-6 ml-6'>
-                    {aboutdata.second_paragraph}
-                  </p>
-                  <p className='greeting-text-p subTitle mt-6 ml-6'>
-                    {aboutdata.third_paragraph}
-                  </p>
-                  <p className='greeting-text-p subTitle mt-6 ml-6'>
-                    {aboutdata.fourth_paragraph}
-                  </p>
-                </div>
-              </div>
+          <div className='about-container'>
+            <div className='about-header'>
+              <h1 className='about-title'>{aboutdata.title}</h1>
+              <h2 className='about-subtitle'>{aboutdata.subtitle}</h2>
+            </div>
+
+            <div className='about-content'>
+              <p className='about-paragraph'>{aboutdata.first_paragraph}</p>
+              <p className='about-paragraph'>{aboutdata.second_paragraph}</p>
+              <p className='about-paragraph'>{aboutdata.third_paragraph}</p>
+              <p className='about-paragraph'>{aboutdata.fourth_paragraph}</p>
             </div>
           </div>
         </Fade>

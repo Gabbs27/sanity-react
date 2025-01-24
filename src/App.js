@@ -7,6 +7,8 @@ import Portfolio from "./components/Portfolio.js";
 import Me from "./components/Me.js";
 import Repos from "./components/Repos";
 import NotFound from "./components/NotFound.js";
+import Education from "./components/Education.js";
+import Services from "./components/Services";
 
 function App() {
   return (
@@ -18,6 +20,8 @@ function App() {
       <Route element={<Portfolio />} exact path='/' />
       <Route element={<Me />} exact path='/Gabriel-Abreu' />
       <Route element={<Repos />} exact path='/Repositorios' />
+      <Route element={<Education />} exact path='/Education' />
+      <Route element={<Services />} exact path='/services' />
     </Routes>
   );
 }

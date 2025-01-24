@@ -1,0 +1,98 @@
+.single-post {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.post-header {
+  margin-bottom: 2rem;
+}
+
+.post-main-image {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+  border-radius: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.post-header-content {
+  text-align: center;
+}
+
+.post-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #2D3047;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.post-meta {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  color: #6B7280;
+  font-size: 1rem;
+}
+
+.post-author {
+  color: #419D78;
+  font-weight: 500;
+}
+
+.post-content {
+  font-size: 1.125rem;
+  line-height: 1.8;
+  color: #4B5563;
+}
+
+.post-content p {
+  margin-bottom: 1.5rem;
+}
+
+.post-content h2 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #2D3047;
+  margin: 2rem 0 1rem;
+}
+
+.post-content h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2D3047;
+  margin: 1.5rem 0 1rem;
+}
+
+.post-content a {
+  color: #419D78;
+  text-decoration: underline;
+}
+
+.post-content a:hover {
+  color: #357d61;
+}
+
+.post-content ul, .post-content ol {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+}
+
+.post-content li {
+  margin-bottom: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .post-title {
+    font-size: 2rem;
+  }
+
+  .post-main-image {
+    height: 300px;
+  }
+
+  .post-content {
+    font-size: 1rem;
+  }
+} 
