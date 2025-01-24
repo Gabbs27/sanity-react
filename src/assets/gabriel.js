@@ -2,12 +2,15 @@ const Me = {
   id: 1,
   title: "Francisco Gabriel Abreu Cornelio",
   subtitle:
-    "Full Stack Developer (Remote) | ReactJs | C# | JavaScript | Challenge-aholic",
+    "Senior Full Stack Developer | React | .NET | JavaScript | Cloud Solutions",
   description:
-    "I'm a Full Stack Software Developer with over 6+ years of hands-on experience in designing and implementing software solutions using ReactJS, C#, and JavaScript. " +
-    "I thrive in collaborative team environments, where I can contribute to and learn from others, but I'm equally capable of delivering high-quality results independently. " +
-    "My passion lies in creating innovative IT solutions that not only meet client needs but also push the boundaries of what's possible. " +
-    "I'm deeply committed to continuous personal and professional growth, constantly seeking to enhance my skills by learning new programming languages, adopting the latest technologies, and mastering agile methodologies. " +
-    "Every day, I strive to improve not just my technical abilities but also my leadership and communication skills, ensuring that I grow both as a developer and as a professional in the industry.",
+    "I'm a Senior Full Stack Developer with 8+ years of experience specializing in React, .NET, and cloud technologies. " +
+    "Currently focused on building scalable enterprise solutions and mentoring development teams. " +
+    "My expertise includes architecting complex web applications, implementing cloud-native solutions, and driving technical innovation. " +
+    "I'm passionate about creating efficient, maintainable code and staying current with emerging technologies. " +
+    "Looking to collaborate on challenging projects that push the boundaries of modern web development.",
+  resumeUrl: "cv.pdf",
+  year: "2025",
 };
+
 export default Me;

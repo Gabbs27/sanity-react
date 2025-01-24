@@ -1,47 +1,40 @@
 import React from "react";
+import "./Card.css";
 
-const Card = (props) => {
+const Card = ({ id, url, image, title, description, languages }) => {
   return (
-    <div
-      className='block h-64 relative rounded  hover:shadow-lg leading-snug bg-white
-    border-l-8 border-green-400 mb-40 ml-4 mt-4'
-      key={props.id}>
-      <a
-        href={props.url}
-        className=''
-        target='_blank'
-        rel='noopener noreferrer'>
+    <article className='project-card'>
+      <div className='card-image-container'>
         <img
-          src={process.env.PUBLIC_URL + props.image}
-          alt={props.title}
-          className='w-full h-full rounded-r object-cover absolute'
+          src={process.env.PUBLIC_URL + image}
+          alt={title}
+          className='card-image'
         />
-
-        <span
-          className='block relative h-full flex justify-end items-end pr
-    -4 pb-4'>
-          <h2
-            className='text-gray-800 text-lg font-bold px-3 py-4 bg-red-700
-      text-red-100  rounded'>
-            {props.title}
-          </h2>
-        </span>
-      </a>
-      <p className='mt-5'>{props.description}</p>
-      <div className='flex flex-wrap'>
-        {props.languages.map((language, index) => {
-          return (
-            <span
-              key={index}
-              className='bg-gray-300 text-gray-800 font-medium px-2 py-1 mr-2 mb-2 rounded-full hover:bg-blue hover:text-white'>
-              #{language}
-            </span>
-          );
-        })}
+        <div className='card-overlay'>
+          <a
+            href={url}
+            className='view-project'
+            target='_blank'
+            rel='noopener noreferrer'>
+            View Project
+          </a>
+        </div>
       </div>
-    </div>
+
+      <div className='card-content'>
+        <h3 className='card-title'>{title}</h3>
+        <p className='card-description'>{description}</p>
+
+        <div className='card-tags'>
+          {languages.map((language, index) => (
+            <span key={index} className='tag'>
+              {language}
+            </span>
+          ))}
+        </div>
+      </div>
+    </article>
   );
 };
 
 export default Card;
-

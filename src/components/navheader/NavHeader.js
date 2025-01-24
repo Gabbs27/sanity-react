@@ -9,7 +9,6 @@ const NavBar = () => {
 
   const handleMenuToggle = () => {
     setMenuOpen(!menuOpen);
-    console.log(menuOpen);
   };
 
   const handleMenuItemClick = () => {
@@ -22,66 +21,41 @@ const NavBar = () => {
   return (
     <Fade>
       <header className='header'>
-        <div className='logo'>
-          <img src={head} alt='Logo' className='header--img' />
-          {/* <span className='logo-name'>Code With Gabo</span> */}
-        </div>
-        <div className='menu-btn' onClick={handleMenuToggle}>
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-        <ul className={`menu ${menuOpen ? "open" : ""}`}>
-          <li>
-            <NavLink
-              to='/'
-              activeClassName='active'
-              onClick={handleMenuItemClick}>
+        <nav className='nav-container'>
+          <div className='nav-logo'>
+            <NavLink to='/' className='logo-link'>
+              Code With Gabo
+            </NavLink>
+          </div>
+
+          <button
+            className='menu-toggle'
+            onClick={handleMenuToggle}
+            aria-label='Toggle menu'>
+            <span className={`hamburger ${menuOpen ? "open" : ""}`}></span>
+          </button>
+
+          <div className={`nav-links ${menuOpen ? "show" : ""}`}>
+            <NavLink to='/' className='nav-item'>
               Portfolio
             </NavLink>
-          </li>
-          <li>
-            <NavLink
-              className='nav-link'
-              to='/allpost'
-              onClick={handleMenuItemClick}>
-              All Posts
+            <NavLink to='/allpost' className='nav-item'>
+              Blog
             </NavLink>
-          </li>
-          <li>
-            <NavLink
-              className='nav-link'
-              to='/about'
-              onClick={handleMenuItemClick}>
+            <NavLink to='/services' className='nav-item'>
+              Services
+            </NavLink>
+            <NavLink to='/about' className='nav-item'>
               About
             </NavLink>
-          </li>
-          <li>
-            <NavLink
-              className='nav-link'
-              to='/gabriel-abreu'
-              onClick={handleMenuItemClick}>
-              Gabriel Abreu
+            <NavLink to='/gabriel-abreu' className='nav-item'>
+              Contact
             </NavLink>
-          </li>
-
-          <li>
-            <NavLink
-              className='nav-link'
-              to='/Repositorios'
-              onClick={handleMenuItemClick}>
-              Repositories
+            <NavLink to='/repositories' className='nav-item'>
+              Projects
             </NavLink>
-          </li>
-          <li>
-            <NavLink
-              className='nav-link'
-              to='/Education'
-              onClick={handleMenuItemClick}>
-              Education
-            </NavLink>
-          </li>
-        </ul>
+          </div>
+        </nav>
       </header>
     </Fade>
   );

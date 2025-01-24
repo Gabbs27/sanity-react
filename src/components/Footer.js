@@ -10,7 +10,7 @@ export default function Footer() {
   return (
     <footer className='footer--t'>
       <div className='footer--text'>
-        <p>Copyright © 2023 - Gabriel Abreu </p>
+        <p>Copyright © 2025 - Gabriel Abreu </p>
       </div>
       <div className='footer--buttons'>
         <button
