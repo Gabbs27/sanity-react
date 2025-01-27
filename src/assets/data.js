@@ -1,6 +1,15 @@
 export const data = [
   {
     id: 1,
+    image: "/images/HairSalon.png",
+    title: "Hair Salon & Spa",
+    description:
+      "A modern, responsive website for a luxury salon and spa built with React and TypeScript. Features include service menu PDFs, location information, Instagram feed integration, and WhatsApp booking functionality.",
+    url: "https://gabbs27.github.io/hair-salon-spa/",
+    languages: ["React", "TypeScript", "Vite", "CSS3", "GitHub Actions"],
+  },
+  {
+    id: 2,
     image: "/images/invoice_generator.png",
     url: "https://gabbs27.github.io/invoice-generator/",
     title: "Invoice Generator",
@@ -9,7 +18,7 @@ export const data = [
     languages: ["ReactJS", "typescript"],
   },
   {
-    id: 2,
+    id: 3,
     image: "/images/calendar.png",
     url: "https://gabbs27.github.io/calendar-reminder/",
     title: "My React Calendar",
@@ -18,7 +27,7 @@ export const data = [
     languages: ["ReactJS", "Axios", "HTML", "OpenWeather"],
   },
   {
-    id: 3,
+    id: 4,
     image: "/images/movie.png",
     url: "https://gabbs27.github.io/gmovie-app/",
     title: "G-Movie",
@@ -35,7 +44,7 @@ export const data = [
     ],
   },
   {
-    id: 4,
+    id: 5,
     image: "/images/todo.png",
     title: "ToDo-matic",
     description:
@@ -45,7 +54,7 @@ export const data = [
   },
 
   {
-    id: 5,
+    id: 6,
     image: "/images/memegenerator.png",
     title: "Memelogy",
     description: "A simple meme generator using ReactJs and ImgFlip API",
