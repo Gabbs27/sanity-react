@@ -1,29 +1,37 @@
 import React from "react";
-import Fade from "react-reveal/Fade";
+import AnimatedSection from "./common/AnimatedSection";
+import SEO from "./common/SEO";
 import NotFoundCard from "./card/NotFoundCard";
-import ReactGA from "react-ga";
-ReactGA.initialize("G-76H28FJYRY");
-ReactGA.pageview(window.location.pathname + window.location.search);
+import usePageTracking from "../hooks/useAnalytics";
 
 export default function NotFound() {
+  usePageTracking();
+  
   return (
-    <div className='min-h-screen p-12 '>
-      <div className='container py-10'>
-        <Fade bottom duration={2000} distance='40px'>
-          <div className='greet-main mb-10'>
-            <div className='greeting-main'>
-              <div className='greeting-text-div'>
-                <NotFoundCard
-                  name='Not Found'
-                  description="Definitely Something's wrong"
-                  image=''
-                  title="Something's wrong"
-                />
+    <>
+      <SEO
+        title="Page Not Found - 404"
+        description="The page you're looking for doesn't exist."
+        url="http://codewithgabo.com"
+      />
+      <div className='min-h-screen p-12'>
+        <div className='container py-10'>
+          <AnimatedSection variant="fadeInUp" duration={0.8}>
+            <section className='greet-main mb-10'>
+              <div className='greeting-main'>
+                <div className='greeting-text-div'>
+                  <NotFoundCard
+                    name='Not Found'
+                    description="Definitely Something's wrong"
+                    image=''
+                    title="Something's wrong"
+                  />
+                </div>
               </div>
-            </div>
-          </div>
-        </Fade>
+            </section>
+          </AnimatedSection>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

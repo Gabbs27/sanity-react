@@ -1,12 +1,20 @@
 import React from "react";
 import "./Card.css";
 
-const Card = ({ id, url, image, title, description, languages }) => {
+const Card = ({ id, url, image, title, description, languages, badge }) => {
+  // Detectar si la URL es interna (empieza con / o #)
+  const isInternalLink = url.startsWith("/") || url.startsWith("#");
+  
+  // Determinar si la imagen es una URL externa
+  const imageUrl = image.startsWith("http") ? image : process.env.PUBLIC_URL + image;
+
   return (
     <article className='project-card'>
+      {badge && <div className='card-badge'>{badge}</div>}
+      
       <div className='card-image-container'>
         <img
-          src={process.env.PUBLIC_URL + image}
+          src={imageUrl}
           alt={title}
           className='card-image'
         />
@@ -14,9 +22,9 @@ const Card = ({ id, url, image, title, description, languages }) => {
           <a
             href={url}
             className='view-project'
-            target='_blank'
-            rel='noopener noreferrer'>
-            View Project
+            target={isInternalLink ? '_self' : '_blank'}
+            rel={isInternalLink ? undefined : 'noopener noreferrer'}>
+            {isInternalLink ? 'View Demo' : 'View Project'}
           </a>
         </div>
       </div>
