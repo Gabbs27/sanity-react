@@ -1,5 +1,15 @@
 export const data = [
   {
+    id: 0,
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=450&fit=crop",
+    title: "Analytics Dashboard",
+    description:
+      "Interactive analytics dashboard with real-time data visualization. Features Google Analytics 4 integration, custom charts with Recharts, and responsive design. Includes admin authentication and mock data demo mode.",
+    url: "/#/dashboard-demo",
+    languages: ["React", "GA4 API", "Recharts", "Framer Motion", "Node.js", "Express"],
+    badge: "New",
+  },
+  {
     id: 1,
     image: "/images/HairSalon.png",
     title: "Hair Salon & Spa",

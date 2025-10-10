@@ -90,6 +90,13 @@
   border-radius: 2px;
 }
 
+/* Dashboard link (dev only) */
+.nav-item-dashboard {
+  border-left: 2px solid var(--color-border);
+  padding-left: 2rem !important;
+  margin-left: 1rem;
+}
+
 /* Remove any other hover styles that might be conflicting */
 .menu li a:hover,
 .header .menu-btn:hover {

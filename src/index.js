@@ -14,6 +14,7 @@ import Footer from "./components/Footer";
 import Navbar from "./components/navheader/NavHeader";
 import ErrorBoundary from "./components/common/ErrorBoundary";
 import { ThemeProvider } from "./context/ThemeContext";
+import { AuthProvider } from "./context/AuthContext";
 import InstallPWA from "./components/InstallPWA/InstallPWA";
 import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 
@@ -23,23 +24,25 @@ root.render(
   <React.StrictMode>
     <ErrorBoundary>
       <ThemeProvider>
-        <HelmetProvider>
-          <HashRouter>
-            <StyletronProvider value={engine}>
-              <BaseProvider theme={LightTheme}>
-                <a href="#main-content" className="skip-link">
-                  Skip to main content
-                </a>
-                <Navbar />
-                <main id="main-content" role="main">
-                  <App />
-                </main>
-                <Footer />
-                <InstallPWA />
-              </BaseProvider>
-            </StyletronProvider>
-          </HashRouter>
-        </HelmetProvider>
+        <AuthProvider>
+          <HelmetProvider>
+            <HashRouter>
+              <StyletronProvider value={engine}>
+                <BaseProvider theme={LightTheme}>
+                  <a href="#main-content" className="skip-link">
+                    Skip to main content
+                  </a>
+                  <Navbar />
+                  <main id="main-content" role="main">
+                    <App />
+                  </main>
+                  <Footer />
+                  <InstallPWA />
+                </BaseProvider>
+              </StyletronProvider>
+            </HashRouter>
+          </HelmetProvider>
+        </AuthProvider>
       </ThemeProvider>
     </ErrorBoundary>
   </React.StrictMode>

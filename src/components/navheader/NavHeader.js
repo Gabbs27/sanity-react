@@ -57,6 +57,11 @@ const NavBar = () => {
             <NavLink to='/repositorios' className='nav-item' onClick={handleMenuItemClick} role="menuitem">
               Projects
             </NavLink>
+            {process.env.NODE_ENV === 'development' && (
+              <NavLink to='/dashboard' className='nav-item nav-item-dashboard' onClick={handleMenuItemClick} role="menuitem">
+                Dashboard
+              </NavLink>
+            )}
           </div>
         </nav>
       </header>
