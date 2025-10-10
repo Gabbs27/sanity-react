@@ -2,13 +2,11 @@ import React, { useEffect, useState } from "react";
 import Card from "./card/Card";
 import Fade from "react-reveal/Fade";
 import { data } from "../assets/data";
-import ReactGA from "react-ga";
+import usePageTracking from "../hooks/useAnalytics";
 import Greeting from "./Greeting/Greeting";
 
-ReactGA.initialize("G-76H28FJYRY");
-ReactGA.pageview(window.location.pathname + window.location.search);
-
 const Portfolio = () => {
+  usePageTracking();
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredData, setFilteredData] = useState([]);
 

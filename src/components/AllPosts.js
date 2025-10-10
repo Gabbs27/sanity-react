@@ -4,10 +4,10 @@ import Fade from "react-reveal/Fade";
 import sanityClient from "../client.js";
 import PostCard from "./card/PostCard";
 import PostGreeting from "./Greeting/PostGreeting";
-import ReactGA from "react-ga";
-ReactGA.initialize("G-76H28FJYRY");
-ReactGA.pageview(window.location.pathname + window.location.search);
+import usePageTracking from "../hooks/useAnalytics";
+
 export default function AllPosts() {
+  usePageTracking();
   const [allPostsData, setAllPosts] = useState([]);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);

@@ -2,15 +2,13 @@ import React from "react";
 import Fade from "react-reveal/Fade";
 import p from "../assets/p-red.png";
 import medata from "../assets/gabriel";
-import ReactGA from "react-ga";
+import usePageTracking from "../hooks/useAnalytics";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faFilePdf } from "@fortawesome/free-solid-svg-icons";
 import { faGithub, faLinkedin } from "@fortawesome/free-brands-svg-icons";
 
-ReactGA.initialize("G-76H28FJYRY");
-ReactGA.pageview(window.location.pathname + window.location.search);
-
 const Me = () => {
+  usePageTracking();
   return (
     <div className='min-h-screen p-12 bg-background'>
       <div className='container mx-auto'>

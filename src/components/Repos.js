@@ -4,11 +4,10 @@ import PostCard from "./card/PostCard";
 import Fade from "react-reveal/Fade";
 import ReposGreeting from "./Greeting/ReposGreeting";
 import github from "../assets/github.png";
-import ReactGA from "react-ga";
-ReactGA.initialize("G-76H28FJYRY");
-ReactGA.pageview(window.location.pathname + window.location.search);
+import usePageTracking from "../hooks/useAnalytics";
 
 const Repos = () => {
+  usePageTracking();
   const [allrepos, setallRepos] = useState([]);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -24,9 +23,9 @@ const Repos = () => {
     : [];
 
   useEffect(() => {
-    const apiUrl = `https://api.github.com/users/Gabbs27/repos?per_page=20`;
+    const apiUrl = `https://api.github.com/users/${process.env.REACT_APP_GITHUB_USERNAME}/repos?per_page=20`;
     const headers = {
-      Authorization: "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",
+      Authorization: `${process.env.REACT_APP_GITHUB_TOKEN}`,
     };
     axios
       .get(apiUrl, { headers })

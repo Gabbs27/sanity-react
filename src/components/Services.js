@@ -11,10 +11,7 @@ import {
   faCloud,
   faArrowRight,
 } from "@fortawesome/free-solid-svg-icons";
-import ReactGA from "react-ga";
-
-ReactGA.initialize("G-76H28FJYRY");
-ReactGA.pageview(window.location.pathname + window.location.search);
+import usePageTracking from "../hooks/useAnalytics";
 
 const services = [
   {
@@ -56,6 +53,8 @@ const services = [
 ];
 
 const Services = () => {
+  usePageTracking();
+  
   return (
     <div className='min-h-screen p-12 bg-background'>
       <div className='container mx-auto'>

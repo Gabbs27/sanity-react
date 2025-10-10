@@ -4,15 +4,13 @@ import sanityClient from "../client";
 import BlockContent from "@sanity/block-content-to-react";
 import Fade from "react-reveal/Fade";
 import "./OnePost.css";
-import ReactGA from "react-ga";
+import usePageTracking from "../hooks/useAnalytics";
 
 import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
 import { nightOwl } from "react-syntax-highlighter/dist/esm/styles/hljs";
 
-ReactGA.initialize("G-76H28FJYRY");
-ReactGA.pageview(window.location.pathname + window.location.search);
-
 const OnePost = () => {
+  usePageTracking();
   const [postData, setPostData] = useState(null);
   const { slug } = useParams();
 
@@ -106,7 +104,7 @@ const OnePost = () => {
           <BlockContent
             blocks={postData.body}
             projectId={process.env.REACT_APP_SANITY_PROJECT_ID}
-            dataset='production'
+            dataset={process.env.REACT_APP_SANITY_DATASET}
           />
         </div>
       </article>
