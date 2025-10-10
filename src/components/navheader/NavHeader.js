@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import "./NavHeader.css";
+import ThemeToggle from "../ThemeToggle/ThemeToggle";
 import head from "../../assets/head.png";
 
 const NavBar = () => {
@@ -26,13 +27,16 @@ const NavBar = () => {
             </NavLink>
           </div>
 
-          <button
-            className='menu-toggle'
-            onClick={handleMenuToggle}
-            aria-label='Toggle navigation menu'
-            aria-expanded={menuOpen}>
-            <span className={`hamburger ${menuOpen ? "open" : ""}`}></span>
-          </button>
+          <div className='nav-actions'>
+            <ThemeToggle />
+            <button
+              className='menu-toggle'
+              onClick={handleMenuToggle}
+              aria-label='Toggle navigation menu'
+              aria-expanded={menuOpen}>
+              <span className={`hamburger ${menuOpen ? "open" : ""}`}></span>
+            </button>
+          </div>
 
           <div className={`nav-links ${menuOpen ? "show" : ""}`} role="menubar">
             <NavLink to='/' className='nav-item' onClick={handleMenuItemClick} role="menuitem">

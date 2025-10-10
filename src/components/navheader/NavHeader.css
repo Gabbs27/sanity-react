@@ -47,6 +47,12 @@
   height: 32px;
 }
 
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
 .nav-links {
   display: flex;
   gap: 2rem;
@@ -97,6 +103,12 @@
 }
 
 @media (max-width: 768px) {
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
   .menu-toggle {
     display: block;
     background: none;
