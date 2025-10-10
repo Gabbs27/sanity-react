@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import "./NavHeader.css";
-import { Fade } from "react-reveal";
 import head from "../../assets/head.png";
 
 const NavBar = () => {
@@ -19,9 +18,8 @@ const NavBar = () => {
   };
 
   return (
-    <Fade>
-      <header className='header'>
-        <nav className='nav-container'>
+    <header className='header' role="banner">
+      <nav className='nav-container' role="navigation" aria-label="Main navigation">
           <div className='nav-logo'>
             <NavLink to='/' className='logo-link'>
               Code With Gabo
@@ -31,33 +29,33 @@ const NavBar = () => {
           <button
             className='menu-toggle'
             onClick={handleMenuToggle}
-            aria-label='Toggle menu'>
+            aria-label='Toggle navigation menu'
+            aria-expanded={menuOpen}>
             <span className={`hamburger ${menuOpen ? "open" : ""}`}></span>
           </button>
 
-          <div className={`nav-links ${menuOpen ? "show" : ""}`}>
-            <NavLink to='/' className='nav-item'>
+          <div className={`nav-links ${menuOpen ? "show" : ""}`} role="menubar">
+            <NavLink to='/' className='nav-item' onClick={handleMenuItemClick} role="menuitem">
               Portfolio
             </NavLink>
-            <NavLink to='/allpost' className='nav-item'>
+            <NavLink to='/allpost' className='nav-item' onClick={handleMenuItemClick} role="menuitem">
               Blog
             </NavLink>
-            <NavLink to='/services' className='nav-item'>
+            <NavLink to='/services' className='nav-item' onClick={handleMenuItemClick} role="menuitem">
               Services
             </NavLink>
-            <NavLink to='/about' className='nav-item'>
+            <NavLink to='/about' className='nav-item' onClick={handleMenuItemClick} role="menuitem">
               About
             </NavLink>
-            <NavLink to='/gabriel-abreu' className='nav-item'>
+            <NavLink to='/gabriel-abreu' className='nav-item' onClick={handleMenuItemClick} role="menuitem">
               Contact
             </NavLink>
-            <NavLink to='/repositories' className='nav-item'>
+            <NavLink to='/repositorios' className='nav-item' onClick={handleMenuItemClick} role="menuitem">
               Projects
             </NavLink>
           </div>
         </nav>
       </header>
-    </Fade>
   );
 };
 

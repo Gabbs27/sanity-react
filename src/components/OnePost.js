@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import sanityClient from "../client";
 import BlockContent from "@sanity/block-content-to-react";
-import Fade from "react-reveal/Fade";
+import AnimatedSection from "./common/AnimatedSection";
+import SEO from "./common/SEO";
+import LoadingSpinner from "./common/LoadingSpinner";
 import "./OnePost.css";
 import usePageTracking from "../hooks/useAnalytics";
 
@@ -36,7 +38,7 @@ const OnePost = () => {
       .catch(console.error);
   }, [slug]);
 
-  if (!postData) return <div>Loading...</div>;
+  if (!postData) return <LoadingSpinner message="Loading post..." />;
 
   // Update your serializers to use the custom style
   const serializers = {
@@ -73,42 +75,50 @@ const OnePost = () => {
   };
 
   return (
-    <Fade>
-      <article className='single-post'>
-        <div className='post-header'>
-          {postData.mainImage && (
-            <img
-              src={postData.mainImage.asset.url}
-              alt={postData.title}
-              className='post-main-image'
-            />
-          )}
-          <div className='post-header-content'>
-            <h1 className='post-title'>{postData.title}</h1>
-            <div className='post-meta'>
-              {postData.name && (
-                <span className='post-author'>By {postData.name}</span>
-              )}
-              <span className='post-date'>
-                {new Date(postData.publishedAt).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </span>
+    <>
+      <SEO
+        title={postData.title}
+        description={postData.title}
+        keywords="blog post, article, tutorial, web development"
+        url={`http://codewithgabo.com/#/${slug}`}
+      />
+      <AnimatedSection variant="fadeInUp" duration={0.6}>
+        <article className='single-post'>
+          <header className='post-header'>
+            {postData.mainImage && (
+              <img
+                src={postData.mainImage.asset.url}
+                alt={postData.title}
+                className='post-main-image'
+              />
+            )}
+            <div className='post-header-content'>
+              <h1 className='post-title'>{postData.title}</h1>
+              <div className='post-meta'>
+                {postData.name && (
+                  <span className='post-author'>By {postData.name}</span>
+                )}
+                <time className='post-date' dateTime={postData.publishedAt}>
+                  {new Date(postData.publishedAt).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </time>
+              </div>
             </div>
-          </div>
-        </div>
+          </header>
 
-        <div className='post-content'>
-          <BlockContent
-            blocks={postData.body}
-            projectId={process.env.REACT_APP_SANITY_PROJECT_ID}
-            dataset={process.env.REACT_APP_SANITY_DATASET}
-          />
-        </div>
-      </article>
-    </Fade>
+          <div className='post-content'>
+            <BlockContent
+              blocks={postData.body}
+              projectId={process.env.REACT_APP_SANITY_PROJECT_ID}
+              dataset={process.env.REACT_APP_SANITY_DATASET}
+            />
+          </div>
+        </article>
+      </AnimatedSection>
+    </>
   );
 };
 
