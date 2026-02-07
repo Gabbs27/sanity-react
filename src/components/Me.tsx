@@ -16,7 +16,7 @@ const Me = () => {
         title="Contact - Get in Touch"
         description="Get in touch with Gabriel Abreu for web development projects, collaborations, or job opportunities."
         keywords="contact Gabriel Abreu, hire developer, web development services, collaboration"
-        url="http://codewithgabo.com/#/Gabriel-Abreu"
+        url="https://codewithgabo.com/#/gabriel-abreu"
       />
       <div className='min-h-screen p-12 bg-background'>
         <div className='container mx-auto'>

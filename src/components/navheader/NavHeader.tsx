@@ -2,8 +2,6 @@ import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import "./NavHeader.css";
 import ThemeToggle from "../ThemeToggle/ThemeToggle";
-import head from "../../assets/head.png";
-
 const NavBar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 

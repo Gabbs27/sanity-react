@@ -23,7 +23,7 @@ import "./Dashboard.css";
  * ChartCard - Componente para mostrar diferentes tipos de gráficos
  */
 
-const COLORS = {
+const COLORS: Record<string, string> = {
   primary: "#419D78",
   secondary: "#4ade80",
   tertiary: "#E0A458",
@@ -32,7 +32,24 @@ const COLORS = {
   warning: "#f59e0b",
 };
 
-const ChartCard = ({ title, type = "line", data, dataKeys, height = 300 }) => {
+const getColor = (colorKey?: string): string => COLORS[colorKey ?? "primary"] ?? COLORS.primary;
+
+export interface DataKey {
+  key: string;
+  name: string;
+  color?: string;
+}
+
+interface ChartCardProps {
+  title: string;
+  type?: "line" | "area" | "bar" | "pie";
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data: any[];
+  dataKeys: DataKey[];
+  height?: number;
+}
+
+const ChartCard = ({ title, type = "line", data, dataKeys, height = 300 }: ChartCardProps) => {
   const renderChart = () => {
     switch (type) {
       case "line":
@@ -40,12 +57,12 @@ const ChartCard = ({ title, type = "line", data, dataKeys, height = 300 }) => {
           <ResponsiveContainer width="100%" height={height}>
             <LineChart data={data}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-              <XAxis 
-                dataKey="date" 
+              <XAxis
+                dataKey="date"
                 stroke="var(--color-text-secondary)"
                 style={{ fontSize: "12px" }}
               />
-              <YAxis 
+              <YAxis
                 stroke="var(--color-text-secondary)"
                 style={{ fontSize: "12px" }}
               />
@@ -57,15 +74,15 @@ const ChartCard = ({ title, type = "line", data, dataKeys, height = 300 }) => {
                 }}
               />
               <Legend />
-              {dataKeys.map((key, index) => (
+              {dataKeys.map((key) => (
                 <Line
                   key={key.key}
                   type="monotone"
                   dataKey={key.key}
                   name={key.name}
-                  stroke={COLORS[key.color] || COLORS.primary}
+                  stroke={getColor(key.color)}
                   strokeWidth={2}
-                  dot={{ fill: COLORS[key.color] || COLORS.primary }}
+                  dot={{ fill: getColor(key.color) }}
                 />
               ))}
             </LineChart>
@@ -77,12 +94,12 @@ const ChartCard = ({ title, type = "line", data, dataKeys, height = 300 }) => {
           <ResponsiveContainer width="100%" height={height}>
             <AreaChart data={data}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-              <XAxis 
-                dataKey="date" 
+              <XAxis
+                dataKey="date"
                 stroke="var(--color-text-secondary)"
                 style={{ fontSize: "12px" }}
               />
-              <YAxis 
+              <YAxis
                 stroke="var(--color-text-secondary)"
                 style={{ fontSize: "12px" }}
               />
@@ -100,8 +117,8 @@ const ChartCard = ({ title, type = "line", data, dataKeys, height = 300 }) => {
                   type="monotone"
                   dataKey={key.key}
                   name={key.name}
-                  stroke={COLORS[key.color] || COLORS.primary}
-                  fill={COLORS[key.color] || COLORS.primary}
+                  stroke={getColor(key.color)}
+                  fill={getColor(key.color)}
                   fillOpacity={0.6}
                 />
               ))}
@@ -114,12 +131,12 @@ const ChartCard = ({ title, type = "line", data, dataKeys, height = 300 }) => {
           <ResponsiveContainer width="100%" height={height}>
             <BarChart data={data}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-              <XAxis 
-                dataKey={dataKeys[0]?.key || "name"} 
+              <XAxis
+                dataKey={dataKeys[0]?.key || "name"}
                 stroke="var(--color-text-secondary)"
                 style={{ fontSize: "12px" }}
               />
-              <YAxis 
+              <YAxis
                 stroke="var(--color-text-secondary)"
                 style={{ fontSize: "12px" }}
               />
@@ -136,7 +153,7 @@ const ChartCard = ({ title, type = "line", data, dataKeys, height = 300 }) => {
                   key={key.key}
                   dataKey={key.key}
                   name={key.name}
-                  fill={COLORS[key.color] || COLORS.primary}
+                  fill={getColor(key.color)}
                   radius={[8, 8, 0, 0]}
                 />
               ))}
@@ -153,15 +170,15 @@ const ChartCard = ({ title, type = "line", data, dataKeys, height = 300 }) => {
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ name, percentage }) => `${name}: ${percentage}%`}
+                label={({ name, percent }) => `${name ?? ""}: ${((percent ?? 0) * 100).toFixed(0)}%`}
                 outerRadius={80}
                 fill="#8884d8"
                 dataKey={dataKeys[0]?.key || "value"}
               >
-                {data.map((entry, index) => (
-                  <Cell 
-                    key={`cell-${index}`} 
-                    fill={Object.values(COLORS)[index % Object.values(COLORS).length]} 
+                {data.map((_entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={Object.values(COLORS)[index % Object.values(COLORS).length]}
                   />
                 ))}
               </Pie>
@@ -197,4 +214,3 @@ const ChartCard = ({ title, type = "line", data, dataKeys, height = 300 }) => {
 };
 
 export default ChartCard;
-

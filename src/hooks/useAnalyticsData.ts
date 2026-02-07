@@ -3,16 +3,65 @@ import { useState, useEffect } from "react";
 /**
  * useAnalyticsData - Hook para obtener datos de Google Analytics
  * Usa datos reales del backend si adminToken está presente, sino usa datos mock
- * 
- * @param {string} dateRange - Rango de fechas: "7days", "30days", "90days"
- * @param {string} adminToken - Token de autenticación admin (opcional)
- * @param {boolean} useMock - Forzar uso de datos mock (para demo público)
  */
 
-export const useAnalyticsData = (dateRange = "30days", adminToken = null, useMock = false) => {
-  const [data, setData] = useState(null);
+interface PageView {
+  date: string;
+  views: number;
+  visitors: number;
+}
+
+interface TopPage {
+  page: string;
+  views: number;
+  avgTime: string;
+  bounceRate: string;
+}
+
+interface CountryData {
+  country: string;
+  visitors: number;
+  percentage: number;
+}
+
+interface DeviceData {
+  device: string;
+  users: number;
+  percentage: number;
+}
+
+interface BrowserData {
+  browser: string;
+  users: number;
+  percentage: number;
+}
+
+export interface AnalyticsOverview {
+  totalVisits: number;
+  uniqueVisitors: number;
+  pageViews: number;
+  avgSessionDuration: string;
+  bounceRate: string;
+  newVsReturning: {
+    new: number;
+    returning: number;
+  };
+}
+
+export interface AnalyticsData {
+  overview: AnalyticsOverview;
+  pageViews: PageView[];
+  topPages: TopPage[];
+  topCountries: CountryData[];
+  devices: DeviceData[];
+  browsers: BrowserData[];
+  realtimeUsers: number;
+}
+
+export const useAnalyticsData = (dateRange = "30days", adminToken: string | null = null, useMock = false) => {
+  const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchAnalyticsData = async () => {
@@ -47,7 +96,7 @@ export const useAnalyticsData = (dateRange = "30days", adminToken = null, useMoc
         setLoading(false);
       } catch (err) {
         console.error("Error fetching analytics:", err);
-        setError(err.message);
+        setError(err instanceof Error ? err.message : "Unknown error");
         
         // Fallback to mock data on error
         const mockData = generateMockData(dateRange);
@@ -63,7 +112,7 @@ export const useAnalyticsData = (dateRange = "30days", adminToken = null, useMoc
 };
 
 // Generar datos mock realistas
-const generateMockData = (dateRange) => {
+const generateMockData = (dateRange: string): AnalyticsData => {
   const days = dateRange === "7days" ? 7 : dateRange === "30days" ? 30 : 90;
   
   return {

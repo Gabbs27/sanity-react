@@ -24,11 +24,11 @@ function App() {
         <Route path='*' element={<NotFound />} />
         <Route element={<AllPosts />} path='/allpost' />
         <Route element={<OnePost />} path='/:slug' />
-        <Route element={<About />} path='/About' />
+        <Route element={<About />} path='/about' />
         <Route element={<Portfolio />} path='/' />
-        <Route element={<Me />} path='/Gabriel-Abreu' />
-        <Route element={<Repos />} path='/Repositorios' />
-        <Route element={<Education />} path='/Education' />
+        <Route element={<Me />} path='/gabriel-abreu' />
+        <Route element={<Repos />} path='/repositorios' />
+        <Route element={<Education />} path='/education' />
         <Route element={<Services />} path='/services' />
 
         {/* Analytics Dashboards */}

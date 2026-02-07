@@ -7,7 +7,18 @@ import "./Dashboard.css";
  * MetricCard - Card para mostrar métricas individuales
  */
 
-const MetricCard = ({ title, value, icon, trend, trendValue, color = "primary" }) => {
+import { type IconDefinition } from "@fortawesome/fontawesome-svg-core";
+
+interface MetricCardProps {
+  title: string;
+  value: string | number;
+  icon: IconDefinition;
+  trend?: "up" | "down";
+  trendValue?: string;
+  color?: string;
+}
+
+const MetricCard = ({ title, value, icon, trend, trendValue, color = "primary" }: MetricCardProps) => {
   const isPositive = trend === "up";
   
   return (

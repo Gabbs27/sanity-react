@@ -6,22 +6,28 @@ import sanityClient from "../client";
 import PostCard from "./card/PostCard";
 import PostGreeting from "./Greeting/PostGreeting";
 import usePageTracking from "../hooks/useAnalytics";
+import "./card/PostCard.css";
+
+interface SanityPost {
+  title: string;
+  slug: { current: string };
+  mainImage: { asset: { _id: string; url: string } };
+  publishedAt: string;
+}
 
 export default function AllPosts() {
   usePageTracking();
-  const [allPostsData, setAllPosts] = useState([]);
+  const [allPostsData, setAllPosts] = useState<SanityPost[]>([]);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
   const postsPerPage = 6;
   const indexOfLastPost = currentPage * postsPerPage;
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
-  let filteredPosts = allPostsData.filter((post) => {
-    return post.title.toLowerCase().indexOf(search.toLowerCase()) !== -1;
-  });
-  const currentPosts = filteredPosts
-    ? filteredPosts.slice(indexOfFirstPost, indexOfLastPost)
-    : [];
+  const filteredPosts = allPostsData.filter((post) =>
+    post.title.toLowerCase().includes(search.toLowerCase())
+  );
+  const currentPosts = filteredPosts.slice(indexOfFirstPost, indexOfLastPost);
 
   useEffect(() => {
     sanityClient
@@ -42,15 +48,13 @@ export default function AllPosts() {
       .catch(console.error);
   }, []);
 
-  const formatDate = (dateString) => {
-    const options = { year: "numeric", month: "long", day: "numeric" }; // Customize the format
+  const formatDate = (dateString: string) => {
+    const options = { year: "numeric", month: "long", day: "numeric" } as const;
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
-  const pageNumbers = [];
-  for (let i = 1; i <= Math.ceil(filteredPosts.length / postsPerPage); i++) {
-    pageNumbers.push(i);
-  }
+  const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
+  const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   return (
     <>
@@ -58,54 +62,71 @@ export default function AllPosts() {
         title="Blog - Articles & Tutorials"
         description="Read Gabriel Abreu's blog featuring tutorials, insights, and articles about web development, React, and modern technologies."
         keywords="web development blog, React tutorials, programming articles, tech blog"
-        url="http://codewithgabo.com/#/allpost"
+        url="https://codewithgabo.com/#/allpost"
       />
       <div className='min-h-screen p-12'>
         <section className='container mx-auto py-12'>
           <PostGreeting />
-          <div className='flex mt-6'>
+
+          <div className="blog-search-container">
             <input
               type='text'
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder='Search posts'
-              className='ml-auto w-full md:w-64 p-2 mt-2 border border-gray-400 rounded-md focus:ring-pink-500'
-              style={{ maxWidth: "100%" }}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setCurrentPage(1);
+              }}
+              placeholder='Search posts...'
+              className='blog-search'
               aria-label="Search blog posts"
             />
           </div>
-          <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-8 mt-6'>
-            {currentPosts.map((post, index) => (
-              <AnimatedSection
-                key={post.slug.current}
-                variant="fadeInUp"
-                duration={0.5}
-                delay={index * 0.1}>
-                <Link to={"/" + post.slug.current}>
-                  <PostCard
-                    image={post.mainImage.asset.url}
-                    title={post.title}
-                    description={formatDate(post.publishedAt)}  
-                    url={"/" + post.slug.current}
-                    languages={[]}
-                  />
-                </Link>
-              </AnimatedSection>
-            ))}
-          </div>
-          <nav className='flex justify-center mt-0 mb-12' aria-label="Pagination">
-            {pageNumbers.map((number) => (
-              <button
-                key={number}
-                onClick={() => setCurrentPage(number)}
-                className='mx-2 px-4 py-2 text-sm font-medium leading-5 text-white transition duration-150 ease-in-out bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-500 focus:outline-none focus:shadow-outline'
-                style={{ backgroundColor: "#276461" }}
-                aria-label={`Go to page ${number}`}
-                aria-current={currentPage === number ? "page" : undefined}>
-                {number}
-              </button>
-            ))}
-          </nav>
+
+          {currentPosts.length > 0 ? (
+            <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-8'>
+              {currentPosts.map((post, index) => (
+                <AnimatedSection
+                  key={post.slug.current}
+                  variant="fadeInUp"
+                  duration={0.5}
+                  delay={index * 0.1}>
+                  <Link
+                    to={"/" + post.slug.current}
+                    style={{ textDecoration: "none" }}>
+                    <PostCard
+                      image={post.mainImage.asset.url}
+                      title={post.title}
+                      date={formatDate(post.publishedAt)}
+                    />
+                  </Link>
+                </AnimatedSection>
+              ))}
+            </div>
+          ) : (
+            <div className="blog-empty">
+              <div className="blog-empty__icon">&#128221;</div>
+              <p className="blog-empty__text">
+                {search ? "No posts match your search." : "No posts yet."}
+              </p>
+            </div>
+          )}
+
+          {totalPages > 1 && (
+            <nav className="blog-pagination" aria-label="Pagination">
+              {pageNumbers.map((number) => (
+                <button
+                  key={number}
+                  onClick={() => setCurrentPage(number)}
+                  className={`blog-pagination__btn ${
+                    currentPage === number ? "blog-pagination__btn--active" : ""
+                  }`}
+                  aria-label={`Go to page ${number}`}
+                  aria-current={currentPage === number ? "page" : undefined}>
+                  {number}
+                </button>
+              ))}
+            </nav>
+          )}
         </section>
       </div>
     </>

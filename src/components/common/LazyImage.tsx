@@ -5,15 +5,23 @@ import { motion } from "motion/react";
  * LazyImage - Componente para carga lazy de imágenes con placeholder
  */
 
+interface LazyImageProps {
+  src: string;
+  alt: string;
+  className?: string;
+  placeholderColor?: string;
+  [key: string]: unknown;
+}
+
 const LazyImage = ({
   src,
   alt,
   className = "",
   placeholderColor = "#f0f0f0",
   ...props
-}) => {
+}: LazyImageProps) => {
   const [isLoaded, setIsLoaded] = useState(false);
-  const [imageSrc, setImageSrc] = useState(null);
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
 
   useEffect(() => {
     const img = new Image();

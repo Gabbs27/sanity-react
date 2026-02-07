@@ -1,6 +1,14 @@
 import { Component } from "react";
 
-class FeelingProud extends Component {
+interface FeelingProudProps {
+  theme: {
+    text: string;
+    dark: string;
+    imageHighlight: string;
+  };
+}
+
+class FeelingProud extends Component<FeelingProudProps> {
   render() {
     const theme = this.props.theme;
     return (

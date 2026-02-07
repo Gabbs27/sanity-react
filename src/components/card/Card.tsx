@@ -1,12 +1,19 @@
 
 import "./Card.css";
 
-const Card = ({ id, url, image, title, description, languages, badge }) => {
+interface CardProps {
+  id?: number;
+  url: string;
+  image: string;
+  title: string;
+  description: string;
+  languages: string[];
+  badge?: string;
+}
+
+const Card = ({ url, image, title, description, languages, badge }: CardProps) => {
   // Detectar si la URL es interna (empieza con / o #)
   const isInternalLink = url.startsWith("/") || url.startsWith("#");
-  
-  // Determinar si la imagen es una URL externa
-  const imageUrl = image.startsWith("http") ? image : image;
 
   return (
     <article className='project-card'>
@@ -14,7 +21,7 @@ const Card = ({ id, url, image, title, description, languages, badge }) => {
       
       <div className='card-image-container'>
         <img
-          src={imageUrl}
+          src={image}
           alt={title}
           className='card-image'
         />

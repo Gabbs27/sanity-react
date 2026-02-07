@@ -1,10 +1,21 @@
 
-import { motion } from "motion/react";
+import { type ReactNode } from "react";
+import { motion, type Variants } from "motion/react";
 
 /**
  * AnimatedSection - Componente reutilizable para animaciones con Framer Motion
  * Reemplaza react-reveal con mejor performance y más control
  */
+
+type VariantName = "fadeInUp" | "fadeIn" | "fadeInLeft" | "fadeInRight" | "scaleIn";
+
+interface AnimatedSectionProps {
+  children: ReactNode;
+  variant?: VariantName;
+  duration?: number;
+  delay?: number;
+  className?: string;
+}
 
 const AnimatedSection = ({
   children,
@@ -12,8 +23,8 @@ const AnimatedSection = ({
   duration = 0.5,
   delay = 0,
   className = "",
-}) => {
-  const variants = {
+}: AnimatedSectionProps) => {
+  const variants: Record<VariantName, Variants> = {
     fadeInUp: {
       hidden: { opacity: 0, y: 40 },
       visible: {
@@ -87,5 +98,3 @@ const AnimatedSection = ({
 };
 
 export default AnimatedSection;
-
-

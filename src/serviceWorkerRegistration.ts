@@ -3,13 +3,18 @@
  * Enables offline functionality and caching for PWA
  */
 
+interface SWConfig {
+  onUpdate?: (registration: ServiceWorkerRegistration) => void;
+  onSuccess?: (registration: ServiceWorkerRegistration) => void;
+}
+
 const isLocalhost = Boolean(
   window.location.hostname === 'localhost' ||
     window.location.hostname === '[::1]' ||
     window.location.hostname.match(/^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/)
 );
 
-export function register(config) {
+export function register(config?: SWConfig) {
   if (import.meta.env.PROD && 'serviceWorker' in navigator) {
     const publicUrl = new URL(import.meta.env.BASE_URL, window.location.href);
     if (publicUrl.origin !== window.location.origin) {
@@ -33,7 +38,7 @@ export function register(config) {
   }
 }
 
-function registerValidSW(swUrl, config) {
+function registerValidSW(swUrl: string, config?: SWConfig) {
   navigator.serviceWorker
     .register(swUrl)
     .then((registration) => {
@@ -64,7 +69,7 @@ function registerValidSW(swUrl, config) {
     });
 }
 
-function checkValidServiceWorker(swUrl, config) {
+function checkValidServiceWorker(swUrl: string, config?: SWConfig) {
   fetch(swUrl, {
     headers: { 'Service-Worker': 'script' },
   })
@@ -99,4 +104,3 @@ export function unregister() {
       });
   }
 }
-

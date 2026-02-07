@@ -529,7 +529,7 @@
 
   .date-range-selector {
     width: 100%;
-    justify-content: stretch;
+    justify-content: space-between;
   }
 
   .date-btn {

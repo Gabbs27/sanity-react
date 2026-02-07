@@ -12,7 +12,7 @@ export default function NotFound() {
       <SEO
         title="Page Not Found - 404"
         description="The page you're looking for doesn't exist."
-        url="http://codewithgabo.com"
+        url="https://codewithgabo.com"
       />
       <div className='min-h-screen p-12'>
         <div className='container py-10'>
@@ -23,7 +23,6 @@ export default function NotFound() {
                   <NotFoundCard
                     name='Not Found'
                     description="Definitely Something's wrong"
-                    image=''
                     title="Something's wrong"
                   />
                 </div>

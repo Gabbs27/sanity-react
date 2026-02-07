@@ -12,7 +12,7 @@ const About = () => {
         title="About Me"
         description="Learn more about Gabriel Abreu, a passionate Full Stack Developer with expertise in React, C#, and modern web technologies."
         keywords="About Gabriel Abreu, developer bio, full stack developer background"
-        url="http://codewithgabo.com/#/About"
+        url="https://codewithgabo.com/#/about"
       />
       <div className='min-h-screen p-12 bg-background'>
         <div className='container mx-auto'>

@@ -81,7 +81,7 @@ body {
 }
 
 .footer--t{
-  position: none;
+  position: static;
   left:0;
   bottom:0;
   right:0;
@@ -90,12 +90,12 @@ body {
   color:#fbfaf8;
   }
 .footer--button{
-  position: none;
+  position: static;
   margin-bottom: 5px;
 }
 
 .footer--text{
-  position: none;
+  position: static;
  margin-bottom: 5px;
 }
 

@@ -12,7 +12,7 @@ const PostGreeting = () => {
             <div>
               <h1 id="blog-heading" className='greeting-text mb-6'>All Posts</h1>
               <h2 className='greeting-nickname mb-6'>Code With Gabo</h2>
-              <p className='greeting-text-p subTitle mt-'>
+              <p className='greeting-text-p mt-4'>
                 Welcome to our blog! Join us as we explore sustainable product
                 development. From passionate individuals to impactful systems,
                 learn about the process and be a part of the journey.

@@ -8,7 +8,9 @@ import LoadingSpinner from "../common/LoadingSpinner";
  * Redirige a login si no está autenticado
  */
 
-const ProtectedDashboard = ({ children }) => {
+import { type ReactNode } from "react";
+
+const ProtectedDashboard = ({ children }: { children: ReactNode }) => {
   const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
