@@ -11,7 +11,7 @@ import "./card/PostCard.css";
 interface SanityPost {
   title: string;
   slug: { current: string };
-  mainImage: { asset: { _id: string; url: string } };
+  mainImage?: { asset: { _id: string; url: string } };
   publishedAt: string;
 }
 
@@ -94,7 +94,7 @@ export default function AllPosts() {
                     to={"/" + post.slug.current}
                     style={{ textDecoration: "none" }}>
                     <PostCard
-                      image={post.mainImage.asset.url}
+                      image={post.mainImage?.asset?.url || ""}
                       title={post.title}
                       date={formatDate(post.publishedAt)}
                     />

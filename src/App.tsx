@@ -21,11 +21,10 @@ function App() {
   return (
     <Suspense fallback={<LoadingSpinner message="Loading page..." />}>
       <Routes>
-        <Route path='*' element={<NotFound />} />
+        <Route element={<Portfolio />} path='/' />
         <Route element={<AllPosts />} path='/allpost' />
         <Route element={<OnePost />} path='/:slug' />
         <Route element={<About />} path='/about' />
-        <Route element={<Portfolio />} path='/' />
         <Route element={<Me />} path='/gabriel-abreu' />
         <Route element={<Repos />} path='/repositorios' />
         <Route element={<Education />} path='/education' />
@@ -42,6 +41,9 @@ function App() {
             </ProtectedDashboard>
           }
         />
+
+        {/* Catch-all: must be last */}
+        <Route path='*' element={<NotFound />} />
       </Routes>
     </Suspense>
   );
