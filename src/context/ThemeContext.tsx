@@ -1,11 +1,18 @@
-import { createContext, useState, useEffect, useContext } from "react";
+import { createContext, useState, useEffect, useContext, type ReactNode } from "react";
 
 /**
  * ThemeContext - Manejo global del tema (light/dark)
  * Persiste la preferencia del usuario en localStorage
  */
 
-const ThemeContext = createContext();
+interface ThemeContextType {
+  theme: string;
+  toggleTheme: () => void;
+  isDark: boolean;
+  isTransitioning: boolean;
+}
+
+const ThemeContext = createContext<ThemeContextType | null>(null);
 
 export const useTheme = () => {
   const context = useContext(ThemeContext);
@@ -15,20 +22,17 @@ export const useTheme = () => {
   return context;
 };
 
-export const ThemeProvider = ({ children }) => {
-  // Detectar preferencia del sistema o localStorage
+export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const getInitialTheme = () => {
-    // Primero revisar localStorage
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme) {
       return savedTheme;
     }
-    
-    // Si no hay preferencia guardada, usar la del sistema
+
     if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
       return "dark";
     }
-    
+
     return "light";
   };
 
@@ -36,17 +40,14 @@ export const ThemeProvider = ({ children }) => {
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
-    // Aplicar tema al documento
     document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("theme", theme);
   }, [theme]);
 
-  // Escuchar cambios en las preferencias del sistema
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    
-    const handleChange = (e) => {
-      // Solo cambiar si el usuario no ha establecido una preferencia manual
+
+    const handleChange = (e: MediaQueryListEvent) => {
       if (!localStorage.getItem("theme")) {
         setTheme(e.matches ? "dark" : "light");
       }
@@ -59,14 +60,13 @@ export const ThemeProvider = ({ children }) => {
   const toggleTheme = () => {
     setIsTransitioning(true);
     setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
-    
-    // Eliminar el estado de transición después de la animación
+
     setTimeout(() => {
       setIsTransitioning(false);
     }, 300);
   };
 
-  const value = {
+  const value: ThemeContextType = {
     theme,
     toggleTheme,
     isDark: theme === "dark",
@@ -81,4 +81,3 @@ export const ThemeProvider = ({ children }) => {
 };
 
 export default ThemeContext;
-

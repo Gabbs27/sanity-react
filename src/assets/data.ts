@@ -6,7 +6,7 @@ export const data = [
     description:
       "Interactive analytics dashboard with real-time data visualization. Features Google Analytics 4 integration, custom charts with Recharts, and responsive design. Includes admin authentication and mock data demo mode.",
     url: "/#/dashboard-demo",
-    languages: ["React", "GA4 API", "Recharts", "Framer Motion", "Node.js", "Express"],
+    languages: ["React", "GA4 API", "Recharts", "Motion", "Node.js", "Express"],
     badge: "New",
   },
   {

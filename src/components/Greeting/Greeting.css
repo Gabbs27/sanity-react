@@ -35,14 +35,14 @@
     font-size: 70px;
     line-height: 1.1;
     font-family: 'Bebas Neue', sans-serif;
-    color:#276461;
+    color: var(--color-text-primary, #276461);
   }
-  
+
   .greeting-nickname {
     font-size: 30px;
-    line-height: 0px;
+    line-height: 1.2;
     font-family: "Bebas Neue", sans-serif;
-    color: #276461
+    color: var(--color-text-primary, #276461);
   }
   
   .greeting-text-p {
@@ -50,7 +50,7 @@
     line-height: 40px;
     margin-right: 40px;
     font-family: "Inter", sans-serif;
-    color: #5f9491;
+    color: var(--color-text-secondary, #5f9491);
   }
   
   .greeting-image-div > * {

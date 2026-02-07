@@ -14,7 +14,7 @@ const ReposGreeting = () => {
               <h2 className='greeting-nickname mb-6' aria-label="Also known as Gabbs279">
                 (Gabbs279)
               </h2>
-              <p className='greeting-text-p subTitle mt-'>
+              <p className='greeting-text-p mt-4'>
                 Explore my public GitHub repositories that showcase my diverse
                 development skills across various projects, from web development
                 to innovative solutions. Get a glimpse of my expertise in

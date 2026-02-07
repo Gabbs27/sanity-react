@@ -9,7 +9,7 @@ import Greeting from "./Greeting/Greeting";
 const Portfolio = () => {
   usePageTracking();
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredData, setFilteredData] = useState([]);
+  const [filteredData, setFilteredData] = useState(data);
 
   useEffect(() => {
     setFilteredData(
@@ -25,7 +25,7 @@ const Portfolio = () => {
         title="Portfolio - Projects & Work"
         description="Explore Gabriel Abreu's portfolio featuring modern web applications built with React, TypeScript, and cutting-edge technologies."
         keywords="React projects, web development portfolio, TypeScript applications, full stack projects"
-        url="http://codewithgabo.com/#/portfolio"
+        url="https://codewithgabo.com/#/portfolio"
       />
       <div className='min-h-screen p-12'>
         <Greeting />

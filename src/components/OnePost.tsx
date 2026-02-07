@@ -10,23 +10,37 @@ import usePageTracking from "../hooks/useAnalytics";
 
 import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
 import { nightOwl } from "react-syntax-highlighter/dist/esm/styles/hljs";
+interface SanityPostData {
+  title: string;
+  slug: { current: string };
+  mainImage?: { asset: { _id: string; url: string } };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  body: any;
+  name?: string;
+  publishedAt: string;
+}
 
-const portableTextComponents = {
+// PortableText custom components — type assertions needed for block-level overrides
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const portableTextComponents: any = {
   block: {
-    code: ({ children }: any) => (
-      <SyntaxHighlighter
-        style={{ ...nightOwl }}
-        wrapLines={true}
-        className='syntax-highlight'>
-        {children}
-      </SyntaxHighlighter>
-    ),
+    code: ({ children }: { children?: string | string[] }) => {
+      const codeString = Array.isArray(children) ? children.join("") : children || "";
+      return (
+        <SyntaxHighlighter
+          style={{ ...nightOwl }}
+          wrapLines={true}
+          className='syntax-highlight'>
+          {codeString}
+        </SyntaxHighlighter>
+      );
+    },
   },
 };
 
 const OnePost = () => {
   usePageTracking();
-  const [postData, setPostData] = useState<any>(null);
+  const [postData, setPostData] = useState<SanityPostData | null>(null);
   const { slug } = useParams();
 
   useEffect(() => {
@@ -47,7 +61,7 @@ const OnePost = () => {
         }`,
         { slug }
       )
-      .then((data: any[]) => setPostData(data[0]))
+      .then((data: SanityPostData[]) => setPostData(data[0]))
       .catch(console.error);
   }, [slug]);
 
@@ -59,7 +73,7 @@ const OnePost = () => {
         title={postData.title}
         description={postData.title}
         keywords="blog post, article, tutorial, web development"
-        url={`http://codewithgabo.com/#/${slug}`}
+        url={`https://codewithgabo.com/#/${slug}`}
       />
       <AnimatedSection variant="fadeInUp" duration={0.6}>
         <article className='single-post'>

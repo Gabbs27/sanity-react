@@ -1,11 +1,19 @@
-import { createContext, useState, useEffect, useContext } from "react";
+import { createContext, useState, useEffect, useContext, type ReactNode } from "react";
 
 /**
  * AuthContext - Manejo de autenticación simple para dashboard admin
  * Usa localStorage para persistir el token
  */
 
-const AuthContext = createContext();
+interface AuthContextType {
+  isAuthenticated: boolean;
+  adminToken: string | null;
+  loading: boolean;
+  login: (token: string) => void;
+  logout: () => void;
+}
+
+const AuthContext = createContext<AuthContextType | null>(null);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -15,13 +23,12 @@ export const useAuth = () => {
   return context;
 };
 
-export const AuthProvider = ({ children }) => {
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [adminToken, setAdminToken] = useState(null);
+  const [adminToken, setAdminToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if token exists in localStorage on mount
     const storedToken = localStorage.getItem("adminToken");
     if (storedToken) {
       setAdminToken(storedToken);
@@ -30,7 +37,7 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = (token) => {
+  const login = (token: string) => {
     localStorage.setItem("adminToken", token);
     setAdminToken(token);
     setIsAuthenticated(true);
@@ -42,7 +49,7 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
   };
 
-  const value = {
+  const value: AuthContextType = {
     isAuthenticated,
     adminToken,
     loading,
@@ -58,6 +65,3 @@ export const AuthProvider = ({ children }) => {
 };
 
 export default AuthContext;
-
-
-

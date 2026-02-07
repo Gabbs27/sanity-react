@@ -23,7 +23,7 @@
 .post-title {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #2D3047;
+  color: var(--color-text-primary, #2D3047);
   margin-bottom: 1rem;
   line-height: 1.2;
 }
@@ -32,19 +32,19 @@
   display: flex;
   justify-content: center;
   gap: 1rem;
-  color: #6B7280;
+  color: var(--color-text-secondary, #6B7280);
   font-size: 1rem;
 }
 
 .post-author {
-  color: #419D78;
+  color: var(--color-accent, #419D78);
   font-weight: 500;
 }
 
 .post-content {
   font-size: 1.125rem;
   line-height: 1.8;
-  color: #4B5563;
+  color: var(--color-text-secondary, #4B5563);
 }
 
 .post-content p {
@@ -54,19 +54,19 @@
 .post-content h2 {
   font-size: 1.875rem;
   font-weight: 700;
-  color: #2D3047;
+  color: var(--color-text-primary, #2D3047);
   margin: 2rem 0 1rem;
 }
 
 .post-content h3 {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #2D3047;
+  color: var(--color-text-primary, #2D3047);
   margin: 1.5rem 0 1rem;
 }
 
 .post-content a {
-  color: #419D78;
+  color: var(--color-accent, #419D78);
   text-decoration: underline;
 }
 
@@ -95,4 +95,4 @@
   .post-content {
     font-size: 1rem;
   }
-} 
+}

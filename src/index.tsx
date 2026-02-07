@@ -24,7 +24,7 @@ root.render(
               Skip to main content
             </a>
             <Navbar />
-            <main id="main-content" role="main">
+            <main id="main-content">
               <App />
             </main>
             <Footer />

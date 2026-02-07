@@ -3,9 +3,9 @@
   position: sticky;
   top: 0;
   z-index: 50;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: var(--nav-bg, rgba(255, 255, 255, 0.8));
   backdrop-filter: blur(8px);
-  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+  border-bottom: 1px solid var(--nav-border, rgba(229, 231, 235, 0.5));
 }
 
 .nav-container {
@@ -77,6 +77,7 @@
 .nav-item.active {
   color: #419D78;
   background-color: rgba(65, 157, 120, 0.1);
+  position: relative;
 }
 
 .nav-item.active::after {
@@ -128,7 +129,7 @@
     display: block;
     width: 24px;
     height: 2px;
-    background: #2D3047;
+    background: var(--color-text-primary, #2D3047);
     position: relative;
     transition: all 0.3s;
   }
@@ -139,7 +140,7 @@
     position: absolute;
     width: 24px;
     height: 2px;
-    background: #2D3047;
+    background: var(--color-text-primary, #2D3047);
     transition: all 0.3s;
   }
 
@@ -171,7 +172,7 @@
     top: 100%;
     left: 0;
     right: 0;
-    background: white;
+    background: var(--card-bg, white);
     padding: 1rem;
     flex-direction: column;
     gap: 1rem;

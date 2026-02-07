@@ -5,7 +5,7 @@ import { motion } from "motion/react";
  * LoadingSpinner - Componente de loading para Suspense y lazy loading
  */
 
-const LoadingSpinner = ({ message = "Loading..." }) => {
+const LoadingSpinner = ({ message = "Loading..." }: { message?: string }) => {
   return (
     <div className="loading-container">
       <motion.div

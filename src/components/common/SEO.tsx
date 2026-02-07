@@ -5,15 +5,25 @@ import { Helmet } from "react-helmet-async";
  * SEO Component - Manejo de meta tags dinámicos para mejor SEO
  */
 
+interface SEOProps {
+  title?: string;
+  description?: string;
+  keywords?: string;
+  author?: string;
+  image?: string;
+  url?: string;
+  type?: string;
+}
+
 const SEO = ({
   title = "Gabriel Abreu - Full Stack Developer",
   description = "Portfolio of Gabriel Abreu, a passionate Full Stack Developer specializing in React, C#, and modern web technologies.",
   keywords = "Gabriel Abreu, Full Stack Developer, React Developer, C# Developer, Web Development, Portfolio",
   author = "Gabriel Abreu",
-  image = "http://codewithgabo.com/images/og-image.png",
-  url = "http://codewithgabo.com",
+  image = "https://codewithgabo.com/images/og-image.png",
+  url = "https://codewithgabo.com",
   type = "website",
-}) => {
+}: SEOProps) => {
   const siteTitle = title.includes("Gabriel Abreu")
     ? title
     : `${title} | Gabriel Abreu`;

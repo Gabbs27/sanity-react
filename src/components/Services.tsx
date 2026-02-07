@@ -62,7 +62,7 @@ const Services = () => {
         title="Services - Full Stack Development"
         description="Professional web development services including React development, backend solutions with C# and .NET, mobile applications, and cloud infrastructure."
         keywords="web development services, React developer for hire, full stack services, C# development, cloud solutions"
-        url="http://codewithgabo.com/#/services"
+        url="https://codewithgabo.com/#/services"
       />
       <div className='min-h-screen p-12 bg-background'>
         <div className='container mx-auto'>

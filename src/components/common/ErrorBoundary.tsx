@@ -1,28 +1,35 @@
-import React from "react";
+import React, { type ReactNode, type ErrorInfo } from "react";
 
 /**
  * ErrorBoundary - Captura errores en componentes hijos y muestra UI de fallback
  */
 
-class ErrorBoundary extends React.Component {
-  constructor(props) {
+interface ErrorBoundaryProps {
+  children: ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error: Error | null;
+  errorInfo: ErrorInfo | null;
+}
+
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false, error: null, errorInfo: null };
   }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
     return { hasError: true };
   }
 
-  componentDidCatch(error, errorInfo) {
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error("Error caught by boundary:", error, errorInfo);
     this.setState({
       error,
       errorInfo,
     });
-
-    // Aquí puedes enviar el error a un servicio de logging como Sentry
-    // logErrorToService(error, errorInfo);
   }
 
   render() {
@@ -59,5 +66,3 @@ class ErrorBoundary extends React.Component {
 }
 
 export default ErrorBoundary;
-
-

@@ -55,7 +55,7 @@ const DashboardDemo = () => {
         title="Analytics Dashboard Demo"
         description="Interactive analytics dashboard demo showcasing real-time data visualization with React and Recharts"
         keywords="analytics dashboard, data visualization, React dashboard, Recharts, interactive charts, web analytics"
-        url="http://codewithgabo.com/#/dashboard-demo"
+        url="https://codewithgabo.com/#/dashboard-demo"
       />
 
       <div className="dashboard">
@@ -312,7 +312,7 @@ const DashboardDemo = () => {
             <div className="tech-list">
               <span className="tech-item">React</span>
               <span className="tech-item">Recharts</span>
-              <span className="tech-item">Framer Motion</span>
+              <span className="tech-item">Motion</span>
               <span className="tech-item">Google Analytics 4 API</span>
               <span className="tech-item">Express.js</span>
               <span className="tech-item">Node.js</span>
