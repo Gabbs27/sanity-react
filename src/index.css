@@ -291,8 +291,9 @@ body {
 }
 
 .contact-link.github {
-  background-color: var(--color-secondary, #0F172A);
-  color: white;
+  background-color: var(--color-bg-tertiary, #0F172A);
+  color: var(--color-text-primary, white);
+  border: 1px solid var(--color-border, transparent);
 }
 
 .contact-link.github:hover {
