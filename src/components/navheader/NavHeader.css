@@ -5,7 +5,7 @@
   z-index: 50;
   background-color: var(--nav-bg, rgba(255, 255, 255, 0.8));
   backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--nav-border, rgba(229, 231, 235, 0.5));
+  border-bottom: 1px solid var(--nav-border, rgba(226, 232, 240, 0.5));
 }
 
 .nav-container {
@@ -20,7 +20,7 @@
 .nav-logo {
   font-size: 1.75rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #419D78 0%, #2D3047 100%);
+  background: linear-gradient(135deg, #6366F1 0%, #38BDF8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   font-family: 'Inter', sans-serif;
@@ -39,7 +39,7 @@
   transform: translateY(-1px);
   opacity: 0.8;
   background: none;
-  -webkit-text-fill-color: #419D78;
+  -webkit-text-fill-color: #6366F1;
 }
 
 .logo-icon {
@@ -60,7 +60,7 @@
 }
 
 .nav-item {
-  color: #6B7280;
+  color: #475569;
   text-decoration: none;
   font-weight: 500;
   font-size: 0.875rem;
@@ -70,13 +70,13 @@
 }
 
 .nav-item:hover {
-  color: #419D78;
-  background-color: rgba(65, 157, 120, 0.1);
+  color: #6366F1;
+  background-color: rgba(99, 102, 241, 0.1);
 }
 
 .nav-item.active {
-  color: #419D78;
-  background-color: rgba(65, 157, 120, 0.1);
+  color: #6366F1;
+  background-color: rgba(99, 102, 241, 0.1);
   position: relative;
 }
 
@@ -87,7 +87,7 @@
   left: 0;
   right: 0;
   height: 2px;
-  background-color: #419D78;
+  background-color: #6366F1;
   border-radius: 2px;
 }
 
@@ -101,7 +101,7 @@
 /* Remove any other hover styles that might be conflicting */
 .menu li a:hover,
 .header .menu-btn:hover {
-  background-color: rgba(65, 157, 120, 0.1);
+  background-color: rgba(99, 102, 241, 0.1);
   border-radius: 0.5rem;
   padding: 0.5rem 1rem;
 }
@@ -129,7 +129,7 @@
     display: block;
     width: 24px;
     height: 2px;
-    background: var(--color-text-primary, #2D3047);
+    background: var(--color-text-primary, #0F172A);
     position: relative;
     transition: all 0.3s;
   }
@@ -140,7 +140,7 @@
     position: absolute;
     width: 24px;
     height: 2px;
-    background: var(--color-text-primary, #2D3047);
+    background: var(--color-text-primary, #0F172A);
     transition: all 0.3s;
   }
 

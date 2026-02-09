@@ -9,7 +9,7 @@
 
 .project-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.15);
 }
 
 .card-image-container {
@@ -31,7 +31,7 @@
 .card-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(45, 48, 71, 0.9);
+  background: rgba(15, 23, 42, 0.9);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -55,7 +55,7 @@
 
 .view-project:hover {
   background: white;
-  color: #2D3047;
+  color: #0F172A;
 }
 
 .card-content {
@@ -65,12 +65,12 @@
 .card-title {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #2D3047;
+  color: #0F172A;
   margin-bottom: 0.75rem;
 }
 
 .card-description {
-  color: #6B7280;
+  color: #475569;
   font-size: 0.875rem;
   line-height: 1.5;
   margin-bottom: 1rem;
@@ -83,8 +83,8 @@
 }
 
 .tag {
-  background: #F3F4F6;
-  color: #2D3047;
+  background: #F1F5F9;
+  color: #0F172A;
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
   font-size: 0.75rem;
@@ -93,7 +93,7 @@
 }
 
 .tag:hover {
-  background: #419D78;
+  background: #6366F1;
   color: white;
 }
 
@@ -102,7 +102,7 @@
   position: absolute;
   top: 1rem;
   right: 1rem;
-  background: linear-gradient(135deg, #419D78, #4ade80);
+  background: linear-gradient(135deg, #6366F1, #38BDF8);
   color: white;
   padding: 0.375rem 0.875rem;
   border-radius: 20px;
@@ -111,7 +111,7 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   z-index: 10;
-  box-shadow: 0 4px 12px rgba(65, 157, 120, 0.4);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
   animation: pulse-badge 2s ease-in-out infinite;
 }
 

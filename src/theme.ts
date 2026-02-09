@@ -197,12 +197,12 @@ export const materialTealTheme = {
 
 export const modernTheme = {
   colors: {
-    primary: "#2D3047", // Deep blue-grey
-    secondary: "#419D78", // Fresh green
-    accent: "#E0A458", // Warm orange
+    primary: "#0F172A", // Deep navy
+    secondary: "#6366F1", // Indigo/purple
+    accent: "#38BDF8", // Sky blue
     background: "#FAFBFC", // Light grey-white
-    text: "#2D3047", // Dark blue-grey
-    lightText: "#6B7280", // Medium grey
+    text: "#0F172A", // Deep navy
+    lightText: "#475569", // Slate grey
     error: "#EF476F", // Bright pink-red
     success: "#06D6A0", // Bright green
     white: "#FFFFFF",
@@ -210,7 +210,7 @@ export const modernTheme = {
   shadows: {
     sm: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
     md: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-    lg: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
+    lg: "0 10px 15px -3px rgba(99, 102, 241, 0.15)",
   },
 };
 

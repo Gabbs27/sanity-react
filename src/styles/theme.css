@@ -1,93 +1,94 @@
 /* Theme Variables - Light & Dark Mode */
+/* Palette: Deep Navy #0F172A, Indigo #6366F1, Sky Blue #38BDF8 */
 
 :root {
   /* Light Mode Colors */
   --color-bg-primary: #FAFBFC;
   --color-bg-secondary: #FFFFFF;
-  --color-bg-tertiary: #F3F4F6;
-  
-  --color-text-primary: #2D3047;
-  --color-text-secondary: #6B7280;
-  --color-text-tertiary: #9CA3AF;
-  
-  --color-primary: #419D78;
-  --color-primary-hover: #357d61;
-  --color-primary-light: rgba(65, 157, 120, 0.1);
-  
-  --color-secondary: #2D3047;
-  --color-accent: #E0A458;
-  
-  --color-border: #E5E7EB;
+  --color-bg-tertiary: #F1F5F9;
+
+  --color-text-primary: #0F172A;
+  --color-text-secondary: #475569;
+  --color-text-tertiary: #94A3B8;
+
+  --color-primary: #6366F1;
+  --color-primary-hover: #4F46E5;
+  --color-primary-light: rgba(99, 102, 241, 0.1);
+
+  --color-secondary: #0F172A;
+  --color-accent: #38BDF8;
+
+  --color-border: #E2E8F0;
   --color-shadow: rgba(0, 0, 0, 0.1);
-  --color-overlay: rgba(45, 48, 71, 0.9);
-  
+  --color-overlay: rgba(15, 23, 42, 0.9);
+
   /* Card & Components */
   --card-bg: #FFFFFF;
   --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  
+  --card-shadow-hover: 0 10px 15px -3px rgba(99, 102, 241, 0.15);
+
   /* Input & Forms */
   --input-bg: #FFFFFF;
-  --input-border: #E5E7EB;
-  --input-focus-border: #419D78;
-  --input-focus-shadow: 0 0 0 3px rgba(65, 157, 120, 0.1);
-  
+  --input-border: #E2E8F0;
+  --input-focus-border: #6366F1;
+  --input-focus-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+
   /* Footer */
-  --footer-bg: #276461;
-  --footer-text: #fbfaf8;
-  
+  --footer-bg: #0F172A;
+  --footer-text: #F1F5F9;
+
   /* Navbar */
   --nav-bg: rgba(255, 255, 255, 0.8);
-  --nav-border: rgba(229, 231, 235, 0.5);
-  
+  --nav-border: rgba(226, 232, 240, 0.5);
+
   /* Code Blocks */
-  --code-bg: #1f2937;
-  --code-text: #f3f4f6;
+  --code-bg: #1E293B;
+  --code-text: #F1F5F9;
 }
 
 [data-theme="dark"] {
   /* Dark Mode Colors */
-  --color-bg-primary: #0f172a;
-  --color-bg-secondary: #1e293b;
+  --color-bg-primary: #0F172A;
+  --color-bg-secondary: #1E293B;
   --color-bg-tertiary: #334155;
-  
-  --color-text-primary: #f1f5f9;
-  --color-text-secondary: #cbd5e1;
-  --color-text-tertiary: #94a3b8;
-  
-  --color-primary: #4ade80;
-  --color-primary-hover: #22c55e;
-  --color-primary-light: rgba(74, 222, 128, 0.1);
-  
-  --color-secondary: #f1f5f9;
-  --color-accent: #fbbf24;
-  
+
+  --color-text-primary: #F1F5F9;
+  --color-text-secondary: #CBD5E1;
+  --color-text-tertiary: #94A3B8;
+
+  --color-primary: #818CF8;
+  --color-primary-hover: #6366F1;
+  --color-primary-light: rgba(129, 140, 248, 0.1);
+
+  --color-secondary: #F1F5F9;
+  --color-accent: #7DD3FC;
+
   --color-border: #334155;
   --color-shadow: rgba(0, 0, 0, 0.3);
   --color-overlay: rgba(15, 23, 42, 0.95);
-  
+
   /* Card & Components */
-  --card-bg: #1e293b;
+  --card-bg: #1E293B;
   --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-  --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
-  
+  --card-shadow-hover: 0 10px 15px -3px rgba(129, 140, 248, 0.15);
+
   /* Input & Forms */
-  --input-bg: #1e293b;
+  --input-bg: #1E293B;
   --input-border: #334155;
-  --input-focus-border: #4ade80;
-  --input-focus-shadow: 0 0 0 3px rgba(74, 222, 128, 0.1);
-  
+  --input-focus-border: #818CF8;
+  --input-focus-shadow: 0 0 0 3px rgba(129, 140, 248, 0.1);
+
   /* Footer */
-  --footer-bg: #1e293b;
-  --footer-text: #f1f5f9;
-  
+  --footer-bg: #1E293B;
+  --footer-text: #F1F5F9;
+
   /* Navbar */
   --nav-bg: rgba(30, 41, 59, 0.9);
   --nav-border: rgba(51, 65, 85, 0.5);
-  
+
   /* Code Blocks */
-  --code-bg: #0f172a;
-  --code-text: #f1f5f9;
+  --code-bg: #0F172A;
+  --code-text: #F1F5F9;
 }
 
 /* Global Theme Application */
@@ -223,8 +224,8 @@ hr {
 
 /* Smooth transitions for theme change */
 * {
-  transition: background-color 0.3s ease, 
-              color 0.3s ease, 
+  transition: background-color 0.3s ease,
+              color 0.3s ease,
               border-color 0.3s ease,
               box-shadow 0.3s ease;
 }
@@ -260,4 +261,3 @@ hr {
 [data-theme="dark"]::-webkit-scrollbar-thumb:hover {
   background: var(--color-text-tertiary);
 }
-
