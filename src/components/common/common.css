@@ -6,7 +6,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #6366F1 0%, #0F172A 100%);
   padding: 2rem;
 }
 
@@ -27,19 +27,19 @@
 .error-title {
   font-size: 2rem;
   font-weight: 700;
-  color: #2D3047;
+  color: #0F172A;
   margin-bottom: 1rem;
 }
 
 .error-description {
   font-size: 1.125rem;
-  color: #6B7280;
+  color: #475569;
   margin-bottom: 2rem;
   line-height: 1.6;
 }
 
 .error-button {
-  background: linear-gradient(135deg, #419D78 0%, #2D3047 100%);
+  background: linear-gradient(135deg, #6366F1 0%, #0F172A 100%);
   color: white;
   border: none;
   padding: 1rem 2rem;
@@ -52,7 +52,7 @@
 
 .error-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(65, 157, 120, 0.3);
+  box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
 }
 
 .error-details {
@@ -66,13 +66,13 @@
 .error-details summary {
   cursor: pointer;
   font-weight: 600;
-  color: #419D78;
+  color: #6366F1;
   margin-bottom: 0.5rem;
 }
 
 .error-stack {
-  background: #1f2937;
-  color: #f3f4f6;
+  background: #1E293B;
+  color: #F1F5F9;
   padding: 1rem;
   border-radius: 0.5rem;
   overflow-x: auto;
@@ -99,14 +99,14 @@
 .spinner-circle {
   width: 100%;
   height: 100%;
-  border: 4px solid #E5E7EB;
-  border-top-color: #419D78;
+  border: 4px solid #E2E8F0;
+  border-top-color: #6366F1;
   border-radius: 50%;
 }
 
 .loading-message {
   margin-top: 1.5rem;
-  color: #6B7280;
+  color: #475569;
   font-size: 1rem;
   font-weight: 500;
 }
@@ -155,7 +155,7 @@
   position: absolute;
   top: -40px;
   left: 0;
-  background: #419D78;
+  background: #6366F1;
   color: white;
   padding: 8px 16px;
   text-decoration: none;
@@ -170,7 +170,7 @@
 
 /* Focus visible styles for better keyboard navigation */
 *:focus-visible {
-  outline: 2px solid #419D78;
+  outline: 2px solid #6366F1;
   outline-offset: 2px;
 }
 
@@ -200,5 +200,3 @@
     border: 2px solid currentColor;
   }
 }
-
-
