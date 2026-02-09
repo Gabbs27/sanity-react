@@ -1,7 +1,7 @@
 
 import "./Greeting.css";
 import AnimatedSection from "../common/AnimatedSection";
-import p from "../../assets/developer-illustration.png";
+import p from "../../assets/nobggabo.png";
 
 const ReposGreeting = () => {
   return (
