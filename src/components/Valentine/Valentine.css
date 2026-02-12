@@ -1,0 +1,768 @@
+/* Valentine Secret Page - Para Leslie Margarita */
+
+/* ===================== LOCK SCREEN ===================== */
+.valentine-lock {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1e1b4b 0%, #4c1d95 30%, #be185d 70%, #f43f5e 100%);
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.valentine-lock-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 24px;
+  padding: 3rem;
+  max-width: 420px;
+  width: 100%;
+  z-index: 2;
+  text-align: center;
+}
+
+.valentine-lock-card .heart-icon {
+  font-size: 3.5rem;
+  color: #f43f5e;
+  margin-bottom: 1rem;
+  filter: drop-shadow(0 0 20px rgba(244, 63, 94, 0.5));
+}
+
+.valentine-lock-card h1 {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 0.5rem 0;
+}
+
+.valentine-lock-card .lock-subtitle {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0 0 2rem 0;
+}
+
+.valentine-lock-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.valentine-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.valentine-input {
+  width: 100%;
+  padding: 1rem 3rem 1rem 1.25rem;
+  font-size: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  transition: all 0.3s;
+  outline: none;
+  font-family: 'Inter', sans-serif;
+}
+
+.valentine-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.valentine-input:focus {
+  border-color: #f43f5e;
+  box-shadow: 0 0 0 4px rgba(244, 63, 94, 0.2);
+}
+
+.valentine-toggle-vis {
+  position: absolute;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  padding: 0.5rem;
+  font-size: 1.1rem;
+  transition: color 0.2s;
+}
+
+.valentine-toggle-vis:hover {
+  color: white;
+}
+
+.valentine-error {
+  padding: 0.75rem 1rem;
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: 10px;
+  color: #fca5a5;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.valentine-unlock-btn {
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, #f43f5e, #e11d48);
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px rgba(244, 63, 94, 0.4);
+  font-family: 'Inter', sans-serif;
+}
+
+.valentine-unlock-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(244, 63, 94, 0.5);
+}
+
+/* ===================== TSPARTICLES BACKGROUND ===================== */
+.particles-bg {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ===================== VALENTINE CONTENT ===================== */
+.valentine-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1e1b4b 0%, #4c1d95 25%, #7c3aed 50%, #be185d 75%, #f43f5e 100%);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+  position: relative;
+}
+
+@keyframes gradientShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ===================== HERO ===================== */
+.valentine-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  text-align: center;
+  padding: 2rem;
+  position: relative;
+  z-index: 2;
+}
+
+.big-heart {
+  font-size: 6rem;
+  filter: drop-shadow(0 0 40px rgba(244, 63, 94, 0.6));
+  margin-bottom: 1.5rem;
+  line-height: 1;
+}
+
+.valentine-title {
+  font-family: 'Bebas Neue', 'Inter', sans-serif;
+  font-size: 4.5rem;
+  color: white;
+  margin: 0;
+  text-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+  letter-spacing: 2px;
+  line-height: 1.1;
+}
+
+.valentine-subtitle {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.25rem;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 1.5rem 0 0 0;
+  font-weight: 300;
+  max-width: 500px;
+}
+
+.valentine-name {
+  color: #fbbf24;
+  font-weight: 700;
+  font-size: 1.4rem;
+}
+
+/* Hero flowers ring */
+.hero-flowers {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.hero-flower {
+  font-size: 2.5rem;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+  animation: gentleSway 3s ease-in-out infinite;
+}
+
+.hero-flower:nth-child(odd) {
+  animation-delay: 0.5s;
+}
+
+@keyframes gentleSway {
+  0%, 100% { transform: rotate(-5deg) translateY(0); }
+  50% { transform: rotate(5deg) translateY(-5px); }
+}
+
+/* Scroll indicator */
+.scroll-indicator {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1.5rem;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(10px); }
+}
+
+/* ===================== LOVE MESSAGE ===================== */
+.valentine-message-section {
+  padding: 6rem 2rem;
+  display: flex;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+}
+
+.valentine-message-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 24px;
+  padding: 3rem;
+  max-width: 650px;
+  width: 100%;
+  text-align: center;
+}
+
+.valentine-message-card h2 {
+  font-family: 'Bebas Neue', 'Inter', sans-serif;
+  font-size: 2rem;
+  color: #fbbf24;
+  margin: 0 0 1.5rem 0;
+  letter-spacing: 1px;
+}
+
+.valentine-message-card p {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.15rem;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.9;
+  margin: 0 0 1.5rem 0;
+}
+
+.message-flowers {
+  font-size: 2rem;
+  letter-spacing: 0.5rem;
+  animation: gentleSway 4s ease-in-out infinite;
+}
+
+/* ===================== FEATURED PHOTO (CAROUSEL) ===================== */
+.featured-photo-section {
+  padding: 4rem 2rem;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
+
+.featured-photo-wrapper {
+  position: relative;
+  max-width: 500px;
+  margin: 0 auto;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  aspect-ratio: 4 / 5;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.featured-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  cursor: pointer;
+  display: block;
+}
+
+.featured-flowers-left,
+.featured-flowers-right {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+  animation: gentleSway 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.featured-flowers-left {
+  left: -2.5rem;
+}
+
+.featured-flowers-right {
+  right: -2.5rem;
+  animation-delay: 1.5s;
+}
+
+.featured-dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.featured-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s;
+  padding: 0;
+}
+
+.featured-dot.active {
+  background: #f43f5e;
+  border-color: #f43f5e;
+  transform: scale(1.3);
+}
+
+.featured-dot:hover {
+  border-color: white;
+}
+
+/* ===================== PHOTO GALLERY ===================== */
+.valentine-gallery-section {
+  padding: 4rem 2rem 6rem;
+  position: relative;
+  z-index: 2;
+}
+
+.gallery-title {
+  font-family: 'Bebas Neue', 'Inter', sans-serif;
+  font-size: 2.5rem;
+  color: white;
+  text-align: center;
+  margin: 0 0 3rem 0;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
+}
+
+.valentine-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.gallery-item {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  aspect-ratio: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: box-shadow 0.4s ease;
+}
+
+/* Variaciones de tamaño para masonry-like effect */
+.gallery-item-1 { grid-row: span 1; }
+.gallery-item-2 { aspect-ratio: 4/5; }
+.gallery-item-3 { grid-row: span 1; }
+.gallery-item-4 { aspect-ratio: 5/4; }
+.gallery-item-5 { grid-row: span 1; }
+.gallery-item-6 { aspect-ratio: 4/5; }
+
+.gallery-item:hover {
+  box-shadow: 0 20px 50px rgba(244, 63, 94, 0.3);
+}
+
+.gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+.gallery-item:hover img {
+  transform: scale(1.12);
+}
+
+/* Flower decoration on each photo */
+.gallery-item-flower {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  font-size: 1.5rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+  opacity: 0;
+  transform: scale(0) rotate(-45deg);
+  transition: all 0.4s ease;
+  pointer-events: none;
+}
+
+.gallery-item:hover .gallery-item-flower {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+}
+
+/* ===================== LIGHTBOX ===================== */
+.lightbox-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  cursor: pointer;
+  padding: 2rem;
+}
+
+.lightbox-img {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 12px;
+  cursor: default;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.lightbox-close {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  font-size: 2.5rem;
+  color: white;
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  line-height: 1;
+}
+
+.lightbox-close:hover {
+  background: rgba(244, 63, 94, 0.5);
+  transform: rotate(90deg);
+}
+
+/* ===================== CTA SECTION (SI / NO) ===================== */
+.valentine-cta-section {
+  padding: 6rem 2rem 4rem;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+  overflow: visible;
+}
+
+.cta-title {
+  font-family: 'Bebas Neue', 'Inter', sans-serif;
+  font-size: 2.5rem;
+  color: white;
+  margin: 0 0 3rem 0;
+  text-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
+  letter-spacing: 1px;
+}
+
+.cta-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  position: relative;
+  min-height: 120px;
+}
+
+.valentine-yes-btn {
+  padding: 1.25rem 3.5rem;
+  font-size: 1.6rem;
+  font-weight: 700;
+  font-family: 'Bebas Neue', 'Inter', sans-serif;
+  color: white;
+  background: linear-gradient(135deg, #f43f5e, #e11d48, #be185d);
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  letter-spacing: 3px;
+  box-shadow: 0 8px 30px rgba(244, 63, 94, 0.5);
+  position: relative;
+  overflow: hidden;
+  z-index: 3;
+}
+
+.valentine-yes-btn::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.15) 50%,
+    transparent 70%
+  );
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0%   { transform: translateX(-100%) rotate(45deg); }
+  100% { transform: translateX(100%) rotate(45deg); }
+}
+
+/* ===================== RUNAWAY "NO" BUTTON ===================== */
+.runaway-no-btn {
+  position: absolute;
+  z-index: 99999;
+  padding: 1rem 2.5rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+  font-family: 'Bebas Neue', 'Inter', sans-serif;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50px;
+  cursor: pointer;
+  letter-spacing: 2px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.runaway-no-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.runaway-message {
+  position: absolute;
+  z-index: 100000;
+  white-space: nowrap;
+  background: rgba(244, 63, 94, 0.95);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  pointer-events: none;
+  box-shadow: 0 4px 15px rgba(244, 63, 94, 0.4);
+}
+
+/* ===================== CELEBRATION (canvas-confetti) ===================== */
+.celebration-message {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 101;
+  text-align: center;
+  pointer-events: none;
+}
+
+.celebration-message h2 {
+  font-family: 'Bebas Neue', 'Inter', sans-serif;
+  font-size: 4.5rem;
+  color: white;
+  text-shadow: 0 4px 30px rgba(0, 0, 0, 0.5), 0 0 60px rgba(244, 63, 94, 0.5);
+  margin: 0;
+  letter-spacing: 4px;
+}
+
+.celebration-message .celebration-hearts {
+  font-size: 3rem;
+  margin-top: 1rem;
+  letter-spacing: 0.5rem;
+}
+
+/* ===================== FOOTER ===================== */
+.valentine-footer {
+  padding: 4rem 2rem 3rem;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-flowers {
+  font-size: 2rem;
+  letter-spacing: 0.5rem;
+  margin-bottom: 1.5rem;
+  animation: gentleSway 4s ease-in-out infinite;
+}
+
+.valentine-footer p {
+  color: rgba(255, 255, 255, 0.8);
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  margin: 0.5rem 0;
+}
+
+.valentine-footer .footer-small {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 0.5rem;
+}
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 768px) {
+  .valentine-lock-card {
+    padding: 2rem 1.5rem;
+    margin: 0 1rem;
+  }
+
+  .valentine-lock-card h1 {
+    font-size: 1.3rem;
+  }
+
+  .valentine-title {
+    font-size: 3rem;
+  }
+
+  .valentine-subtitle {
+    font-size: 1rem;
+  }
+
+  .big-heart {
+    font-size: 4rem;
+  }
+
+  .hero-flower {
+    font-size: 2rem;
+  }
+
+  .hero-flowers {
+    gap: 0.5rem;
+  }
+
+  .valentine-gallery {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .gallery-title {
+    font-size: 2rem;
+  }
+
+  .valentine-message-card {
+    padding: 2rem 1.5rem;
+  }
+
+  .valentine-message-card h2 {
+    font-size: 1.5rem;
+  }
+
+  .valentine-message-card p {
+    font-size: 1rem;
+  }
+
+  .featured-photo-wrapper {
+    max-width: 85vw;
+  }
+
+  .featured-flowers-left,
+  .featured-flowers-right {
+    font-size: 1.5rem;
+  }
+
+  .featured-flowers-left {
+    left: -1.5rem;
+  }
+
+  .featured-flowers-right {
+    right: -1.5rem;
+  }
+
+  .cta-title {
+    font-size: 2rem;
+  }
+
+  .cta-buttons {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .valentine-yes-btn {
+    padding: 1rem 2.5rem;
+    font-size: 1.3rem;
+  }
+
+  .celebration-message h2 {
+    font-size: 3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .valentine-lock-card {
+    padding: 1.5rem 1rem;
+  }
+
+  .valentine-lock-card h1 {
+    font-size: 1.2rem;
+  }
+
+  .valentine-title {
+    font-size: 2.2rem;
+  }
+
+  .valentine-gallery {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+
+  .hero-flower {
+    font-size: 1.5rem;
+  }
+
+  .valentine-yes-btn {
+    padding: 0.875rem 2rem;
+    font-size: 1.1rem;
+  }
+
+  .runaway-no-btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+  }
+
+  .celebration-message h2 {
+    font-size: 2.2rem;
+  }
+
+  .featured-photo-wrapper {
+    max-width: 90vw;
+  }
+}

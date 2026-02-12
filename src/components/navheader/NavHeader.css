@@ -91,6 +91,61 @@
   border-radius: 2px;
 }
 
+/* ===================== VALENTINE HEADER ===================== */
+.header--valentine {
+  background: linear-gradient(135deg, rgba(30, 27, 75, 0.95) 0%, rgba(76, 29, 149, 0.95) 50%, rgba(190, 24, 93, 0.95) 100%);
+  border-bottom: 1px solid rgba(244, 63, 94, 0.3);
+  backdrop-filter: blur(12px);
+}
+
+.header--valentine .nav-container {
+  justify-content: space-between;
+}
+
+.logo-link--valentine {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: transform 0.2s;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white !important;
+  -webkit-text-fill-color: white !important;
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  font-family: 'Bebas Neue', 'Inter', sans-serif;
+  letter-spacing: 2px;
+}
+
+.logo-link--valentine:hover {
+  transform: translateY(-1px) scale(1.02);
+  -webkit-text-fill-color: #fbbf24 !important;
+  color: #fbbf24 !important;
+}
+
+.valentine-nav-flowers {
+  font-size: 1.25rem;
+  letter-spacing: 0.3rem;
+  animation: valentineNavSway 3s ease-in-out infinite;
+}
+
+@keyframes valentineNavSway {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+@media (max-width: 480px) {
+  .valentine-nav-flowers {
+    font-size: 0.9rem;
+    letter-spacing: 0.15rem;
+  }
+
+  .logo-link--valentine {
+    font-size: 1.2rem;
+  }
+}
+
 /* Dashboard link (dev only) */
 .nav-item-dashboard {
   border-left: 2px solid var(--color-border);

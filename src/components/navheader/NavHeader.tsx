@@ -1,9 +1,26 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import "./NavHeader.css";
 import ThemeToggle from "../ThemeToggle/ThemeToggle";
+
+const ValentineHeader = () => (
+  <header className="header header--valentine" role="banner">
+    <nav className="nav-container" role="navigation" aria-label="Valentine navigation">
+      <div className="nav-logo">
+        <NavLink to="/para-ti" className="logo-link logo-link--valentine">
+          ❤️ Para Ti
+        </NavLink>
+      </div>
+      <div className="valentine-nav-flowers">🌹 🌻 🌷 🌺 🌸</div>
+    </nav>
+  </header>
+);
+
 const NavBar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const location = useLocation();
+
+  const isValentine = location.pathname === "/para-ti";
 
   const handleMenuToggle = () => {
     setMenuOpen(!menuOpen);
@@ -15,6 +32,8 @@ const NavBar = () => {
       setMenuOpen(false);
     }
   };
+
+  if (isValentine) return <ValentineHeader />;
 
   return (
     <header className="header" role="banner">
