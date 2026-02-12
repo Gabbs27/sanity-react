@@ -5,8 +5,14 @@ import {
   faLinkedinIn,
   faGithub,
 } from "@fortawesome/free-brands-svg-icons";
+import { useLocation } from "react-router-dom";
 
 export default function Footer() {
+  const location = useLocation();
+
+  // La página Valentine tiene su propio footer, no mostrar el global
+  if (location.pathname === "/para-ti") return null;
+
   return (
     <footer className='footer--t'>
       <div className='footer--text'>

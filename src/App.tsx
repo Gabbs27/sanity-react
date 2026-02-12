@@ -16,6 +16,7 @@ const Services = lazy(() => import("./components/Services"));
 const Dashboard = lazy(() => import("./components/Dashboard/Dashboard"));
 const DashboardDemo = lazy(() => import("./components/Dashboard/DashboardDemo"));
 const AdminLogin = lazy(() => import("./components/Auth/AdminLogin"));
+const Valentine = lazy(() => import("./components/Valentine/Valentine"));
 
 function App() {
   return (
@@ -41,6 +42,9 @@ function App() {
             </ProtectedDashboard>
           }
         />
+
+        {/* Secret Valentine's page */}
+        <Route element={<Valentine />} path='/para-ti' />
 
         {/* Catch-all: must be last */}
         <Route path='*' element={<NotFound />} />
