@@ -619,7 +619,7 @@ const ValentineContent = () => {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             transition={{ type: "spring", damping: 10, stiffness: 100 }}>
-            <h2>TE AMO LESLIE</h2>
+            <h2>TE AMO BAE, Esposita, Piojin</h2>
             <div className="celebration-hearts">🌹 ❤️ 🌻 ❤️ 🌷</div>
           </motion.div>
         )}
