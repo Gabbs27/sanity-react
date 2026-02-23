@@ -1,3 +1,8 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /dashboard
+Disallow: /admin-login
+Disallow: /para-ti
+
+Sitemap: https://codewithgabo.com/sitemap.xml

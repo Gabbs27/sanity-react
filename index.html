@@ -10,17 +10,75 @@
       gtag('config', 'G-76H28FJYRY');
     </script>
     <meta charset="utf-8" />
-    <link rel="icon" href="/favicon.ico" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#6366F1" />
     <meta name="google-adsense-account" content="ca-pub-2464529747764309">
-    <meta name="description" content="Code With Gabo is a personal website that serves as a blog and a portfolio of Gabo's projects. The blog section covers various topics related to web development, software engineering, and technology in general. Meanwhile, the portfolio showcases Gabo's skills and experience as a full-stack developer, including projects he has worked on and contributed to. Visit Code With Gabo to learn more and get in touch with Gabo.">
+    <meta name="description" content="Gabriel Abreu — Full Stack Developer specializing in React, TypeScript, and C#. Explore my portfolio, blog, and open-source projects.">
+    <meta name="keywords" content="Gabriel Abreu, Full Stack Developer, React, TypeScript, C#, Web Development, Portfolio, Code With Gabo">
+    <meta name="author" content="Gabriel Abreu">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://codewithgabo.com/">
     <link rel="apple-touch-icon" href="/logo192.png" />
     <link rel="manifest" href="/manifest.json" />
-    <title>Code With Gabo</title>
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://codewithgabo.com/">
+    <meta property="og:title" content="Gabriel Abreu — Full Stack Developer">
+    <meta property="og:description" content="Portfolio, blog, and open-source projects by Gabriel Abreu. React, TypeScript, C# and modern web technologies.">
+    <meta property="og:image" content="https://codewithgabo.com/og-image.png">
+    <meta property="og:site_name" content="Code With Gabo">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Gabriel Abreu — Full Stack Developer">
+    <meta name="twitter:description" content="Portfolio, blog, and open-source projects by Gabriel Abreu.">
+    <meta name="twitter:image" content="https://codewithgabo.com/og-image.png">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "name": "Code With Gabo",
+          "url": "https://codewithgabo.com",
+          "description": "Portfolio and blog by Gabriel Abreu, Full Stack Developer.",
+          "author": { "@id": "https://codewithgabo.com/#person" }
+        },
+        {
+          "@type": "Person",
+          "@id": "https://codewithgabo.com/#person",
+          "name": "Gabriel Abreu",
+          "url": "https://codewithgabo.com",
+          "jobTitle": "Full Stack Developer",
+          "knowsAbout": ["React", "TypeScript", "C#", "Web Development", "Next.js"],
+          "sameAs": [
+            "https://github.com/Gabbs27",
+            "https://linkedin.com/in/gabriel-abreu"
+          ]
+        }
+      ]
+    }
+    </script>
+
+    <title>Gabriel Abreu — Full Stack Developer | Code With Gabo</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
+    <!-- GitHub Pages SPA redirect handler -->
+    <script>
+      (function(){
+        var redirect = sessionStorage.redirect;
+        delete sessionStorage.redirect;
+        if (redirect && redirect !== location.href) {
+          history.replaceState(null, null, redirect);
+        }
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/index.tsx"></script>
   </body>

@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#0F172A"/>
+    </linearGradient>
+    <linearGradient id="logoGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.25)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0.08)"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Decorative circles -->
+  <circle cx="1100" cy="80" r="180" fill="rgba(56,189,248,0.08)"/>
+  <circle cx="1050" cy="550" r="120" fill="rgba(56,189,248,0.05)"/>
+  <circle cx="150" cy="580" r="80" fill="rgba(56,189,248,0.05)"/>
+
+  <!-- Logo badge -->
+  <rect x="80" y="180" width="200" height="200" rx="32" ry="32" fill="url(#logoGrad)" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+  <text
+    x="180"
+    y="295"
+    font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif"
+    font-size="100"
+    font-weight="700"
+    fill="#FFFFFF"
+    text-anchor="middle"
+    dominant-baseline="central"
+    letter-spacing="-3"
+  >GA</text>
+
+  <!-- Main title -->
+  <text
+    x="340"
+    y="240"
+    font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif"
+    font-size="52"
+    font-weight="700"
+    fill="#FFFFFF"
+    letter-spacing="-1"
+  >Gabriel Abreu</text>
+
+  <!-- Subtitle -->
+  <text
+    x="340"
+    y="300"
+    font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif"
+    font-size="28"
+    font-weight="400"
+    fill="rgba(255,255,255,0.85)"
+  >Full Stack Developer</text>
+
+  <!-- Divider line -->
+  <rect x="340" y="330" width="60" height="3" rx="1.5" fill="rgba(56,189,248,0.7)"/>
+
+  <!-- Tech stack -->
+  <text
+    x="340"
+    y="370"
+    font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif"
+    font-size="22"
+    font-weight="300"
+    fill="rgba(255,255,255,0.7)"
+    letter-spacing="2"
+  >React | TypeScript | C# | Modern Web Technologies</text>
+
+  <!-- Bottom bar -->
+  <rect x="0" y="590" width="1200" height="40" fill="rgba(0,0,0,0.15)"/>
+  <text
+    x="600"
+    y="615"
+    font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif"
+    font-size="18"
+    font-weight="400"
+    fill="rgba(255,255,255,0.6)"
+    text-anchor="middle"
+  >codewithgabo.com</text>
+</svg>
