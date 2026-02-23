@@ -1,5 +1,5 @@
 import ReactDOM from "react-dom/client";
-import { HashRouter } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import "./index.css";
 import "./styles/theme.css";
@@ -19,7 +19,7 @@ root.render(
     <ThemeProvider>
       <AuthProvider>
         <HelmetProvider>
-          <HashRouter>
+          <BrowserRouter>
             <a href="#main-content" className="skip-link">
               Skip to main content
             </a>
@@ -29,7 +29,7 @@ root.render(
             </main>
             <Footer />
             <InstallPWA />
-          </HashRouter>
+          </BrowserRouter>
         </HelmetProvider>
       </AuthProvider>
     </ThemeProvider>

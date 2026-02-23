@@ -1,4 +1,3 @@
-
 import { Helmet } from "react-helmet-async";
 
 /**
@@ -17,10 +16,10 @@ interface SEOProps {
 
 const SEO = ({
   title = "Gabriel Abreu - Full Stack Developer",
-  description = "Portfolio of Gabriel Abreu, a passionate Full Stack Developer specializing in React, C#, and modern web technologies.",
+  description = "Portfolio of Gabriel Abreu, a passionate Full Stack Developer specializing in React, TypeScript, C#, and modern web technologies.",
   keywords = "Gabriel Abreu, Full Stack Developer, React Developer, C# Developer, Web Development, Portfolio",
   author = "Gabriel Abreu",
-  image = "https://codewithgabo.com/images/og-image.png",
+  image = "https://codewithgabo.com/og-image.png",
   url = "https://codewithgabo.com",
   type = "website",
 }: SEOProps) => {
@@ -43,13 +42,14 @@ const SEO = ({
       <meta property="og:title" content={siteTitle} />
       <meta property="og:description" content={description} />
       <meta property="og:image" content={image} />
+      <meta property="og:site_name" content="Code With Gabo" />
 
       {/* Twitter */}
-      <meta property="twitter:card" content="summary_large_image" />
-      <meta property="twitter:url" content={url} />
-      <meta property="twitter:title" content={siteTitle} />
-      <meta property="twitter:description" content={description} />
-      <meta property="twitter:image" content={image} />
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:url" content={url} />
+      <meta name="twitter:title" content={siteTitle} />
+      <meta name="twitter:description" content={description} />
+      <meta name="twitter:image" content={image} />
 
       {/* Additional SEO */}
       <link rel="canonical" href={url} />
@@ -61,5 +61,3 @@ const SEO = ({
 };
 
 export default SEO;
-
-

@@ -4,6 +4,12 @@
   "description": "Professional portfolio showcasing web development projects, blog posts, and services by Gabriel Abreu (Gabbs27)",
   "icons": [
     {
+      "src": "favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any"
+    },
+    {
       "src": "favicon.ico",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
@@ -23,7 +29,7 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#419D78",
+  "theme_color": "#6366F1",
   "background_color": "#FAFBFC",
   "orientation": "portrait-primary",
   "categories": ["portfolio", "development", "technology"],
