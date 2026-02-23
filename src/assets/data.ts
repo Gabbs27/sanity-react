@@ -11,6 +11,16 @@ export const data = [
   },
   {
     id: 1,
+    image: "/images/negociord.png",
+    title: "NegocioRD",
+    description:
+      "WhatsApp Order Management Platform for Dominican SMEs. Features an AI-powered chatbot (Claude) that takes orders via WhatsApp, real-time order tracking with status flow, product catalog management, Stripe subscription billing, analytics dashboard with Recharts, and real-time push notifications via SSE. Fully bilingual (ES/EN).",
+    url: "https://negocio-rd.vercel.app",
+    languages: ["Next.js", "React 19", "TypeScript", "Tailwind CSS", "Prisma", "PostgreSQL", "Stripe", "Claude AI"],
+    badge: "New",
+  },
+  {
+    id: 2,
     image: "/images/HairSalon.png",
     title: "Hair Salon & Spa",
     description:
@@ -19,7 +29,7 @@ export const data = [
     languages: ["React", "TypeScript", "Vite", "CSS3", "GitHub Actions"],
   },
   {
-    id: 2,
+    id: 3,
     image: "/images/invoice_generator.png",
     url: "https://gabbs27.github.io/invoice-generator/",
     title: "Invoice Generator",
@@ -28,7 +38,7 @@ export const data = [
     languages: ["ReactJS", "typescript"],
   },
   {
-    id: 3,
+    id: 4,
     image: "/images/calendar.png",
     url: "https://gabbs27.github.io/calendar-reminder/",
     title: "My React Calendar",
@@ -37,7 +47,7 @@ export const data = [
     languages: ["ReactJS", "Axios", "HTML", "OpenWeather"],
   },
   {
-    id: 4,
+    id: 5,
     image: "/images/movie.png",
     url: "https://gabbs27.github.io/gmovie-app/",
     title: "G-Movie",
@@ -54,7 +64,7 @@ export const data = [
     ],
   },
   {
-    id: 5,
+    id: 6,
     image: "/images/todo.png",
     title: "ToDo-matic",
     description:
@@ -62,9 +72,8 @@ export const data = [
     url: "https://gabbs27.github.io/todolist/",
     languages: ["ReactJS"],
   },
-
   {
-    id: 6,
+    id: 7,
     image: "/images/memegenerator.png",
     title: "Memelogy",
     description: "A simple meme generator using ReactJs and ImgFlip API",
