@@ -11,7 +11,7 @@
 }
 
 .error-boundary-content {
-  background: white;
+  background: var(--card-bg, #ffffff);
   border-radius: 2rem;
   padding: 3rem;
   max-width: 600px;
@@ -27,13 +27,13 @@
 .error-title {
   font-size: 2rem;
   font-weight: 700;
-  color: #0F172A;
+  color: var(--color-text-primary);
   margin-bottom: 1rem;
 }
 
 .error-description {
   font-size: 1.125rem;
-  color: #475569;
+  color: var(--color-text-secondary);
   margin-bottom: 2rem;
   line-height: 1.6;
 }
