@@ -1,17 +1,21 @@
 import { useState, useEffect } from "react";
-import Card from "./card/Card";
+import RepoCard from "./card/RepoCard";
 import AnimatedSection from "./common/AnimatedSection";
 import SEO from "./common/SEO";
 import ReposGreeting from "./Greeting/ReposGreeting";
-import github from "../assets/github.png";
 import usePageTracking from "../hooks/useAnalytics";
 import "./card/PostCard.css";
 
 interface GithubRepo {
   id: number;
   name: string;
-  description: string;
+  description: string | null;
   html_url: string;
+  language: string | null;
+  stargazers_count: number;
+  forks_count: number;
+  updated_at: string;
+  topics?: string[];
 }
 
 const Repos = () => {
@@ -30,9 +34,12 @@ const Repos = () => {
 
   useEffect(() => {
     const username = import.meta.env.VITE_GITHUB_USERNAME || "Gabbs27";
+    // mediaType.preview enables `topics` in the response
     const apiUrl = `https://api.github.com/users/${username}/repos?per_page=20&sort=updated`;
     const token = import.meta.env.VITE_GITHUB_TOKEN;
-    const headers: Record<string, string> = {};
+    const headers: Record<string, string> = {
+      Accept: "application/vnd.github.mercy-preview+json",
+    };
     if (token) {
       headers.Authorization = `token ${token}`;
     }
@@ -88,12 +95,15 @@ const Repos = () => {
                   variant="fadeInUp"
                   duration={0.5}
                   delay={index * 0.1}>
-                  <Card
-                    image={github}
-                    title={repo.name}
-                    description={repo.description || "No description available"}
+                  <RepoCard
+                    name={repo.name}
+                    description={repo.description}
                     url={repo.html_url}
-                    languages={[]}
+                    language={repo.language}
+                    stars={repo.stargazers_count}
+                    forks={repo.forks_count}
+                    updatedAt={repo.updated_at}
+                    topics={repo.topics}
                   />
                 </AnimatedSection>
               ))}
