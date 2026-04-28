@@ -188,6 +188,33 @@ If verification fails, **no commit** until root-caused and fixed.
 ## Slice progress
 
 - ✅ **Slice 1 — Theme audit fixes** completed 2026-04-28. Six audit findings landed across 6 commits (`48c80f6`, `1cb969c`, `477c87d`, `370a629`, `c6ea573`, `acfb703`). Verified in both modes via computed-style inspection.
+- ✅ **Slice 2 — Vercel migration (code refactor)** completed 2026-04-28. Five commits: `f5b6d39` (vercel.json), `09460ff` (auth helper), `76b57d1` (GA4 helpers), `1524693` (handlers), `05f00e6` (drop Express + delete server.js). Module-load verified locally. Deployment + smoke test deferred to manual checklist below.
+
+### Slice 2 manual deployment checklist
+
+Run these steps once env vars are ready in Vercel:
+
+1. Install Vercel CLI: `npm i -g vercel` (or `npx vercel ...`)
+2. From `analytics-backend/`: `vercel login`, then `vercel`. Project name suggestion: `analytics-backend`. Accept defaults.
+3. In Vercel dashboard → project → Settings → Environment Variables, add for **Production + Preview + Development**:
+   - `ADMIN_TOKEN` — fresh value from `openssl rand -hex 32`
+   - `FRONTEND_URL=https://codewithgabo.com,https://gabbs27.github.io,http://localhost:3000`
+   - `GA4_CLIENT_EMAIL` — service-account email from the rotated GCP JSON
+   - `GA4_PRIVATE_KEY` — `private_key` field from the rotated GCP JSON (paste with real newlines; Vercel supports multiline values)
+   - `GA4_PROPERTY_ID=210671049`
+   - `NODE_ENV` is auto-set by Vercel; don't add manually
+4. Promote: `vercel --prod`. Note the URL.
+5. Update frontend `.env.production`:
+   ```
+   VITE_ANALYTICS_API_URL=https://<your-vercel-url>
+   ```
+6. Rebuild + redeploy portfolio: `npm run deploy` from project root.
+7. Smoke test: `https://codewithgabo.com/#/admin-login`, paste the new `ADMIN_TOKEN`, confirm dashboard loads with real metrics.
+8. Decommission Railway: stop the `analytics-backend` service in Railway dashboard.
+
+### Pending hygiene (out of slice but worth tracking)
+
+- `npm audit` reports 9 vulnerabilities in transitive deps of `@google-analytics/data` (1 critical, 1 high, 5 moderate, 2 low). Pre-existing — not blocking — but a `npm audit fix` pass should land in a follow-up commit when convenient.
 
 ## Commit log (planned)
 
