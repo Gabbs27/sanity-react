@@ -75,8 +75,8 @@
 }
 
 .post-card__read-more:hover {
-  background: white;
-  color: var(--color-secondary);
+  background: #ffffff;
+  color: #0f172a; /* fixed dark — background is always white on hover regardless of theme */
 }
 
 .post-card__content {
