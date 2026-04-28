@@ -188,7 +188,8 @@ If verification fails, **no commit** until root-caused and fixed.
 ## Slice progress
 
 - ✅ **Slice 1 — Theme audit fixes** completed 2026-04-28. Six audit findings landed across 6 commits (`48c80f6`, `1cb969c`, `477c87d`, `370a629`, `c6ea573`, `acfb703`). Verified in both modes via computed-style inspection.
-- ✅ **Slice 2 — Vercel migration (code refactor)** completed 2026-04-28. Five commits: `f5b6d39` (vercel.json), `09460ff` (auth helper), `76b57d1` (GA4 helpers), `1524693` (handlers), `05f00e6` (drop Express + delete server.js). Module-load verified locally. Deployment + smoke test deferred to manual checklist below.
+- ✅ **Slice 2 — Vercel migration (code refactor)** completed 2026-04-28. Five commits: `f5b6d39` (vercel.json), `09460ff` (auth helper), `76b57d1` (GA4 helpers), `1524693` (handlers), `05f00e6` (drop Express + delete server.js). Module-load verified locally. Deployed to `https://analytics-backend-seven.vercel.app` (alias). Smoke-tested with real ADMIN_TOKEN; dashboard works end-to-end.
+- ✅ **Slice 3 — Custom post editor (BlockNote)** completed 2026-04-28. Backend: `017f135` (Sanity client helper), `ca4b591` (posts list+create), `ee0b872` (posts/[id] CRUD), `3ba2899` (upload proxy). Frontend: `91ee39b` (BlockNote deps + portable text mapper, includes mantine peer deps), `79e6d26` (AdminLayout sidebar), `bfd6f06` (PostsList table), `a97613d` (PostEditor with BlockNote + image upload), `4663f5a` (admin routes wired). Deployed to production via `vercel --prod` and `npm run deploy`. Verified locally: `/admin/posts` lists real posts from Sanity; `/admin/escribir` renders BlockNote editor with all metadata fields.
 
 ### Slice 2 manual deployment checklist
 
