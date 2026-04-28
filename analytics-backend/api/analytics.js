@@ -90,6 +90,21 @@ module.exports = async (req, res) => {
       metrics: [{ name: 'activeUsers' }],
     });
 
+    const [affiliateResponse] = await client.runReport({
+      property: `properties/${propertyId}`,
+      dateRanges: [{ startDate, endDate }],
+      dimensions: [{ name: 'eventName' }, { name: 'customEvent:link_domain' }],
+      metrics: [{ name: 'eventCount' }],
+      dimensionFilter: {
+        filter: {
+          fieldName: 'eventName',
+          stringFilter: { value: 'affiliate_click', matchType: 'EXACT' },
+        },
+      },
+      orderBys: [{ metric: { metricName: 'eventCount' }, desc: true }],
+      limit: 10,
+    });
+
     const formatted = formatAnalyticsData({
       overview: overviewResponse,
       pageViews: pageViewsResponse,
@@ -98,6 +113,7 @@ module.exports = async (req, res) => {
       devices: devicesResponse,
       browsers: browsersResponse,
       realtime: realtimeResponse,
+      affiliate: affiliateResponse,
     });
 
     res.json(formatted);
