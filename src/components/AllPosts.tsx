@@ -5,6 +5,7 @@ import SEO from "./common/SEO";
 import sanityClient from "../client";
 import PostCard from "./card/PostCard";
 import PostGreeting from "./Greeting/PostGreeting";
+import NewsletterSignup from "./Newsletter/NewsletterSignup";
 import usePageTracking from "../hooks/useAnalytics";
 import "./card/PostCard.css";
 
@@ -127,6 +128,8 @@ export default function AllPosts() {
               ))}
             </nav>
           )}
+
+          <NewsletterSignup variant="card" />
         </section>
       </div>
     </>
