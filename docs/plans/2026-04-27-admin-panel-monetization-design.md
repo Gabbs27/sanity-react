@@ -185,6 +185,10 @@ For each slice before commit:
 
 If verification fails, **no commit** until root-caused and fixed.
 
+## Slice progress
+
+- ✅ **Slice 1 — Theme audit fixes** completed 2026-04-28. Six audit findings landed across 6 commits (`48c80f6`, `1cb969c`, `477c87d`, `370a629`, `c6ea573`, `acfb703`). Verified in both modes via computed-style inspection.
+
 ## Commit log (planned)
 
 1. `fix(theme): resolve dark/light mode contrast issues`
