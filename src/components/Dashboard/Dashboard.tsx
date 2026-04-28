@@ -12,6 +12,7 @@ import {
   faCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import MetricCard from "./MetricCard";
+import NewsletterCard from "./NewsletterCard";
 import ChartCard from "./ChartCard";
 import useAnalyticsData from "../../hooks/useAnalyticsData";
 import usePageTracking from "../../hooks/useAnalytics";
@@ -138,6 +139,7 @@ const Dashboard = () => {
               trendValue="-2.1%"
               color="warning"
             />
+            <NewsletterCard />
           </div>
 
           {/* Charts Row 1 */}
