@@ -1,0 +1,114 @@
+.posts-list { max-width: 1100px; }
+
+.posts-list__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.posts-list__header h1 { margin: 0; }
+
+.posts-list__new-btn {
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.posts-list__new-btn:hover { background: var(--color-primary-hover); }
+
+.posts-list__search {
+  width: 100%;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  background: var(--input-bg);
+  color: var(--color-text-primary);
+  margin-bottom: 1rem;
+}
+
+.posts-list__search:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.posts-list__empty {
+  color: var(--color-text-secondary);
+  padding: 2rem;
+  text-align: center;
+}
+
+.posts-list__error {
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.08);
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+.posts-list__table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--card-bg);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.posts-list__table th,
+.posts-list__table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.9rem;
+}
+
+.posts-list__table th {
+  background: var(--color-bg-tertiary);
+  font-weight: 600;
+}
+
+.posts-list__table tr:last-child td { border-bottom: none; }
+
+.posts-list__badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  margin-right: 0.4rem;
+}
+
+.posts-list__badge--sponsored {
+  background: rgba(217, 119, 87, 0.15);
+  color: #d97757;
+}
+
+.posts-list__badge--affiliate {
+  background: rgba(87, 185, 217, 0.15);
+  color: #57b9d9;
+}
+
+.posts-list__actions { display: flex; gap: 0.5rem; }
+
+.posts-list__action {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 0.4rem;
+  padding: 0.35rem 0.7rem;
+  color: var(--color-text-primary);
+  text-decoration: none;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.posts-list__action:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.posts-list__action--danger:hover {
+  border-color: #dc2626;
+  color: #dc2626;
+}
