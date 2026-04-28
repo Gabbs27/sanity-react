@@ -90,20 +90,35 @@ module.exports = async (req, res) => {
       metrics: [{ name: 'activeUsers' }],
     });
 
-    const [affiliateResponse] = await client.runReport({
-      property: `properties/${propertyId}`,
-      dateRanges: [{ startDate, endDate }],
-      dimensions: [{ name: 'eventName' }, { name: 'customEvent:link_domain' }],
-      metrics: [{ name: 'eventCount' }],
-      dimensionFilter: {
-        filter: {
-          fieldName: 'eventName',
-          stringFilter: { value: 'affiliate_click', matchType: 'EXACT' },
+    // The affiliate report depends on `link_domain` being registered as a
+    // GA4 Custom Dimension on the property. If it isn't (yet), GA4 returns
+    // INVALID_ARGUMENT and the whole report would otherwise blow up. Wrap
+    // the call so we degrade to "no affiliate data" instead of failing the
+    // entire dashboard.
+    let affiliateResponse = null;
+    try {
+      const [resp] = await client.runReport({
+        property: `properties/${propertyId}`,
+        dateRanges: [{ startDate, endDate }],
+        dimensions: [{ name: 'eventName' }, { name: 'customEvent:link_domain' }],
+        metrics: [{ name: 'eventCount' }],
+        dimensionFilter: {
+          filter: {
+            fieldName: 'eventName',
+            stringFilter: { value: 'affiliate_click', matchType: 'EXACT' },
+          },
         },
-      },
-      orderBys: [{ metric: { metricName: 'eventCount' }, desc: true }],
-      limit: 10,
-    });
+        orderBys: [{ metric: { metricName: 'eventCount' }, desc: true }],
+        limit: 10,
+      });
+      affiliateResponse = resp;
+    } catch (err) {
+      console.warn(
+        'Affiliate query failed (likely link_domain custom dimension not registered):',
+        err.message
+      );
+      affiliateResponse = { rows: [] };
+    }
 
     const formatted = formatAnalyticsData({
       overview: overviewResponse,
