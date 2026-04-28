@@ -6,6 +6,7 @@ import AnimatedSection from "./common/AnimatedSection";
 import SEO from "./common/SEO";
 import LoadingSpinner from "./common/LoadingSpinner";
 import NewsletterSignup from "./Newsletter/NewsletterSignup";
+import AdSlot from "./Ads/AdSlot";
 import "./OnePost.css";
 import usePageTracking from "../hooks/useAnalytics";
 
@@ -120,11 +121,32 @@ const OnePost = () => {
                 extra cost to you. It helps keep this blog running — thank you.
               </aside>
             )}
-            <PortableText
-              value={postData.body}
-              components={portableTextComponents}
-            />
+            {/* In-article ad: split the body so AdSense can place a slot
+                roughly a third of the way through. Falls back to a single
+                <PortableText> render when the body is too short to split
+                cleanly (under 4 blocks). */}
+            {Array.isArray(postData.body) && postData.body.length >= 4 ? (
+              <>
+                <PortableText
+                  value={postData.body.slice(0, 3)}
+                  components={portableTextComponents}
+                />
+                <AdSlot slotId="in-article-1" format="fluid" layout="in-article" />
+                <PortableText
+                  value={postData.body.slice(3)}
+                  components={portableTextComponents}
+                />
+              </>
+            ) : (
+              <PortableText
+                value={postData.body}
+                components={portableTextComponents}
+              />
+            )}
           </div>
+
+          {/* End-of-post ad — between content and the newsletter CTA. */}
+          <AdSlot slotId="end-of-post-1" format="auto" />
 
           <NewsletterSignup variant="inline" />
         </article>

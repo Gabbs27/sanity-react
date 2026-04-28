@@ -1,0 +1,17 @@
+/* AdSlot — wrapper around <ins.adsbygoogle> so we can reserve space
+   and avoid layout shift before AdSense fills the slot. */
+
+.ad-slot {
+  display: block;
+  width: 100%;
+  min-height: 100px; /* reserve a thin band so the page doesn't jump */
+  margin: 2rem 0;
+  text-align: center;
+}
+
+.ad-slot .adsbygoogle {
+  width: 100%;
+}
+
+/* In dev environments where AdSense isn't loaded, the .ad-slot wrapper
+   never renders (component returns null). No fallback styles needed. */
