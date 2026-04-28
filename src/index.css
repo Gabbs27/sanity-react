@@ -85,18 +85,43 @@ body {
   left:0;
   bottom:0;
   right:0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px 16px;
   text-align: center;
   background-color: var(--footer-bg, #0F172A);
   color: var(--footer-text, #F1F5F9);
-  }
-.footer--button{
-  position: static;
-  margin-bottom: 5px;
 }
 
 .footer--text{
-  position: static;
- margin-bottom: 5px;
+  margin: 0;
+  width: 100%;
+  text-align: center;
+}
+
+.footer--text p{
+  margin: 0;
+}
+
+.footer--buttons{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.footer-social-link{
+  color: #57b9d9;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.footer-social-link:hover{
+  color: #3a9cbd;
+  transform: translateY(-2px);
 }
 
 .copy--div{
@@ -444,7 +469,7 @@ body {
   border-radius: 2rem;
   padding: 4rem 2rem;
   text-align: center;
-  color: white;
+  color: #ffffff;
 }
 
 .cta-content {
@@ -452,16 +477,21 @@ body {
   margin: 0 auto;
 }
 
-.cta-title {
+/* Force readable colors on the gradient regardless of theme */
+.cta-container .cta-title,
+.cta-container h2.cta-title {
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 1rem;
+  color: #ffffff;
 }
 
-.cta-description {
+.cta-container .cta-description,
+.cta-container p.cta-description {
   font-size: 1.125rem;
   margin-bottom: 2rem;
-  opacity: 0.9;
+  opacity: 0.95;
+  color: rgba(255, 255, 255, 0.92);
 }
 
 .cta-buttons {
