@@ -5,11 +5,17 @@
   "scripts": {
     "dev": "vercel dev"
   },
-  "keywords": ["analytics", "ga4", "google-analytics", "express"],
+  "keywords": [
+    "analytics",
+    "ga4",
+    "google-analytics",
+    "express"
+  ],
   "author": "Gabriel Abreu",
   "license": "MIT",
   "dependencies": {
-    "dotenv": "^16.3.1",
-    "@google-analytics/data": "^4.1.0"
+    "@google-analytics/data": "^4.1.0",
+    "@sanity/client": "^7.22.0",
+    "dotenv": "^16.3.1"
   }
 }
