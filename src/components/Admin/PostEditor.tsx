@@ -5,6 +5,7 @@ import { BlockNoteView } from '@blocknote/mantine';
 import { useCreateBlockNote, getDefaultReactSlashMenuItems, SuggestionMenuController } from '@blocknote/react';
 import '@blocknote/mantine/style.css';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import { blocksToPortable, portableToBlocks } from '../../utils/blocknoteToPortable';
 import LoadingSpinner from '../common/LoadingSpinner';
 import './PostEditor.css';
@@ -21,6 +22,7 @@ export default function PostEditor() {
   const { id } = useParams();
   const isEdit = !!id;
   const { adminToken } = useAuth();
+  const { isDark } = useTheme();
   const navigate = useNavigate();
   const apiUrl = import.meta.env.VITE_ANALYTICS_API_URL || '';
 
@@ -219,7 +221,7 @@ export default function PostEditor() {
       </div>
 
       <div className="post-editor__body">
-        <BlockNoteView editor={editor} theme="dark" slashMenu={false}>
+        <BlockNoteView editor={editor} theme={isDark ? 'dark' : 'light'} slashMenu={false}>
           <SuggestionMenuController
             triggerCharacter="/"
             getItems={async (query) =>
