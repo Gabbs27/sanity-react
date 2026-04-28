@@ -346,6 +346,11 @@ body {
   transform: translateY(-2px);
 }
 
+[data-theme="dark"] .contact-link.resume {
+  background-color: var(--color-primary);
+  color: #ffffff;
+}
+
 /* Media Queries */
 @media (max-width: 768px) {
   .contact-container {
