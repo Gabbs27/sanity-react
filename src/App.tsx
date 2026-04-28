@@ -34,20 +34,21 @@ function App() {
         <Route element={<Education />} path='/education' />
         <Route element={<Services />} path='/services' />
 
-        {/* Analytics Dashboards */}
+        {/* Analytics Dashboards (public/demo + login) */}
         <Route element={<DashboardDemo />} path='/dashboard-demo' />
         <Route element={<AdminLogin />} path='/admin-login' />
-        <Route
-          path='/dashboard'
-          element={
-            <ProtectedDashboard>
-              <Dashboard />
-            </ProtectedDashboard>
-          }
-        />
 
-        {/* Admin routes (auth gated inside AdminLayout) */}
+        {/* Admin routes — all share AdminLayout's sidebar (Dashboard, Posts,
+            Write New, Logout). Auth is gated inside AdminLayout via AuthContext. */}
         <Route element={<AdminLayout />}>
+          <Route
+            path='/dashboard'
+            element={
+              <ProtectedDashboard>
+                <Dashboard />
+              </ProtectedDashboard>
+            }
+          />
           <Route path="/admin/posts" element={<PostsList />} />
           <Route path="/admin/escribir" element={<PostEditor />} />
           <Route path="/admin/escribir/:id" element={<PostEditor />} />
