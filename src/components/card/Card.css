@@ -1,5 +1,5 @@
 .project-card {
-  background: white;
+  background: var(--card-bg);
   border-radius: 1rem;
   overflow: hidden;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
@@ -65,12 +65,12 @@
 .card-title {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #0F172A;
+  color: var(--color-text-primary);
   margin-bottom: 0.75rem;
 }
 
 .card-description {
-  color: #475569;
+  color: var(--color-text-secondary);
   font-size: 0.875rem;
   line-height: 1.5;
   margin-bottom: 1rem;
