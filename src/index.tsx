@@ -12,6 +12,7 @@ import { ThemeProvider } from "./context/ThemeContext";
 import { AuthProvider } from "./context/AuthContext";
 import InstallPWA from "./components/InstallPWA/InstallPWA";
 import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
+import { installAffiliateTracker } from "./utils/affiliateTracker";
 
 const root = ReactDOM.createRoot(document.getElementById("root")!);
 root.render(
@@ -35,6 +36,8 @@ root.render(
     </ThemeProvider>
   </ErrorBoundary>
 );
+
+installAffiliateTracker();
 
 // Register service worker for PWA functionality
 serviceWorkerRegistration.register({
