@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "description": "Backend server for Google Analytics 4 API integration",
   "scripts": {
-    "dev": "vercel dev",
-    "build": "vercel build"
+    "dev": "vercel dev"
   },
   "keywords": ["analytics", "ga4", "google-analytics", "express"],
   "author": "Gabriel Abreu",
