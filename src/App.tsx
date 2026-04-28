@@ -1,5 +1,5 @@
 import { Suspense, lazy } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useParams } from "react-router-dom";
 import LoadingSpinner from "./components/common/LoadingSpinner";
 import ProtectedDashboard from "./components/Dashboard/ProtectedDashboard";
 
@@ -20,6 +20,17 @@ const Valentine = lazy(() => import("./components/Valentine/Valentine"));
 const AdminLayout = lazy(() => import("./components/Admin/AdminLayout"));
 const PostsList = lazy(() => import("./components/Admin/PostsList"));
 const PostEditor = lazy(() => import("./components/Admin/PostEditor"));
+
+/**
+ * Wrapper that reads the :id route param and passes it as `key` to PostEditor,
+ * so React remounts the component when navigating between different post IDs
+ * (or back to /admin/escribir for a fresh draft). Without this, useEffect's
+ * fetch + BlockNote editor state would not reset when switching posts.
+ */
+function PostEditorWithKey() {
+  const { id } = useParams();
+  return <PostEditor key={id ?? "new"} />;
+}
 
 function App() {
   return (
@@ -50,8 +61,12 @@ function App() {
             }
           />
           <Route path="/admin/posts" element={<PostsList />} />
-          <Route path="/admin/escribir" element={<PostEditor />} />
-          <Route path="/admin/escribir/:id" element={<PostEditor />} />
+          {/* PostEditorWithKey uses the route :id as React `key` so that
+              navigating between create (no id) and edit (different ids)
+              forces a clean unmount/remount — otherwise local state and
+              the BlockNote editor instance leak across routes. */}
+          <Route path="/admin/escribir" element={<PostEditorWithKey />} />
+          <Route path="/admin/escribir/:id" element={<PostEditorWithKey />} />
         </Route>
 
         {/* Secret Valentine's page */}
