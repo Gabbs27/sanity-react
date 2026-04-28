@@ -10,14 +10,12 @@ import {
   faMobile,
   faGlobe,
   faCircle,
-  faSignOutAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import MetricCard from "./MetricCard";
 import ChartCard from "./ChartCard";
 import useAnalyticsData from "../../hooks/useAnalyticsData";
 import usePageTracking from "../../hooks/useAnalytics";
 import { useAuth } from "../../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 import SEO from "../common/SEO";
 import LoadingSpinner from "../common/LoadingSpinner";
 import "./Dashboard.css";
@@ -31,8 +29,7 @@ import "./Dashboard.css";
 const Dashboard = () => {
   usePageTracking();
   const [dateRange, setDateRange] = useState("30days");
-  const { adminToken, logout } = useAuth();
-  const navigate = useNavigate();
+  const { adminToken } = useAuth();
   const { data, loading, error } = useAnalyticsData(dateRange, adminToken, false);
 
   if (loading) {
@@ -77,21 +74,6 @@ const Dashboard = () => {
                 Real-time data from Google Analytics 4
               </p>
             </div>
-
-            {/* Logout button */}
-            <motion.button
-              className="logout-button"
-              onClick={() => {
-                logout();
-                navigate("/");
-              }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              aria-label="Logout"
-            >
-              <FontAwesomeIcon icon={faSignOutAlt} />
-              <span>Logout</span>
-            </motion.button>
 
             {/* Real-time indicator */}
             <div className="realtime-indicator">
