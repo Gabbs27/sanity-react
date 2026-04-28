@@ -57,6 +57,11 @@ function formatDuration(seconds) {
 function formatAnalyticsData(responses) {
   const { overview, pageViews, topPages, countries, devices, browsers, realtime } = responses;
 
+  const affiliateData = (responses.affiliate?.rows || []).map((row) => ({
+    domain: row.dimensionValues[1]?.value || 'unknown',
+    clicks: parseInt(row.metricValues[0].value),
+  })).filter((r) => r.domain && r.domain !== '(not set)');
+
   const overviewRow = overview.rows?.[0];
   const totalVisits = parseInt(overviewRow?.metricValues[0]?.value || 0);
   const uniqueVisitors = parseInt(overviewRow?.metricValues[1]?.value || 0);
@@ -138,6 +143,7 @@ function formatAnalyticsData(responses) {
     devices: devicesData,
     browsers: browsersData,
     realtimeUsers,
+    affiliateClicks: affiliateData,
   };
 }
 
