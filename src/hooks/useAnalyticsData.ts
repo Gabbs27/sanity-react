@@ -56,6 +56,7 @@ export interface AnalyticsData {
   devices: DeviceData[];
   browsers: BrowserData[];
   realtimeUsers: number;
+  affiliateClicks?: { domain: string; clicks: number }[];
 }
 
 export const useAnalyticsData = (dateRange = "30days", adminToken: string | null = null, useMock = false) => {
