@@ -22,6 +22,12 @@ const NavBar = () => {
 
   const isValentine = location.pathname === "/para-ti";
 
+  // Admin section has its own AdminLayout sidebar — don't double-stack a public nav on top.
+  const isAdmin =
+    location.pathname === "/admin-login" ||
+    location.pathname === "/dashboard" ||
+    location.pathname.startsWith("/admin/");
+
   const handleMenuToggle = () => {
     setMenuOpen(!menuOpen);
   };
@@ -34,6 +40,7 @@ const NavBar = () => {
   };
 
   if (isValentine) return <ValentineHeader />;
+  if (isAdmin) return null;
 
   return (
     <header className="header" role="banner">

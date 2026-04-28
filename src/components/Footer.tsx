@@ -13,6 +13,15 @@ export default function Footer() {
   // La página Valentine tiene su propio footer, no mostrar el global
   if (location.pathname === "/para-ti") return null;
 
+  // Admin section is a focused workspace — no public footer there either.
+  if (
+    location.pathname === "/admin-login" ||
+    location.pathname === "/dashboard" ||
+    location.pathname.startsWith("/admin/")
+  ) {
+    return null;
+  }
+
   return (
     <footer className='footer--t'>
       <div className='footer--text'>
