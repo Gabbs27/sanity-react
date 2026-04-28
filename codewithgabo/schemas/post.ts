@@ -55,6 +55,22 @@ export default defineType({
       initialValue: () => new Date().toISOString(),
     }),
     defineField({
+      name: 'sponsored',
+      title: 'Sponsored post',
+      type: 'boolean',
+      description:
+        'If true, render a "Sponsored" badge near the post title to disclose paid placement.',
+      initialValue: false,
+    }),
+    defineField({
+      name: 'affiliateDisclosure',
+      title: 'Contains affiliate links',
+      type: 'boolean',
+      description:
+        'If true, show an FTC-compliant disclosure banner at the top of the post body.',
+      initialValue: false,
+    }),
+    defineField({
       name: 'body',
       title: 'Body',
       type: 'blockContent',

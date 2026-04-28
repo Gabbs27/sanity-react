@@ -18,6 +18,8 @@ interface SanityPostData {
   body: any;
   name?: string;
   publishedAt: string;
+  sponsored?: boolean;
+  affiliateDisclosure?: boolean;
 }
 
 // PortableText custom components — type assertions needed for block-level overrides
@@ -57,7 +59,9 @@ const OnePost = () => {
           },
           body,
           "name": author->name,
-          publishedAt
+          publishedAt,
+          sponsored,
+          affiliateDisclosure
         }`,
         { slug }
       )
@@ -86,6 +90,11 @@ const OnePost = () => {
               />
             )}
             <div className='post-header-content'>
+              {postData.sponsored && (
+                <span className='post-badge post-badge--sponsored' aria-label='Sponsored content'>
+                  Sponsored
+                </span>
+              )}
               <h1 className='post-title'>{postData.title}</h1>
               <div className='post-meta'>
                 {postData.name && (
@@ -103,6 +112,13 @@ const OnePost = () => {
           </header>
 
           <div className='post-content'>
+            {postData.affiliateDisclosure && (
+              <aside className='post-disclosure' role='note'>
+                <strong>Disclosure:</strong> This post contains affiliate links. If you
+                make a purchase through them I may earn a small commission at no
+                extra cost to you. It helps keep this blog running — thank you.
+              </aside>
+            )}
             <PortableText
               value={postData.body}
               components={portableTextComponents}
