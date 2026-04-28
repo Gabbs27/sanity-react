@@ -5,6 +5,7 @@ import { PortableText } from "@portabletext/react";
 import AnimatedSection from "./common/AnimatedSection";
 import SEO from "./common/SEO";
 import LoadingSpinner from "./common/LoadingSpinner";
+import NewsletterSignup from "./Newsletter/NewsletterSignup";
 import "./OnePost.css";
 import usePageTracking from "../hooks/useAnalytics";
 
@@ -124,6 +125,8 @@ const OnePost = () => {
               components={portableTextComponents}
             />
           </div>
+
+          <NewsletterSignup variant="inline" />
         </article>
       </AnimatedSection>
     </>
