@@ -17,6 +17,9 @@ const Dashboard = lazy(() => import("./components/Dashboard/Dashboard"));
 const DashboardDemo = lazy(() => import("./components/Dashboard/DashboardDemo"));
 const AdminLogin = lazy(() => import("./components/Auth/AdminLogin"));
 const Valentine = lazy(() => import("./components/Valentine/Valentine"));
+const AdminLayout = lazy(() => import("./components/Admin/AdminLayout"));
+const PostsList = lazy(() => import("./components/Admin/PostsList"));
+const PostEditor = lazy(() => import("./components/Admin/PostEditor"));
 
 function App() {
   return (
@@ -42,6 +45,13 @@ function App() {
             </ProtectedDashboard>
           }
         />
+
+        {/* Admin routes (auth gated inside AdminLayout) */}
+        <Route element={<AdminLayout />}>
+          <Route path="/admin/posts" element={<PostsList />} />
+          <Route path="/admin/escribir" element={<PostEditor />} />
+          <Route path="/admin/escribir/:id" element={<PostEditor />} />
+        </Route>
 
         {/* Secret Valentine's page */}
         <Route element={<Valentine />} path='/para-ti' />
