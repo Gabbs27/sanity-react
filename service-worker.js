@@ -1,117 +1,114 @@
 /* eslint-disable no-restricted-globals */
 
 /**
- * Custom Service Worker for PWA
- * Handles caching strategies and offline functionality
+ * Custom Service Worker for PWA.
+ *
+ * Caching strategy:
+ *   - HTML / navigation requests → network-first (so deep links + new
+ *     deploys are picked up immediately; cache only used when offline).
+ *   - Same-origin static assets (js/css/img/font) → cache-first
+ *     (immutable filenames courtesy of Vite's hashed bundles).
+ *   - Cross-origin and non-http(s) → never cached, always passthrough
+ *     (this avoids the chrome-extension:// Cache API error).
+ *
+ * Bump CACHE_VERSION whenever the SW logic changes — the activate
+ * handler nukes any cache whose name doesn't match the current version,
+ * so a single deploy invalidates every visitor's stale cache.
  */
 
-const CACHE_NAME = 'codewithgabo-v1';
-const urlsToCache = [
+const CACHE_VERSION = 'v3';
+const STATIC_CACHE = `codewithgabo-static-${CACHE_VERSION}`;
+const HTML_CACHE = `codewithgabo-html-${CACHE_VERSION}`;
+
+// Pre-cache only the bare minimum that Vite always emits at known paths.
+const PRECACHE_URLS = [
   '/',
   '/index.html',
-  '/static/css/main.css',
-  '/static/js/main.js',
   '/manifest.json',
   '/favicon.ico',
 ];
 
-// Install event - cache critical assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
-      .catch((error) => {
-        console.error('Cache installation failed:', error);
-      })
+    caches
+      .open(HTML_CACHE)
+      .then((cache) => cache.addAll(PRECACHE_URLS))
+      .catch((err) => console.warn('[SW] precache failed (non-fatal):', err))
   );
+  // Activate this SW as soon as it's installed, replacing any older one.
   self.skipWaiting();
 });
 
-// Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
+    caches.keys().then((names) =>
+      Promise.all(
+        names
+          .filter((n) => n !== STATIC_CACHE && n !== HTML_CACHE)
+          .map((n) => {
+            console.log('[SW] deleting stale cache:', n);
+            return caches.delete(n);
+          })
+      )
+    )
   );
-  return self.clients.claim();
+  // Take control of any open tabs immediately.
+  self.clients.claim();
 });
 
-// Fetch event - serve from cache, fallback to network
 self.addEventListener('fetch', (event) => {
+  const { request } = event;
+  const url = new URL(request.url);
+
+  // Never cache cross-origin requests or non-http(s) schemes
+  // (this fixes the chrome-extension:// "scheme unsupported" error
+  // and avoids stale-caching analytics, fonts.googleapis, sanity CDN, etc).
+  if (url.origin !== self.location.origin) return;
+  if (request.method !== 'GET') return;
+
+  // Navigation / HTML: network-first
+  const isHTML =
+    request.mode === 'navigate' ||
+    request.destination === 'document' ||
+    (request.headers.get('accept') || '').includes('text/html');
+
+  if (isHTML) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          const copy = response.clone();
+          caches.open(HTML_CACHE).then((cache) => {
+            cache.put(request, copy).catch(() => {});
+          });
+          return response;
+        })
+        .catch(() =>
+          // Offline: serve cached index.html as SPA fallback.
+          caches.match('/index.html').then((r) => r || caches.match('/'))
+        )
+    );
+    return;
+  }
+
+  // Static assets: cache-first
   event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Cache hit - return response
-        if (response) {
+    caches.match(request).then((cached) => {
+      if (cached) return cached;
+      return fetch(request).then((response) => {
+        if (!response || response.status !== 200 || response.type !== 'basic') {
           return response;
         }
-
-        return fetch(event.request).then((response) => {
-          // Check if valid response
-          if (!response || response.status !== 200 || response.type !== 'basic') {
-            return response;
-          }
-
-          // Clone the response
-          const responseToCache = response.clone();
-
-          caches.open(CACHE_NAME)
-            .then((cache) => {
-              cache.put(event.request, responseToCache);
-            });
-
-          return response;
+        const copy = response.clone();
+        caches.open(STATIC_CACHE).then((cache) => {
+          cache.put(request, copy).catch(() => {});
         });
-      })
-      .catch(() => {
-        // Return offline page if available
-        return caches.match('/index.html');
-      })
+        return response;
+      });
+    })
   );
 });
 
-// Background sync for offline actions
-self.addEventListener('sync', (event) => {
-  if (event.tag === 'sync-data') {
-    event.waitUntil(syncData());
-  }
+// Optional: allow the page to ping the SW to force-skip-waiting on demand.
+self.addEventListener('message', (event) => {
+  if (event.data === 'SKIP_WAITING') self.skipWaiting();
 });
-
-async function syncData() {
-  console.log('Syncing data in the background');
-  // Add your sync logic here
-}
-
-// Push notifications (optional)
-self.addEventListener('push', (event) => {
-  const options = {
-    body: event.data ? event.data.text() : 'New update available!',
-    icon: '/logo192.png',
-    badge: '/logo192.png',
-    vibrate: [200, 100, 200],
-  };
-
-  event.waitUntil(
-    self.registration.showNotification('CodeWithGabo', options)
-  );
-});
-
-// Notification click event
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close();
-  event.waitUntil(
-    clients.openWindow('/')
-  );
-});
-
