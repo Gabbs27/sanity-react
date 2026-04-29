@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { motion } from "motion/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -12,7 +12,18 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import MetricCard from "./MetricCard";
-import ChartCard from "./ChartCard";
+
+// recharts is the heaviest dependency on this page (~400 KB). Splitting
+// ChartCard into its own chunk means visitors who bounce before the
+// charts mount don't pay the full cost.
+const ChartCard = lazy(() => import("./ChartCard"));
+const ChartFallback = () => (
+  <div
+    className="chart-card chart-skeleton"
+    style={{ height: 300, opacity: 0.4 }}
+    aria-hidden="true"
+  />
+);
 import useAnalyticsData from "../../hooks/useAnalyticsData";
 import usePageTracking from "../../hooks/useAnalytics";
 import SEO from "../common/SEO";
@@ -159,41 +170,42 @@ const DashboardDemo = () => {
             />
           </div>
 
-          {/* Charts Row 1 */}
-          <div className="charts-grid">
-            <ChartCard
-              title="Visitors Over Time"
-              type="area"
-              data={pageViews}
-              dataKeys={[
-                { key: "views", name: "Page Views", color: "primary" },
-                { key: "visitors", name: "Visitors", color: "secondary" },
-              ]}
-              height={300}
-            />
-          </div>
+          {/* Charts (lazy-loaded recharts bundle) */}
+          <Suspense fallback={<ChartFallback />}>
+            <div className="charts-grid">
+              <ChartCard
+                title="Visitors Over Time"
+                type="area"
+                data={pageViews}
+                dataKeys={[
+                  { key: "views", name: "Page Views", color: "primary" },
+                  { key: "visitors", name: "Visitors", color: "secondary" },
+                ]}
+                height={300}
+              />
+            </div>
 
-          {/* Charts Row 2 */}
-          <div className="charts-grid-2col">
-            <ChartCard
-              title="Top Pages"
-              type="bar"
-              data={topPages}
-              dataKeys={[
-                { key: "page", name: "Page" },
-                { key: "views", name: "Views", color: "primary" },
-              ]}
-              height={300}
-            />
+            <div className="charts-grid-2col">
+              <ChartCard
+                title="Top Pages"
+                type="bar"
+                data={topPages}
+                dataKeys={[
+                  { key: "page", name: "Page" },
+                  { key: "views", name: "Views", color: "primary" },
+                ]}
+                height={300}
+              />
 
-            <ChartCard
-              title="Device Distribution"
-              type="pie"
-              data={devices}
-              dataKeys={[{ key: "users", name: "Users" }]}
-              height={300}
-            />
-          </div>
+              <ChartCard
+                title="Device Distribution"
+                type="pie"
+                data={devices}
+                dataKeys={[{ key: "users", name: "Users" }]}
+                height={300}
+              />
+            </div>
+          </Suspense>
 
           {/* Tables Section */}
           <div className="tables-grid">
