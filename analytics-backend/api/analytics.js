@@ -50,7 +50,7 @@ module.exports = async (req, res) => {
     const [topPagesResponse] = await client.runReport({
       property: `properties/${propertyId}`,
       dateRanges: [{ startDate, endDate }],
-      dimensions: [{ name: 'pageTitle' }, { name: 'pagePath' }],
+      dimensions: [{ name: 'pagePath' }],
       metrics: [
         { name: 'screenPageViews' },
         { name: 'averageSessionDuration' },
