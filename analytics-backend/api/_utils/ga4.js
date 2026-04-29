@@ -77,8 +77,7 @@ function formatAnalyticsData(responses) {
   })) || [];
 
   const topPagesData = topPages.rows?.map((row) => ({
-    page: row.dimensionValues[1].value,
-    title: row.dimensionValues[0].value,
+    page: row.dimensionValues[0].value,
     views: parseInt(row.metricValues[0].value),
     avgTime: formatDuration(parseFloat(row.metricValues[1].value)),
     bounceRate: (parseFloat(row.metricValues[2].value) * 100).toFixed(1) + '%',
