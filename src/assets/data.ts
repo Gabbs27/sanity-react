@@ -20,6 +20,16 @@ export const data = [
     badge: "New",
   },
   {
+    id: 8,
+    image: "/images/a2c.png",
+    title: "A2C International",
+    description:
+      "Luxury and exotic vehicle dealership for A2C International (Santo Domingo, DR). Multi-section site covering buy/sell/financing/service flows with a Supabase-backed inventory, branded metallic visual identity, and integrated WhatsApp contact CTA. Built with React 18 + Vite and React Router 7.",
+    url: "https://gabbs27.github.io/A2C/",
+    languages: ["React 18", "Vite", "React Router 7", "Supabase", "PostgreSQL", "CSS3"],
+    badge: "New",
+  },
+  {
     id: 2,
     image: "/images/HairSalon.png",
     title: "Hair Salon & Spa",
