@@ -42,6 +42,16 @@ export default defineType({
       of: [{type: 'reference', to: {type: 'category'}}],
     }),
     defineField({
+      name: 'tags',
+      title: 'Tags',
+      type: 'array',
+      of: [{type: 'string'}],
+      description: 'Free-form tags shown on post cards (e.g. React, TypeScript, Vercel)',
+      options: {
+        layout: 'tags',
+      },
+    }),
+    defineField({
       name: 'excerpt',
       title: 'Excerpt',
       type: 'text',

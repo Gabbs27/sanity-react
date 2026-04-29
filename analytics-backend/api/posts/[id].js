@@ -16,7 +16,7 @@ module.exports = async (req, res) => {
       const post = await client.fetch(
         `*[_type == "post" && _id == $id][0]{
           _id, title, slug, body, publishedAt,
-          sponsored, affiliateDisclosure,
+          sponsored, affiliateDisclosure, tags,
           mainImage{asset->{_id, url}},
           "name": author->name
         }`,
@@ -29,7 +29,7 @@ module.exports = async (req, res) => {
     if (req.method === 'PUT' || req.method === 'PATCH') {
       const patches = req.body || {};
       // Whitelist editable fields
-      const allowed = ['title', 'slug', 'body', 'publishedAt', 'sponsored', 'affiliateDisclosure', 'mainImage'];
+      const allowed = ['title', 'slug', 'body', 'publishedAt', 'sponsored', 'affiliateDisclosure', 'mainImage', 'tags'];
       const set = {};
       for (const k of allowed) if (k in patches) set[k] = patches[k];
       const updated = await client.patch(id).set(set).commit();

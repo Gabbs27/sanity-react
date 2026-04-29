@@ -32,6 +32,7 @@ export default function PostEditor() {
   const [publishedAt, setPublishedAt] = useState(new Date().toISOString().slice(0, 16));
   const [sponsored, setSponsored] = useState(false);
   const [affiliateDisclosure, setAffiliateDisclosure] = useState(false);
+  const [tagsInput, setTagsInput] = useState('');
   const [mainImage, setMainImage] = useState<{ _id: string; url: string } | null>(null);
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
@@ -76,6 +77,7 @@ export default function PostEditor() {
         setPublishedAt(post.publishedAt ? new Date(post.publishedAt).toISOString().slice(0, 16) : '');
         setSponsored(!!post.sponsored);
         setAffiliateDisclosure(!!post.affiliateDisclosure);
+        setTagsInput(Array.isArray(post.tags) ? post.tags.join(', ') : '');
         setMainImage(post.mainImage?.asset ? { _id: post.mainImage.asset._id, url: post.mainImage.asset.url } : null);
         const blocks = portableToBlocks(post.body || []);
         if (blocks.length) editor.replaceBlocks(editor.document, blocks);
@@ -106,6 +108,10 @@ export default function PostEditor() {
     setError(null);
     try {
       const body = blocksToPortable(editor.document);
+      const tags = tagsInput
+        .split(',')
+        .map((t) => t.trim())
+        .filter(Boolean);
       const payload = {
         title,
         slug: { _type: 'slug', current: slug },
@@ -113,6 +119,7 @@ export default function PostEditor() {
         publishedAt: publishedAt ? new Date(publishedAt).toISOString() : new Date().toISOString(),
         sponsored,
         affiliateDisclosure,
+        tags,
         ...(mainImage
           ? {
               mainImage: {
@@ -136,7 +143,14 @@ export default function PostEditor() {
       if (!res.ok) throw new Error(`Save failed: ${res.status}`);
       navigate('/admin/posts');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Save failed');
+      // Log full stack to console so it can be copied if the message alone
+      // is too vague (e.g. "T is not iterable" from a bad block shape).
+      console.error('[PostEditor] save failed:', err);
+      const detail =
+        err instanceof Error
+          ? `${err.message}${err.stack ? `\n\n${err.stack.split('\n').slice(0, 4).join('\n')}` : ''}`
+          : 'Save failed';
+      setError(detail);
     } finally {
       setSaving(false);
     }
@@ -198,6 +212,15 @@ export default function PostEditor() {
             onChange={(e) => setAffiliateDisclosure(e.target.checked)}
           />
           <span>Contains affiliate links (show FTC disclosure)</span>
+        </label>
+
+        <label className="post-editor__field">
+          <span>Tags</span>
+          <input
+            value={tagsInput}
+            onChange={(e) => setTagsInput(e.target.value)}
+            placeholder="comma-separated, e.g. React, TypeScript, Vercel"
+          />
         </label>
 
         <div className="post-editor__field">
