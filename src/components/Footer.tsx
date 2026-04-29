@@ -27,7 +27,9 @@ export default function Footer() {
       <div className='footer--text'>
         <p>
           Copyright &copy; 2026 - Gabriel Abreu —{" "}
-          <Link to="/privacy" className='footer-link'>Privacy Policy</Link>
+          <Link to="/privacy" className='footer-link'>Privacy</Link>
+          {" · "}
+          <Link to="/terms" className='footer-link'>Terms</Link>
         </p>
       </div>
       <div className='footer--buttons'>
