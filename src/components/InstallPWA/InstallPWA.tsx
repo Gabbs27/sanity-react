@@ -61,7 +61,7 @@ const InstallPWA = () => {
 
     // Wait for the user's response
     const { outcome } = await deferredPrompt.userChoice;
-    console.log(`User response to install prompt: ${outcome}`);
+    if (import.meta.env.DEV) console.log(`User response to install prompt: ${outcome}`);
 
     // Clear the deferred prompt
     setDeferredPrompt(null);
