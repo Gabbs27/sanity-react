@@ -14,6 +14,7 @@ const NotFound = lazy(() => import("./components/NotFound"));
 const Education = lazy(() => import("./components/Education"));
 const Services = lazy(() => import("./components/Services"));
 const Privacy = lazy(() => import("./components/Privacy"));
+const Terms = lazy(() => import("./components/Terms"));
 const Dashboard = lazy(() => import("./components/Dashboard/Dashboard"));
 const DashboardDemo = lazy(() => import("./components/Dashboard/DashboardDemo"));
 const AdminLogin = lazy(() => import("./components/Auth/AdminLogin"));
@@ -46,6 +47,7 @@ function App() {
         <Route element={<Education />} path='/education' />
         <Route element={<Services />} path='/services' />
         <Route element={<Privacy />} path='/privacy' />
+        <Route element={<Terms />} path='/terms' />
 
         {/* Analytics Dashboards (public/demo + login) */}
         <Route element={<DashboardDemo />} path='/dashboard-demo' />

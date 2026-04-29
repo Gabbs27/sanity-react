@@ -33,6 +33,7 @@ const STATIC_ROUTES = [
   { path: "/services",      priority: 0.7, freq: "monthly" },
   { path: "/education",     priority: 0.6, freq: "monthly" },
   { path: "/privacy",       priority: 0.5, freq: "yearly"  },
+  { path: "/terms",         priority: 0.5, freq: "yearly"  },
 ];
 
 function escapeXml(s) {
