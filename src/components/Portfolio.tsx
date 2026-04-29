@@ -55,6 +55,7 @@ const Portfolio = () => {
                   description={project.description}
                   url={project.url}
                   languages={project.languages}
+                  badge={project.badge}
                 />
               </AnimatedSection>
             ))}
