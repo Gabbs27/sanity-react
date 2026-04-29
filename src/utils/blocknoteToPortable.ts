@@ -25,6 +25,11 @@ function inlineToSpans(inline: AnyBlock[] | string | undefined): { spans: PtBloc
     spans.push({ _type: 'span', _key: makeKey(), text: inline, marks: [] });
     return { spans, markDefs };
   }
+  if (!Array.isArray(inline)) {
+    // Some BlockNote versions return objects we can't iterate (e.g. for table
+    // cells, embeds). Skip rather than throw "T is not iterable".
+    return { spans, markDefs };
+  }
 
   for (const node of inline) {
     if (node.type === 'text') {
@@ -50,10 +55,41 @@ function inlineToSpans(inline: AnyBlock[] | string | undefined): { spans: PtBloc
 }
 
 export function blocksToPortable(blocks: AnyBlock[]): PtBlock[] {
-  if (!blocks?.length) return [];
+  if (!Array.isArray(blocks) || !blocks.length) return [];
   const result: PtBlock[] = [];
 
+  const SUPPORTED = new Set([
+    'paragraph',
+    'heading',
+    'bulletListItem',
+    'numberedListItem',
+    'image',
+    'codeBlock',
+  ]);
+
   for (const block of blocks) {
+    if (!block || typeof block !== 'object') continue;
+
+    // Unsupported block types (table, embed, file, audio, video, etc.) —
+    // best-effort extract plain text so content isn't lost on save.
+    if (block.type && !SUPPORTED.has(block.type)) {
+      const fallback = Array.isArray(block.content)
+        ? block.content
+            .map((n: AnyBlock) => (typeof n?.text === 'string' ? n.text : ''))
+            .join('')
+        : '';
+      if (fallback.trim()) {
+        result.push({
+          _type: 'block',
+          _key: makeKey(),
+          style: 'normal',
+          markDefs: [],
+          children: [{ _type: 'span', _key: makeKey(), text: fallback, marks: [] }],
+        });
+      }
+      continue;
+    }
+
     if (block.type === 'image' && block.props?.url) {
       result.push({
         _type: 'image',

@@ -182,13 +182,13 @@ Once the dashboard rendered metrics from Vercel, I stopped the Railway service. 
 
 ## The result
 
-| Metric | Before (Railway) | After (Vercel) |
-|---|---|---|
-| Monthly cost | small but recurring | \$0 |
-| Cold start | ~50ms (always warm) | 500–1500ms first hit |
-| Deploy flow | separate dashboard | `git push` |
-| Dependencies | express, cors, helmet, nodemon | none (platform handles it) |
-| Repo files | server.js, routes/, middleware/ | a few handlers under `api/` |
+Concrete before / after:
+
+- **Monthly cost:** small but recurring → **\$0**
+- **Cold start:** ~50 ms (always warm on Railway) → 500–1500 ms on first hit, then cached
+- **Deploy flow:** separate Railway dashboard → `git push` from the same monorepo
+- **Dependencies:** `express`, `cors`, `helmet`, `nodemon` → **none** (the platform handles all of it)
+- **Repo footprint:** `server.js`, `routes/`, `middleware/` → a handful of small handlers under `api/`
 
 For a small admin endpoint like this one, Vercel Functions are clearly the right fit. For a high-traffic API where every millisecond matters, Railway or Fly would still be the better answer.
 

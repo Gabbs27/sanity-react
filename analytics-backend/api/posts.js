@@ -19,6 +19,7 @@ module.exports = async (req, res) => {
           publishedAt,
           sponsored,
           affiliateDisclosure,
+          tags,
           mainImage{asset->{_id, url}}
         }
       `);
@@ -26,7 +27,7 @@ module.exports = async (req, res) => {
     }
 
     if (req.method === 'POST') {
-      const { title, slug, body, mainImage, publishedAt, sponsored, affiliateDisclosure, authorId } = req.body || {};
+      const { title, slug, body, mainImage, publishedAt, sponsored, affiliateDisclosure, tags, authorId } = req.body || {};
       if (!title || !slug?.current) {
         return res.status(400).json({ error: 'title and slug.current are required' });
       }
@@ -38,6 +39,7 @@ module.exports = async (req, res) => {
         publishedAt: publishedAt || new Date().toISOString(),
         sponsored: !!sponsored,
         affiliateDisclosure: !!affiliateDisclosure,
+        ...(Array.isArray(tags) && tags.length ? { tags: tags.filter((t) => typeof t === 'string' && t.trim()) } : {}),
         ...(mainImage ? { mainImage } : {}),
         ...(authorId ? { author: { _type: 'reference', _ref: authorId } } : {}),
       };
