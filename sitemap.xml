@@ -49,6 +49,12 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://codewithgabo.com/terms</loc>
+    <lastmod>2026-04-29</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://codewithgabo.com/introduction-to-web-scraping-with-python-extracting-data-with-ease</loc>
     <lastmod>2023-11-26</lastmod>
     <changefreq>monthly</changefreq>
