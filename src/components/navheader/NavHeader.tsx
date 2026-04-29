@@ -95,6 +95,13 @@ const NavBar = () => {
             About
           </NavLink>
           <NavLink
+            to="/education"
+            className="nav-item"
+            onClick={handleMenuItemClick}
+            role="menuitem">
+            Education
+          </NavLink>
+          <NavLink
             to="/gabriel-abreu"
             className="nav-item"
             onClick={handleMenuItemClick}
