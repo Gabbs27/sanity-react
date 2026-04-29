@@ -5,7 +5,7 @@ import {
   faLinkedinIn,
   faGithub,
 } from "@fortawesome/free-brands-svg-icons";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 export default function Footer() {
   const location = useLocation();
@@ -25,7 +25,10 @@ export default function Footer() {
   return (
     <footer className='footer--t'>
       <div className='footer--text'>
-        <p>Copyright &copy; 2026 - Gabriel Abreu </p>
+        <p>
+          Copyright &copy; 2026 - Gabriel Abreu —{" "}
+          <Link to="/privacy" className='footer-link'>Privacy Policy</Link>
+        </p>
       </div>
       <div className='footer--buttons'>
         <a

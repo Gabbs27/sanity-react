@@ -106,6 +106,17 @@ body {
   margin: 0;
 }
 
+.footer-link{
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: rgba(87, 185, 217, 0.5);
+  transition: text-decoration-color 0.2s ease;
+}
+
+.footer-link:hover{
+  text-decoration-color: #57b9d9;
+}
+
 .footer--buttons{
   display: flex;
   align-items: center;
