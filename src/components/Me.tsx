@@ -1,7 +1,7 @@
 
 import AnimatedSection from "./common/AnimatedSection";
 import SEO from "./common/SEO";
-import p from "../assets/developer-illustration.png";
+import p from "../assets/developer-illustration.webp";
 import medata from "../assets/gabriel";
 import usePageTracking from "../hooks/useAnalytics";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
