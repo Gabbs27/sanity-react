@@ -68,7 +68,7 @@ export default function PostsList() {
         <h1>Posts</h1>
         <button
           className="posts-list__new-btn"
-          onClick={() => navigate('/admin/escribir')}>
+          onClick={() => navigate('/admin/write')}>
           + New Post
         </button>
       </header>
@@ -107,7 +107,7 @@ export default function PostsList() {
                   {p.affiliateDisclosure && <span className="posts-list__badge posts-list__badge--affiliate">Affiliate</span>}
                 </td>
                 <td className="posts-list__actions">
-                  <Link to={`/admin/escribir/${p._id}`} className="posts-list__action">Edit</Link>
+                  <Link to={`/admin/write/${p._id}`} className="posts-list__action">Edit</Link>
                   <button
                     onClick={() => handleDelete(p._id)}
                     className="posts-list__action posts-list__action--danger">
