@@ -7,6 +7,7 @@ import SEO from "./common/SEO";
 import LoadingSpinner from "./common/LoadingSpinner";
 import NewsletterSignup from "./Newsletter/NewsletterSignup";
 import AdSlot from "./Ads/AdSlot";
+import NotFound from "./NotFound";
 import "./OnePost.css";
 import usePageTracking from "../hooks/useAnalytics";
 
@@ -45,9 +46,12 @@ const portableTextComponents: any = {
 const OnePost = () => {
   usePageTracking();
   const [postData, setPostData] = useState<SanityPostData | null>(null);
+  const [notFound, setNotFound] = useState(false);
   const { slug } = useParams();
 
   useEffect(() => {
+    setNotFound(false);
+    setPostData(null);
     sanityClient
       .fetch(
         `*[slug.current == $slug]{
@@ -67,10 +71,17 @@ const OnePost = () => {
         }`,
         { slug }
       )
-      .then((data: SanityPostData[]) => setPostData(data[0]))
-      .catch(console.error);
+      .then((data: SanityPostData[]) => {
+        if (!data || data.length === 0) {
+          setNotFound(true);
+        } else {
+          setPostData(data[0]);
+        }
+      })
+      .catch(() => setNotFound(true));
   }, [slug]);
 
+  if (notFound) return <NotFound />;
   if (!postData) return <LoadingSpinner message="Loading post..." />;
 
   return (
