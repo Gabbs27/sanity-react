@@ -47,6 +47,6 @@ serviceWorkerRegistration.register({
     }
   },
   onSuccess: () => {
-    console.log('Service Worker registered successfully');
+    if (import.meta.env.DEV) console.log('Service Worker registered successfully');
   },
 });

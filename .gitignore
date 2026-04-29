@@ -25,3 +25,6 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Local tooling state (Claude Code, IDE, etc.)
+.claude/

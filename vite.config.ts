@@ -7,6 +7,7 @@ export default defineConfig({
   base: '/',
   build: {
     outDir: 'build',
+    chunkSizeWarningLimit: 1500,
   },
   server: {
     port: 3000,
