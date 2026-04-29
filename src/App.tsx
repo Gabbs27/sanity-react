@@ -24,7 +24,7 @@ const PostEditor = lazy(() => import("./components/Admin/PostEditor"));
 /**
  * Wrapper that reads the :id route param and passes it as `key` to PostEditor,
  * so React remounts the component when navigating between different post IDs
- * (or back to /admin/escribir for a fresh draft). Without this, useEffect's
+ * (or back to /admin/write for a fresh draft). Without this, useEffect's
  * fetch + BlockNote editor state would not reset when switching posts.
  */
 function PostEditorWithKey() {
@@ -65,8 +65,8 @@ function App() {
               navigating between create (no id) and edit (different ids)
               forces a clean unmount/remount — otherwise local state and
               the BlockNote editor instance leak across routes. */}
-          <Route path="/admin/escribir" element={<PostEditorWithKey />} />
-          <Route path="/admin/escribir/:id" element={<PostEditorWithKey />} />
+          <Route path="/admin/write" element={<PostEditorWithKey />} />
+          <Route path="/admin/write/:id" element={<PostEditorWithKey />} />
         </Route>
 
         {/* Secret Valentine's page */}

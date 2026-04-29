@@ -25,7 +25,7 @@ export default function AdminLayout() {
           <NavLink to="/admin/posts" className="admin-nav-link">
             <FontAwesomeIcon icon={faList} /> Posts
           </NavLink>
-          <NavLink to="/admin/escribir" end className="admin-nav-link">
+          <NavLink to="/admin/write" end className="admin-nav-link">
             <FontAwesomeIcon icon={faPenToSquare} /> Write New
           </NavLink>
         </nav>
