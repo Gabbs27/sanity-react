@@ -29,8 +29,16 @@ interface SanityPostData {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const portableTextComponents: any = {
   block: {
-    code: ({ children }: { children?: string | string[] }) => {
-      const codeString = Array.isArray(children) ? children.join("") : children || "";
+    // For style: 'code' blocks, PortableText passes `children` as RENDERED
+    // React nodes (spans), not strings — calling .join('') on those produces
+    // "[object Object][object Object]..." garbage. Pull the raw text from
+    // `value.children` (the underlying portable-text block) instead.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    code: ({ value }: { value: any }) => {
+      const codeString = Array.isArray(value?.children)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ? value.children.map((c: any) => (typeof c?.text === "string" ? c.text : "")).join("")
+        : "";
       return (
         <SyntaxHighlighter
           style={{ ...nightOwl }}
