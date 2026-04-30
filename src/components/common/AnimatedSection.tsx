@@ -90,7 +90,13 @@ const AnimatedSection = ({
       className={className}
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, amount: 0.2 }}
+      // amount: "some" fires as soon as ANY part of the section enters the
+      // viewport. Previously amount: 0.2 required 20% visibility, which
+      // is unreachable for very tall sections (e.g. a long blog post that
+      // exceeds 5× the viewport height) — those got stuck at opacity 0
+      // forever. "some" is safer and produces near-identical visuals on
+      // shorter sections.
+      viewport={{ once: true, amount: "some" }}
       variants={variants[variant]}>
       {children}
     </motion.div>
