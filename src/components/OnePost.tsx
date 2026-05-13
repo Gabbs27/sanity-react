@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import sanityClient from "../client";
+import sanityClient, { urlFor } from "../client";
 import { PortableText } from "@portabletext/react";
 import AnimatedSection from "./common/AnimatedSection";
 import SEO from "./common/SEO";
@@ -28,6 +28,31 @@ interface SanityPostData {
 // PortableText custom components — type assertions needed for block-level overrides
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const portableTextComponents: any = {
+  types: {
+    // Images may arrive in two shapes: with `asset` (uploaded via Sanity asset
+    // pipeline) or with a raw `url` (uploaded via the BlockNote editor, which
+    // stores the upload-endpoint URL directly — see blocksToPortable).
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    image: ({ value }: { value: any }) => {
+      const src = value?.asset
+        ? urlFor(value).width(1600).fit("max").auto("format").url()
+        : value?.url;
+      if (!src) return null;
+      return (
+        <figure className='post-figure'>
+          <img
+            src={src}
+            alt={value.alt || ""}
+            loading='lazy'
+            className='post-inline-image'
+          />
+          {value.caption && (
+            <figcaption className='post-figcaption'>{value.caption}</figcaption>
+          )}
+        </figure>
+      );
+    },
+  },
   block: {
     // For style: 'code' blocks, PortableText passes `children` as RENDERED
     // React nodes (spans), not strings — calling .join('') on those produces
