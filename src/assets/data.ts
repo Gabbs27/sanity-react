@@ -10,6 +10,16 @@ export const data = [
     badge: "New",
   },
   {
+    id: 9,
+    image: "/images/ginecologo-spa.png",
+    title: "Dr. Abreu Cornelio — Gynecology Clinic",
+    description:
+      "Landing page for a gynecology & obstetrics practice with a warm editorial design (Fraunces & Karla typography). Features WhatsApp appointment booking, services catalog, contact form, and a single-file content config that makes the template reusable for any medical practice. SEO-ready with sitemap and structured metadata.",
+    url: "https://gabbs27.github.io/ginecologo-spa/",
+    languages: ["Astro 5", "React 19", "JavaScript", "CSS3", "GitHub Pages"],
+    badge: "New",
+  },
+  {
     id: 1,
     image: "/images/negociord.png",
     title: "NegocioRD",
