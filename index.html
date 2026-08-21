@@ -20,10 +20,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#6366F1" />
     <meta name="google-adsense-account" content="ca-pub-2464529747764309">
-    <!-- AdSense rendering script. Loaded once at the page level; per-slot
-         markup lives in <AdSlot /> components and only renders when
-         VITE_ADSENSE_CLIENT_ID is set. The script is harmless on pages
-         that don't have any <ins.adsbygoogle> children. -->
+    <!-- AdSense rendering script. Loaded once here, unconditionally, on every
+         route — including /admin and /para-ti. That is why Auto ads is off in
+         the console: with it on, Google would place ads there too. Per-slot
+         markup lives in <AdSlot />, which renders only where a real numeric ad
+         unit ID is configured in src/config/adsense.ts. -->
     <script
       async
       src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2464529747764309"
@@ -35,6 +36,7 @@
     <meta name="robots" content="index, follow">
     <link rel="apple-touch-icon" href="/logo192.png" />
     <link rel="manifest" href="/manifest.json" />
+    <link rel="alternate" type="application/rss+xml" title="Code With Gabo" href="https://codewithgabo.com/rss.xml" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website">
