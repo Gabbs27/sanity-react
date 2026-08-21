@@ -75,25 +75,6 @@ const Portfolio = () => {
             </div>
           </AnimatedSection>
 
-          <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-8'>
-            {filteredData.map((project, index) => (
-              <AnimatedSection
-                key={project.id}
-                variant="fadeInUp"
-                duration={0.5}
-                delay={index * 0.1}>
-                <Card
-                  image={project.image}
-                  title={project.title}
-                  description={project.description}
-                  url={project.url}
-                  languages={project.languages}
-                  badge={project.badge}
-                />
-              </AnimatedSection>
-            ))}
-          </div>
-
           {latestPosts.length > 0 && (
             <AnimatedSection variant="fadeIn" duration={0.6}>
               <section className='mt-20'>
@@ -130,6 +111,34 @@ const Portfolio = () => {
               </section>
             </AnimatedSection>
           )}
+
+
+          {/* The blog strip now sits above this grid, so the projects need a
+              heading of their own — otherwise the page reads as one unlabelled
+              run of cards. */}
+          <AnimatedSection variant="fadeIn" duration={0.6}>
+            <h2 className='text-3xl md:text-4xl font-bold mt-20 mb-8'>Projects</h2>
+          </AnimatedSection>
+
+          <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-8'>
+            {filteredData.map((project, index) => (
+              <AnimatedSection
+                key={project.id}
+                variant="fadeInUp"
+                duration={0.5}
+                delay={index * 0.1}>
+                <Card
+                  image={project.image}
+                  title={project.title}
+                  description={project.description}
+                  url={project.url}
+                  languages={project.languages}
+                  badge={project.badge}
+                />
+              </AnimatedSection>
+            ))}
+          </div>
+
 
           <AnimatedSection variant="fadeIn" duration={0.6}>
             <section className='mt-20'>

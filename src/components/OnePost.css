@@ -161,3 +161,66 @@
     font-size: 1rem;
   }
 }
+
+/* "Sigue leyendo" — three links out of every post. Before this, the only exit
+   from an article was the browser's back button, and crawlers had no path
+   between posts at all. */
+.post-related {
+  margin: 4rem 0 2rem;
+  padding-top: 2.5rem;
+  border-top: 1px solid var(--color-border, rgba(148, 163, 184, 0.25));
+}
+
+.post-related__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 1.5rem;
+}
+
+.post-related__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+  gap: 1.25rem;
+}
+
+.post-related__card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: inherit;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.post-related__card:hover,
+.post-related__card:focus-visible {
+  transform: translateY(-3px);
+  opacity: 0.92;
+}
+
+.post-related__img {
+  width: 100%;
+  aspect-ratio: 1200 / 630;
+  object-fit: cover;
+  border-radius: 0.75rem;
+  display: block;
+}
+
+.post-related__name {
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.post-related__all {
+  display: inline-block;
+  margin-top: 1.5rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--color-primary, #6366F1);
+}
+
+.post-related__all:hover {
+  text-decoration: underline;
+}

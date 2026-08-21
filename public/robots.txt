@@ -2,17 +2,17 @@
 User-agent: *
 Allow: /
 
-# Admin surfaces. This prefix covers /admin-login, /admin/posts and
-# /admin/write — the previous "Disallow: /admin-login" left the two
-# /admin/* routes crawlable.
-Disallow: /admin
-
-# Only the real dashboard, which sits behind auth. The previous rule was a
-# bare prefix, so it also blocked /dashboard-demo — the public, linkable
-# demo that is meant to be indexed.
-Disallow: /dashboard$
-
-# Personal page, never indexed.
-Disallow: /para-ti
-
 Sitemap: https://codewithgabo.com/sitemap.xml
+
+# Nothing is disallowed here on purpose.
+#
+# The admin, dashboard and personal routes are kept out of the index with an
+# X-Robots-Tag: noindex header, declared in vercel.json. Disallowing them here
+# as well would be counterproductive: a crawler that is forbidden from fetching
+# a URL never sees the noindex on it, so the URL can still be indexed from
+# links alone — which is exactly what happened to /dashboard, one of only two
+# URLs of this site a search engine knew, listed with "we would like to show
+# you a description here but the site won't allow us".
+#
+# Blocking crawling and asking for de-indexing are opposite instructions. Only
+# the header can actually remove a page.
