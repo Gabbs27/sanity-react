@@ -1,4 +1,5 @@
 
+import { Link } from "react-router-dom";
 import "./Greeting.css";
 import AnimatedSection from "../common/AnimatedSection";
 import p from "../../assets/nobggabo.webp";
@@ -11,14 +12,29 @@ const Greeting = () => {
           <div className='greeting-text-div'>
             <div>
               <h1 id="greeting-heading" className='greeting-text mb-6'>Gabriel Abreu</h1>
-              <h2 className='greeting-nickname mb-6' aria-label="Also known as Gabbs279">
-                ( Gabbs279)
+              <h2 className='greeting-nickname mb-6'>
+                Full-Stack Developer &middot; Santo Domingo, RD
               </h2>
               <p className='greeting-text-p'>
-                A driven individual who strives to develop sustainable, scalable
-                solutions for both social and technical systems, always seeking
-                to create a lasting impact.
+                I build web products for small businesses &mdash; a WhatsApp
+                ordering platform for Dominican SMEs, a booking site for a
+                clinic. React, TypeScript, Next.js. Backend work in C# and .NET.
               </p>
+              <p className='greeting-text-p mt-4'>
+                I write about how I build them{" "}
+                <Link to='/allpost' className='greeting-inline-link'>
+                  here
+                </Link>
+                , including the parts that break.
+              </p>
+              <div className='greeting-cta'>
+                <Link to='/services' className='greeting-cta__primary'>
+                  Work with me
+                </Link>
+                <Link to='/allpost' className='greeting-cta__secondary'>
+                  Read the blog
+                </Link>
+              </div>
             </div>
           </div>
           <div className='greeting-image-div ml-20'>
