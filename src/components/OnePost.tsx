@@ -8,6 +8,7 @@ import LoadingSpinner from "./common/LoadingSpinner";
 import NewsletterSignup from "./Newsletter/NewsletterSignup";
 import AdSlot from "./Ads/AdSlot";
 import { AD_SLOTS } from "../config/adsense";
+import { alternatesForSlug, langForSlug } from "../config/translations";
 import NotFound from "./NotFound";
 import "./OnePost.css";
 import usePageTracking from "../hooks/useAnalytics";
@@ -175,6 +176,8 @@ const OnePost = () => {
         url={`https://codewithgabo.com/${slug}`}
         image={postData.mainImage?.asset?.url}
         type="article"
+        lang={langForSlug(slug)}
+        alternates={alternatesForSlug(slug)}
       />
       <AnimatedSection variant="fadeInUp" duration={0.6}>
         <article className='single-post'>
