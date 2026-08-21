@@ -24,11 +24,14 @@
   margin-bottom: 0.375rem;
 }
 
-/* An unfilled slot is normal — new ad units take hours to start filling, and
-   no-fill happens routinely afterwards. Without this the reserved band plus
-   its margins leave ~164px of blank space mid-article every time. */
-.ad-slot[data-ad-state='unfilled'],
-.ad-slot[data-ad-state='no-response'] {
+/* An unfilled slot is normal — no-fill happens routinely — and without this the
+   reserved band plus its margins leave ~164px of blank space mid-article.
+
+   Only AdSense's own "unfilled" verdict collapses the slot. A pending slot must
+   keep its box: this rule previously also matched a "no-response" state the
+   component invented after 3 seconds, which hid the container while AdSense was
+   still measuring it and made a fill impossible. */
+.ad-slot[data-ad-state='unfilled'] {
   display: none;
   min-height: 0;
   margin: 0;

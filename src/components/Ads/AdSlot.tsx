@@ -88,16 +88,15 @@ export default function AdSlot({
     });
     observer.observe(ins, { attributes: true, attributeFilter: ['data-ad-status'] });
 
-    // Fallback for the case the observer can never catch: the script never
-    // touches the element, so the attribute is never written at all.
-    const timer = window.setTimeout(() => {
-      setStatus((prev) => prev ?? (ins.getAttribute('data-ad-status') || 'no-response'));
-    }, 3000);
-
-    return () => {
-      observer.disconnect();
-      window.clearTimeout(timer);
-    };
+    // Deliberately no timeout that invents a status. An earlier version set
+    // "no-response" after 3s when the attribute was still missing, and the CSS
+    // hid the slot on that state — so the container went display:none while
+    // AdSense was still measuring it, and an ad could never be placed into a
+    // hidden, zero-width box. The slot's own guard was what kept it empty.
+    //
+    // Only AdSense's own verdict changes the state now. Missing simply means
+    // "still pending", which reserves space rather than collapsing it.
+    return () => observer.disconnect();
   }, [enabled, slotId]);
 
   useEffect(() => {
