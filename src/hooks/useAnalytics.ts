@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 /**
  * Page-view tracking for the SPA.
@@ -16,6 +17,18 @@ import { useEffect } from "react";
  * numbers meant anything.
  *
  * One property, one client, one page_view per view.
+ *
+ * The effect keys off the location rather than running once per mount. It used
+ * to have an empty dependency array, which quietly broke post-to-post
+ * navigation: /:slug renders one <OnePost /> with no key, so moving from one
+ * post to another reuses the mounted component, the effect never re-ran, and
+ * the second post was never counted. That is exactly the path the "Sigue
+ * leyendo" block creates, so the feature meant to raise pages-per-session was
+ * invisible to the property measuring it.
+ *
+ * page_location carries the full href on purpose: GA4 reads utm_source,
+ * utm_medium and utm_campaign out of that field, so campaign attribution for
+ * anyone arriving from a tagged link depends on the query string being here.
  */
 
 declare global {
@@ -25,15 +38,26 @@ declare global {
   }
 }
 
+// The last URL reported. OnePost returns <NotFound /> for an unknown slug and
+// both components call this hook, so an unresolved slug used to count twice.
+let lastTracked: string | null = null;
+
 export const usePageTracking = () => {
+  const { pathname, search } = useLocation();
+
   useEffect(() => {
     if (typeof window.gtag !== "function") return;
+
+    const url = window.location.href;
+    if (url === lastTracked) return;
+    lastTracked = url;
+
     window.gtag("event", "page_view", {
-      page_path: window.location.pathname + window.location.search,
-      page_location: window.location.href,
+      page_path: pathname + search,
+      page_location: url,
       page_title: document.title,
     });
-  }, []);
+  }, [pathname, search]);
 };
 
 export default usePageTracking;
