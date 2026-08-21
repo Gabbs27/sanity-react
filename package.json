@@ -40,7 +40,8 @@
     "studio": "cd codewithgabo && sanity dev",
     "studio:deploy": "cd codewithgabo && sanity deploy",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d build",
+    "postbuild": "node scripts/prerender.mjs"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.18",
