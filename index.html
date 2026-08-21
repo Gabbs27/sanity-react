@@ -83,7 +83,7 @@
          sees the real route. -->
     <script>
       (function(l){
-        if (l.search[1] === '/' ) {
+        if (l.search[1] === '/' && l.pathname === '/') {
           var decoded = l.search.slice(1).split('&').map(function(s){
             return s.replace(/~and~/g, '&');
           }).join('?');
