@@ -35,6 +35,15 @@ const BUILD = join(root, 'build');
 const ORIGIN = 'https://codewithgabo.com';
 const FALLBACK_IMAGE = `${ORIGIN}/og-image.jpg`;
 
+// Same table src/config/translations.ts reads. This script cannot import the
+// TypeScript module, and duplicating the slugs here is how the two halves drift
+// apart, so both sides read the JSON.
+const translations = JSON.parse(
+  readFileSync(join(root, 'src/config/translations.json'), 'utf8')
+);
+const SPANISH_POSTS = new Set(translations.spanishPosts);
+const PAIRS = translations.pairs;
+
 const client = createClient({
   projectId: 'nnt7ytcd',
   dataset: 'production',
@@ -74,6 +83,14 @@ for (const post of posts) {
   if (!post.slug || !post.title) continue;
 
   const url = `${ORIGIN}/${post.slug}`;
+  const lang = SPANISH_POSTS.has(post.slug) ? 'es' : 'en';
+  const pair = PAIRS.find((p) => p.es === post.slug || p.en === post.slug);
+  const alternates = pair
+    ? `
+    <link rel="alternate" hreflang="es" href="${esc(`${ORIGIN}/${pair.es}`)}" />
+    <link rel="alternate" hreflang="en" href="${esc(`${ORIGIN}/${pair.en}`)}" />
+    <link rel="alternate" hreflang="x-default" href="${esc(`${ORIGIN}/${pair.en}`)}" />`
+    : '';
   const title = post.title.includes('Gabriel Abreu')
     ? post.title
     : `${post.title} | Gabriel Abreu`;
@@ -87,7 +104,7 @@ for (const post of posts) {
     <meta name="description" content="${esc(desc)}" />
     <meta name="author" content="Gabriel Abreu" />
     <meta name="robots" content="index, follow" />
-    <link rel="canonical" href="${esc(url)}" />
+    <link rel="canonical" href="${esc(url)}" />${alternates}
     <meta property="og:type" content="article" />
     <meta property="og:url" content="${esc(url)}" />
     <meta property="og:title" content="${esc(title)}" />
@@ -121,10 +138,11 @@ for (const post of posts) {
     .replace(/<meta\s+charset[^>]*>/gi, '')
     .replace(/<meta\s+name="viewport"[^>]*>/gi, '');
 
-  const out = shell.replace(
-    /<head([^>]*)>[\s\S]*?<\/head>/i,
-    `<head$1>${head}${kept}</head>`
-  );
+  // The shell hardcodes <html lang="en">. Only the head was ever rewritten, so
+  // every Spanish post shipped as English to anything that does not run JS.
+  const out = shell
+    .replace(/<head([^>]*)>[\s\S]*?<\/head>/i, `<head$1>${head}${kept}</head>`)
+    .replace(/<html([^>]*)\slang="[^"]*"/i, `<html$1 lang="${lang}"`);
 
   const dir = join(BUILD, post.slug);
   mkdirSync(dir, { recursive: true });

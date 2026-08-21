@@ -9,6 +9,165 @@
     <language>es</language>
     <atom:link href="https://codewithgabo.com/rss.xml" rel="self" type="application/rss+xml" />
     <item>
+      <title><![CDATA[I Audited My Own Portfolio and Found 20 Problems]]></title>
+      <link>https://codewithgabo.com/portfolio-audit-20-problems</link>
+      <guid isPermaLink="true">https://codewithgabo.com/portfolio-audit-20-problems</guid>
+      <pubDate>Fri, 21 Aug 2026 20:25:06 GMT</pubDate>
+      <description><![CDATA[Auditing someone else's site is easy. Auditing your own, after two years of defending every decision, is another thing entirely. I found 20 problems, and five of them actually hurt.]]></description>
+      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/3b48195a58198fdf72ecfb4ef87426ae01114c0e-1200x630.png" alt="I Audited My Own Portfolio and Found 20 Problems" />
+<p>Auditing someone else's site is easy. You open devtools, point at what's broken, send the invoice, leave. Auditing your own is a different job, because every bad decision in it is yours, most of them made around eleven at night on a Tuesday, and you have spent months certain they were fine.</p>
+<p>So I sat down with codewithgabo.com and reviewed it like it belonged to a client. No excuses, no &quot;I'll get to that later.&quot; The review turned up <strong>20 findings</strong> across four areas. Five of them stung.</p>
+<p>This post is the honest list: what I found, why it was there, and which number moved when I fixed it.</p>
+<h2>How I audited</h2>
+<p>There's no trick to it. The method was boring on purpose, because boring is what actually finds things.</p>
+<ul>
+<li>I read <strong>every public component</strong> and every route definition in <code>src/</code>.</li>
+<li>I walked the <strong>10 public routes</strong> in a browser, at 375px and on desktop, writing down each page's <code>h1</code>, its character count, its internal links, and any broken image.</li>
+<li>I queried Sanity to count the posts and words I actually had, not the ones I assumed I had.</li>
+<li>I ran <code>npm audit</code> and <code>npm outdated</code>.</li>
+<li>I went through the build output chunk by chunk in <code>build/assets/</code>.</li>
+</ul>
+<p>That last step is the one that hurts and the one most people skip. Looking at the real weight of what you ship is like stepping on a scale in January: you already know it's bad, but you need the number.</p>
+<h2>Finding 1: a 993 KB illustration</h2>
+<p>The worst of the twenty. On <code>/gabriel-abreu</code> I was serving an unoptimized PNG of a developer illustration. <strong>993 KB.</strong> Almost a megabyte of decoration.</p>
+<p>It had company. <code>nobggabo.png</code> weighed 358 KB and shipped on the home page, the blog index and the repos page, because all three variants of my <code>Greeting</code> component import it. So those 358 KB sat on the critical path of the three pages people land on first.</p>
+<p>The fix has no technical merit whatsoever: convert to WebP at quality 80.</p>
+<pre><code>developer-illustration:  993 KB  -&gt;  23 KB   (-98%)
+nobggabo:                358 KB  -&gt;  45 KB   (-87%)</code></pre>
+<p>Ninety-eight percent. Nearly a megabyte, for a drawing that looks identical. The credit isn't in the conversion. It's in finally bothering to look.</p>
+<p><strong>The lesson:</strong> if you've never checked what your images weigh, that is your biggest problem right now. Statistically, it just is.</p>
+<h2>Finding 2: the sitemap contained zero posts</h2>
+<p>I had 9 published posts. My <code>sitemap.xml</code> listed <strong>7 static pages and no posts at all</strong>. The <code>lastmod</code> dates were frozen months in the past on top of that.</p>
+<p>Which means I'd been writing content and then not showing it to Google. All of the writing work, none of the distribution work.</p>
+<p>The root cause was that the sitemap was a static file I had to update by hand. By hand means never.</p>
+<p>It's now generated at build time from a GROQ query against Sanity, running as <code>prebuild</code>:</p>
+<pre><code>*[_type==&quot;post&quot; &amp;&amp; !(_id in path(&quot;drafts.**&quot;)) &amp;&amp; defined(slug.current)]{
+  &quot;slug&quot;: slug.current,
+  _updatedAt
+}</code></pre>
+<p>Every <code>npm run build</code> writes a fresh <code>sitemap.xml</code> with all the posts and real dates. It no longer depends on me remembering.</p>
+<p><strong>The lesson:</strong> anything that depends on your memory is already broken. You just haven't found out yet.</p>
+<h2>Finding 3: my 404 page didn't exist in practice</h2>
+<p>This is the one I'm most embarrassed by, because it was a real bug and not an oversight.</p>
+<p>If you typed <code>codewithgabo.com/anything</code>, the site hung forever on <strong>&quot;Loading post...&quot;</strong>. No 404. No error message. Just a spinner, until you got bored and closed the tab.</p>
+<p>The cause: my post route, <code>/:slug</code>, caught any unknown URL before it could ever reach the <code>*</code> route that renders <code>NotFound</code>. <code>OnePost</code> queried Sanity, got nothing back, and since it didn't distinguish &quot;still loading&quot; from &quot;this doesn't exist,&quot; it sat in the loading state indefinitely.</p>
+<p>The fix was separating those two states:</p>
+<pre><code>const [postData, setPostData] = useState&lt;SanityPostData | null&gt;(null);
+const [notFound, setNotFound] = useState(false);
+
+// ...
+
+if (notFound) return &lt;NotFound /&gt;;
+if (!postData) return &lt;LoadingSpinner message=&quot;Loading post...&quot; /&gt;;</code></pre>
+<p>Three lines. One extra <code>useState</code> and two returns in the right order. That was the fix for a bug that had spent months quietly turning visitors away.</p>
+<p>While I was in there I gave the 404 page an actual design: the big number, a bilingual heading, and three buttons that take you somewhere useful instead of leaving you stranded.</p>
+<p><strong>The lesson:</strong> a loading state that never resolves looks exactly like &quot;slow.&quot; That's why nobody reports it.</p>
+<h2>Finding 4: a feature that hadn't rendered in months</h2>
+<p>In <code>data.ts</code> I have three projects tagged <code>badge: &quot;New&quot;</code>: Analytics Dashboard, NegocioRD and A2C International. The <code>Card</code> component accepts a <code>badge</code> prop and renders it as a pill.</p>
+<p>The pill never appeared. Not once.</p>
+<p>Why? Because <code>Portfolio.tsx</code> destructured <code>image</code>, <code>title</code>, <code>description</code>, <code>url</code> and <code>languages</code> off each project, and forgot <code>badge</code>. The data existed. The component that renders it existed. Nobody had ever introduced the two to each other.</p>
+<pre><code>  description={project.description}
+  url={project.url}
+  languages={project.languages}
++ badge={project.badge}</code></pre>
+<p><strong>One line.</strong> I wrote the data, I wrote the component, and I left out the wire between them. It sat like that for months, and I never noticed because I never looked at the project grid asking &quot;does this look the way it should?&quot; I looked at it asking &quot;does it load?&quot;</p>
+<p><strong>The lesson:</strong> check your UI against what it's <em>supposed</em> to show, not against what it shows. Those are different questions and only one of them catches this bug.</p>
+<h2>Finding 5: 405 KB of charting library for people who hadn't asked for charts</h2>
+<p>I keep an analytics dashboard at <code>/dashboard-demo</code>, public, so the work is visible. It uses recharts.</p>
+<p>Recharts is heavy. And it was sitting inside the chunk loaded eagerly when you hit the route. So anyone who opened the demo downloaded <strong>405 KB</strong> of charting library before deciding whether they even cared.</p>
+<p>The fix was wrapping <code>ChartCard</code> in <code>React.lazy</code> with <code>Suspense</code>, so recharts becomes its own chunk and only comes down when the charts are actually about to mount:</p>
+<pre><code>before:  useAnalyticsData chunk = 405 KB   (recharts inside)
+after:   useAnalyticsData chunk =   3 KB
+         ChartCard chunk        = 411 KB   (lazy)</code></pre>
+<p>405 KB down to 3 KB on initial load. The library still weighs what it weighs, obviously. What changed is <em>when</em> you pay for it, and who does.</p>
+<p><strong>The lesson:</strong> code splitting doesn't make your app smaller. It stops the people who bounce from paying for what they never used.</p>
+<h2>The other fifteen</h2>
+<p>Not all of them were dramatic. Six unused images sitting in the repo, more than a megabyte of dead weight. One moderate vulnerability in a dependency. A page, <code>/education</code>, that existed and rendered content but wasn't linked from anywhere in the menu. Forgotten <code>console.log</code> and <code>console.warn</code> calls in five files. No privacy policy page and no terms page.</p>
+<p>There were also things that were fine, which is worth writing down so you don't drive yourself crazy: the mobile layout was clean, the content density was good, and the ad configuration was correct. An honest audit also tells you what to leave alone.</p>
+<h2>How to audit yours</h2>
+<p>If you're up for it, this is the order I'd go in. It's sorted by return per hour spent:</p>
+<ol>
+<li><strong>Weigh your images.</strong> Sort by size and look at the top three. If anything is over 200 KB, there's your afternoon.</li>
+<li><strong>Type a URL that doesn't exist</strong> on your own site. Watch what happens. Count to ten. If it's still loading, you have my finding number 3.</li>
+<li><strong>Open your sitemap</strong> and count the URLs. Is your actual content in there? Are the dates real?</li>
+<li><strong>Look at your build chunk sizes.</strong> Anything over 300 KB that isn't required for the first paint is a candidate for lazy loading.</li>
+<li><strong>Walk every page asking what it should be showing</strong>, not whether it loads. That's where bugs like the badge one turn up.</li>
+<li><strong>Run `npm audit` and `npm outdated`.</strong> Ten seconds.</li>
+<li><strong>Grep the project for `console.log`.</strong> Another ten seconds.</li>
+</ol>
+<p>All seven steps fit in an afternoon. It took me one afternoon to find these and another to fix the ones that mattered.</p>
+<h2>What I actually learned</h2>
+<p>None of these problems were hard. Not one. The most complex fix was three lines; the highest-impact one was converting a PNG to WebP, which is a single command.</p>
+<p>They weren't there because they were difficult. They were there because <strong>I never sat down and looked.</strong> Building is more fun than reviewing, so you keep building on top, and the broken things stay underneath, holding up the building with a months-old bug.</p>
+<p>If you have a portfolio, a blog or a side project you haven't honestly looked at in a while: put two hours on the calendar this week. Not to add anything. Just to look.</p>
+<p>You'll find your own 993 KB PNG. I promise.</p>]]></content:encoded>
+    </item>
+    <item>
+      <title><![CDATA[How I Actually Code with Claude Code: My Real Workflow on a Real Project]]></title>
+      <link>https://codewithgabo.com/how-i-actually-code-with-claude-code</link>
+      <guid isPermaLink="true">https://codewithgabo.com/how-i-actually-code-with-claude-code</guid>
+      <pubDate>Fri, 21 Aug 2026 20:25:03 GMT</pubDate>
+      <description><![CDATA[Not another "write a prompt and watch the magic" tutorial. This is the real workflow I use on this very site — three tasks I actually delegated, and the part almost nobody writes about: where it fails.]]></description>
+      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/7fd3232dc85c4dde59f786dcc78d0d405dca7119-1200x630.png" alt="How I Actually Code with Claude Code: My Real Workflow on a Real Project" />
+<p>There are two kinds of articles about coding with AI. The ones that generate a sorting function and conclude the profession is over, and the ones that show a dumb bug and conclude none of this works.</p>
+<p>Neither one looks anything like my actual workday.</p>
+<p>This is the third kind: the concrete workflow I use with Claude Code on this very site, three tasks I actually delegated, the trail in the repository to back it up, and a section on where it fails that runs as long as the section on where it works. That's the part I would have wanted to read.</p>
+<h2>What it is, without the marketing</h2>
+<p>Claude Code is an agent that runs in your terminal, inside your repository. It reads your files, runs your commands, edits your code, makes your commits. It isn't editor autocomplete, and it isn't a separate chat window where you paste fragments back and forth.</p>
+<p>That difference matters more than it sounds. An assistant that sees one file helps you write a function. An agent that sees the whole repo, runs the tests and reads the output can take a complete task off your hands. It's the difference between asking for advice and delegating work.</p>
+<h2>My setup</h2>
+<p>Nothing exotic:</p>
+<ul>
+<li>The repo for this site: a React frontend on Vite, Sanity as the CMS, and a small backend of Vercel Functions.</li>
+<li>A <code>.claude/</code> folder in the project with the local config and permissions.</li>
+<li>A <code>docs/plans/</code> folder where every design and plan lives. This is the key piece, and I'll explain why in a second.</li>
+<li>Git worktrees when a big task deserves isolation from the current working tree.</li>
+</ul>
+<p>And one rule of my own, which is what actually changed my results: <strong>nothing big gets written without a written plan first.</strong></p>
+<h2>The workflow: design, plan, execute</h2>
+<p>The temptation with an agent is to open the terminal and say &quot;add me an admin panel.&quot; Sometimes that works. Often it produces something that runs but isn't what you wanted, and you find out after six hundred lines are already on disk.</p>
+<p>So I split it into three phases, and I don't let them overlap.</p>
+<p><strong>One: design.</strong> Before touching code, a conversation. What problem are we solving, two or three approaches with their downsides, which one we pick and why. Out comes a design document in <code>docs/plans/</code>. Short, but written.</p>
+<p><strong>Two: plan.</strong> The design turns into a task-by-task plan. Which files each task touches, which test gets written first, which command verifies it, where the commit goes. My plans folder has files like <code>2026-04-28-slice-2-vercel-migration.md</code> and <code>2026-04-29-portfolio-audit-implementation.md</code>. Each one is a plan that got executed task by task.</p>
+<p><strong>Three: execute.</strong> Now the code. With the plan in front of it, the session doesn't drift. If something doesn't fit, it shows up right away, because there's a document saying what should be happening.</p>
+<p>It sounds like bureaucracy, and I thought so at first. It isn't. The written plan is what turns &quot;the agent did something weird&quot; into &quot;the agent went off script at step 4,&quot; which is a very different problem and a much easier one to fix.</p>
+<h2>Three tasks I actually delegated</h2>
+<h3>The portfolio audit</h3>
+<p>I asked it to audit this site as if it belonged to a client. Read every public component, walk the routes on mobile and desktop, measure the build chunk sizes, count the real posts in Sanity.</p>
+<p>It came back with <strong>20 findings across four areas</strong>, each with a priority and an effort estimate. Among them: a 993 KB unoptimized illustration, a sitemap containing zero of nine published posts, and a 404 page that hung forever on &quot;Loading post...&quot;.</p>
+<p>I wrote that one up in detail <a href="https://codewithgabo.com/portfolio-audit-20-problems">in a separate post</a>, but what matters here is the division of labor: <strong>the machine found, I prioritized.</strong> The document came back with findings and no fixes, on purpose, so I would be the one deciding what got touched and what didn't. Three of the twenty I threw out.</p>
+<h3>Migrating Express to Vercel Functions</h3>
+<p>I had a small Express server on Railway wrapping the Google Analytics API. It worked, but it cost money every month to sit there 24/7 serving a dashboard almost nobody visits.</p>
+<p>Moving it to serverless functions was textbook work: pull the helpers into <code>api/_utils/</code>, turn the route into a handler, move the environment variables, verify the external contract didn't change. The frontend never noticed. The bill went to zero.</p>
+<p>This is exactly the kind of task where delegating wins: mechanical, well defined, with an objective success criterion. It doesn't take judgment, it takes not getting twenty details in a row wrong. A machine does that better than I do at eleven at night.</p>
+<h3>The sitemap generated from Sanity</h3>
+<p>My sitemap was a static file I had to edit by hand every time I published. Which is to say: never.</p>
+<p>Now it's a script that runs on <code>prebuild</code>, queries Sanity with GROQ, and writes the file with every post and its real date. Eighty lines of Node, no new dependencies.</p>
+<p>Small task, and that's exactly why it sat there for months. That's the pattern I've noticed most: what has saved me the most time isn't the big tasks, it's the forty-minute ones that had been on the list for half a year because they were never urgent enough.</p>
+<h2>Where it fails</h2>
+<p>This is where most of these articles go blurry. Straight to it.</p>
+<p><strong>It accepts your premise too fast.</strong> If you say &quot;fix this CSS bug,&quot; it will go looking for a CSS bug. If the real problem was route ordering, you may get a CSS fix that covers the symptom. Now, when something breaks, I describe the behavior and not my diagnosis. The difference in outcome is enormous.</p>
+<p><strong>It's too agreeable about your ideas.</strong> If you propose a bad approach, the default response tends to be helping you build it well. I explicitly ask for two or three options with their downsides before anything gets decided, because if I don't ask for alternatives, they don't show up.</p>
+<p><strong>Context degrades in long sessions.</strong> Over a session of several hours, the decisions from the first half hour get fuzzy. That's why the plan goes into a file instead of staying in the conversation: the file doesn't forget.</p>
+<p><strong>It doesn't know what ugly looks like.</strong> It can write a component that is correct, accessible, passes the tests, and looks bad. Visual judgment is still yours. On this site I've redone by hand a fair amount of CSS that was technically fine.</p>
+<p><strong>And the big one: you are still responsible for what gets merged.</strong> I read every diff. Not because I trust it less than a human colleague, but exactly as much as I'd check a human colleague. A commit with my name on it is mine, no matter who typed it.</p>
+<p><strong>When it costs more than it saves:</strong> tasks under ten minutes that I already know how to do, one-line changes, and anything where explaining the context takes longer than doing the thing. Writing a good prompt for a trivial change is net negative work.</p>
+<h2>How to start tomorrow</h2>
+<p>If you want to try this without getting burned:</p>
+<ol>
+<li><strong>Start with a boring, well-defined task.</strong> Migrating a format, writing tests for something that already exists, updating dependencies. Don't start with your product's flagship feature.</li>
+<li><strong>Ask for a plan before code.</strong> Even when the task is small. Reading the plan tells you in thirty seconds whether you were understood, and fixing a plan is free compared to fixing an implementation.</li>
+<li><strong>Work on a branch or a worktree.</strong> So you can throw it all away without thinking twice if it goes sideways.</li>
+<li><strong>Read the diffs.</strong> All of them. If you're not going to read them, don't delegate.</li>
+<li><strong>Leave the context in the repository, in writing.</strong> Decisions that live only in a conversation get lost. The ones in <code>docs/plans/</code> are still there three months later, when you no longer remember why you chose that.</li>
+</ol>
+<h2>What actually changed</h2>
+<p>I don't code faster. I code with less friction on the boring parts, which turn out to be most of the work.</p>
+<p>The tasks that used to sit on the list out of inertia now get done, because the cost of starting them dropped enough. The sitemap had been pending for months. The audit for longer. Neither was hard; both were tedious, and tedious is exactly what piled up on me.</p>
+<p>What didn't change: I still decide what gets built, I still review every line that goes in, and I'm still the one responsible when something breaks in production.</p>
+<p>That seems right to me. It's the part of the job I like.</p>]]></content:encoded>
+    </item>
+    <item>
       <title><![CDATA[Por qué construí mi propio editor de posts en vez de usar Sanity Studio]]></title>
       <link>https://codewithgabo.com/editor-propio-vs-sanity-studio</link>
       <guid isPermaLink="true">https://codewithgabo.com/editor-propio-vs-sanity-studio</guid>

@@ -8,7 +8,7 @@ import LoadingSpinner from "./common/LoadingSpinner";
 import NewsletterSignup from "./Newsletter/NewsletterSignup";
 import AdSlot from "./Ads/AdSlot";
 import { AD_SLOTS } from "../config/adsense";
-import { alternatesForSlug, langForSlug } from "../config/translations";
+import { alternatesForSlug, langForSlug, translationOf } from "../config/translations";
 import NotFound from "./NotFound";
 import "./OnePost.css";
 import usePageTracking from "../hooks/useAnalytics";
@@ -18,6 +18,7 @@ import { nightOwl } from "react-syntax-highlighter/dist/esm/styles/hljs";
 interface RelatedPost {
   title: string;
   slug: { current: string };
+  tags?: string[];
   mainImage?: { asset: { url: string } };
 }
 
@@ -142,19 +143,53 @@ const OnePost = () => {
   // Every post links to three others. Without this the only path between posts
   // was /allpost, so a reader who finished an article had nowhere to go — and
   // crawlers had no route between them either.
+  //
+  // This used to be `order(publishedAt desc)[0...3]`, which is a "newest" list
+  // wearing the word "related": every post on the site showed the same three
+  // cards. Publishing the English translations made the flaw visible, because
+  // the two newest posts were English and every Spanish post started
+  // recommending them.
+  //
+  // Only five of sixteen posts carry tags, so tags alone cannot rank the list.
+  // Language is the hard constraint, shared tags break the tie, recency breaks
+  // what is left. A post's own translation is excluded outright: offering the
+  // article you are already reading, in a language you did not pick, is not a
+  // next thing to read — that is what the hreflang tags are for.
   useEffect(() => {
     if (!slug) return;
+    const myLang = langForSlug(slug);
     sanityClient
       .fetch(
-        `*[_type == "post" && slug.current != $slug && defined(slug.current)]
-          | order(publishedAt desc)[0...3]{
-            title,
-            slug,
-            mainImage{asset->{url}}
-          }`,
-        { slug }
+        `{
+          "mine": *[_type == "post" && slug.current == $slug][0]{"tags": coalesce(tags, [])},
+          "pool": *[_type == "post" && slug.current != $slug
+                    && slug.current != $pair && defined(slug.current)]
+            | order(publishedAt desc)[0...20]{
+              title,
+              slug,
+              "tags": coalesce(tags, []),
+              mainImage{asset->{url}}
+            }
+        }`,
+        { slug, pair: translationOf(slug) ?? "" }
       )
-      .then((data: RelatedPost[]) => setRelated(data || []))
+      .then(({ mine, pool }: { mine?: { tags: string[] }; pool: RelatedPost[] }) => {
+        const myTags = new Set((mine?.tags ?? []).map((t) => t.toLowerCase()));
+        const ranked = (pool ?? [])
+          .map((post, index) => {
+            const shared = (post.tags ?? []).filter((t) =>
+              myTags.has(t.toLowerCase())
+            ).length;
+            const sameLang = langForSlug(post.slug?.current) === myLang;
+            // Language dominates, then tag overlap; `index` preserves the
+            // newest-first order the query already applied.
+            return { post, score: (sameLang ? 100 : 0) + shared * 10, index };
+          })
+          .sort((a, b) => b.score - a.score || a.index - b.index)
+          .slice(0, 3)
+          .map((r) => r.post);
+        setRelated(ranked);
+      })
       .catch(() => setRelated([]));
   }, [slug]);
 

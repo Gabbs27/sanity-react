@@ -1,0 +1,19 @@
+{
+  "_comment": "Source of truth for post language and translation pairs. Read by BOTH src/config/translations.ts (the browser) and scripts/prerender.mjs (the build). It lives in JSON because a .mjs build script cannot import a .ts module, and a duplicated table would drift the moment one side was edited alone.",
+  "spanishPosts": [
+    "3-prompts-gemini-nano-banana-resultados",
+    "auditoria-portfolio-20-problemas",
+    "como-programo-con-claude-code-flujo-real",
+    "editor-propio-vs-sanity-studio"
+  ],
+  "pairs": [
+    {
+      "es": "auditoria-portfolio-20-problemas",
+      "en": "portfolio-audit-20-problems"
+    },
+    {
+      "es": "como-programo-con-claude-code-flujo-real",
+      "en": "how-i-actually-code-with-claude-code"
+    }
+  ]
+}
