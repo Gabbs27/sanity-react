@@ -7,7 +7,7 @@ excerpt: Sanity ya me daba un editor gratis, mantenido y con más funciones que 
 
 Sanity viene con Studio, un editor de contenido completo, mantenido por gente que sabe más que yo del tema, gratis y ya integrado con mi esquema. Y aun así escribí el mío.
 
-Esto normalmente es mala señal. La mayoría de las veces que un desarrollador reconstruye algo que ya existía, la respuesta honesta es "porque me apetecía". Así que déjame defender la decisión con argumentos, enseñar el código de la parte interesante, y admitir lo que me costó. Al final hay una sección de cuándo **no** deberías hacer esto, que es probablemente la más útil.
+Esto normalmente es mala señal. La mayoría de las veces que un desarrollador reconstruye algo que ya existía, la respuesta honesta es "porque me dio la gana". Así que déjame defender la decisión con argumentos, enseñar el código de la parte interesante, y admitir lo que me costó. Al final hay una sección de cuándo **no** deberías hacer esto, que es probablemente la más útil.
 
 ## El problema no era el editor
 
@@ -123,7 +123,7 @@ Con lo que sé ahora, usa Studio y no mires atrás si te reconoces en algo de es
 - **Quien escribe no eres tú.** Si el editor lo va a usar alguien no técnico, la interfaz pulida y mantenida vale mucho más que la integración con tu tema.
 - **Tu fricción para publicar no es el problema.** Si publicas de forma constante y el cambio de contexto no te frena, no tienes el problema que esto resuelve. No construyas la solución.
 
-Mi caso cumplía justo lo contrario: un autor, sin revisión, contenido casi todo texto, y una fricción para publicar que se notaba en la cadencia. Por eso salió a cuenta.
+Mi caso cumplía justo lo contrario: un autor, sin revisión, contenido casi todo texto, y una fricción para publicar que se notaba en la cadencia. Por eso valió la pena.
 
 ## Lo que haría igual
 
