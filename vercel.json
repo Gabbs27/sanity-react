@@ -9,7 +9,7 @@
       "destination": "https://analytics-backend-seven.vercel.app/api/:path*"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!assets/).*)",
       "destination": "/index.html"
     }
   ],

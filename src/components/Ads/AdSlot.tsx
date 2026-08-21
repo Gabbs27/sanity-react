@@ -44,33 +44,60 @@ export default function AdSlot({
   style,
 }: Props) {
   const insRef = useRef<HTMLModElement>(null);
-  const pushed = useRef(false);
+  // Which slot id has already been pushed. A boolean would make the slotId
+  // dependency below dead: a changed id would re-run the effect and return
+  // immediately, so the new unit would never enter AdSense's queue.
+  const pushedFor = useRef<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
 
   const enabled = isValidSlotId(slotId);
 
   useEffect(() => {
-    if (!enabled || pushed.current) return;
+    if (!enabled) return;
     const ins = insRef.current;
-    // AdSense stamps this attribute on elements it has already claimed.
-    // Pushing such an element again throws "All ins elements in the DOM with
-    // class adsbygoogle already have ads in them".
-    if (!ins || ins.getAttribute('data-adsbygoogle-status')) return;
+    if (!ins) return;
 
-    pushed.current = true;
-    try {
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
-    } catch (err) {
-      if (import.meta.env.DEV) console.warn('[AdSlot] adsbygoogle push failed:', err);
+    // A different unit is a different ad: forget the previous one's fill state
+    // so a stale "unfilled" cannot keep the new slot hidden.
+    setStatus(null);
+
+    // AdSense stamps data-adsbygoogle-status on elements it has already
+    // claimed. Pushing such an element again throws "All ins elements in the
+    // DOM with class adsbygoogle already have ads in them".
+    if (pushedFor.current !== slotId && !ins.getAttribute('data-adsbygoogle-status')) {
+      pushedFor.current = slotId;
+      try {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+      } catch (err) {
+        if (import.meta.env.DEV) console.warn('[AdSlot] adsbygoogle push failed:', err);
+      }
     }
 
-    // The try/catch above cannot see the common failures: AdSense reports them
-    // asynchronously from its own queue. Reading data-ad-status is the only way
-    // to tell "filled" from "unfilled" from "the script never processed this".
+    // The try/catch cannot see the common failures: AdSense reports them
+    // asynchronously from its own queue, so data-ad-status is the only way to
+    // tell "filled" from "unfilled" from "never processed".
+    //
+    // Observed rather than sampled once. A single delayed reading would latch
+    // whatever was true at that instant, and a slot that filled a moment later
+    // would stay in the display:none branch below — serving a real ad inside a
+    // hidden container, which is exactly the kind of unviewable impression that
+    // gets an AdSense account limited.
+    const observer = new MutationObserver(() => {
+      const value = ins.getAttribute('data-ad-status');
+      if (value) setStatus(value);
+    });
+    observer.observe(ins, { attributes: true, attributeFilter: ['data-ad-status'] });
+
+    // Fallback for the case the observer can never catch: the script never
+    // touches the element, so the attribute is never written at all.
     const timer = window.setTimeout(() => {
-      setStatus(ins.getAttribute('data-ad-status') ?? 'no-response');
+      setStatus((prev) => prev ?? (ins.getAttribute('data-ad-status') || 'no-response'));
     }, 3000);
-    return () => window.clearTimeout(timer);
+
+    return () => {
+      observer.disconnect();
+      window.clearTimeout(timer);
+    };
   }, [enabled, slotId]);
 
   useEffect(() => {
@@ -92,6 +119,7 @@ export default function AdSlot({
           units; sending it on a fluid in-article unit can distort sizing on
           phones, so it is omitted unless the format is "auto". */}
       <ins
+        key={slotId}
         ref={insRef}
         className="adsbygoogle"
         style={{ display: 'block', ...style }}

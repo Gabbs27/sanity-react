@@ -1,8 +1,15 @@
 
 import { educationData } from "../assets/educationData";
+import SEO from "./common/SEO";
 
 const Education = () => {
   return (
+    <>
+      <SEO
+        title="Education"
+        description="Gabriel Abreu's academic background, degrees and certifications in software engineering and web development."
+        url="https://codewithgabo.com/education"
+      />
     <div className='min-h-screen p-12'>
       <div className='container mx-auto py-12'>
         <h1 className='text-4xl font-bold mb-8'>Education</h1>
@@ -19,6 +26,7 @@ const Education = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
