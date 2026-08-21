@@ -47,8 +47,10 @@ const Privacy = () => {
                 <li>
                   <strong>Advertising (Google AdSense):</strong> when ads are served,
                   Google may set cookies to personalize ads, frequency-cap them, and
-                  measure performance. EEA, UK, and Swiss visitors see a Google CMP
-                  consent banner with three options (consent, do not consent, manage).
+                  measure performance. Ads are not being served at this time. Once
+                  they are, visitors in the EEA, UK, and Switzerland will be shown
+                  Google&rsquo;s consent message, with the option to consent, not
+                  consent, or manage their choices.
                 </li>
                 <li>
                   <strong>Newsletter (MailerLite):</strong> only if you submit the
@@ -89,8 +91,23 @@ const Privacy = () => {
                 </li>
               </ul>
               <p className="mt-3">
-                You can clear cookies in your browser settings or use the CMP banner
-                (visible to EEA/UK/Swiss visitors) to update consent at any time.
+                You can clear cookies in your browser settings at any time. You can
+                also opt out of personalized advertising through{" "}
+                <a
+                  href="https://www.google.com/settings/ads"
+                  target="_blank"
+                  rel="noopener noreferrer">
+                  Google Ads Settings
+                </a>{" "}
+                or the industry opt-out page at{" "}
+                <a
+                  href="https://www.aboutads.info/choices/"
+                  target="_blank"
+                  rel="noopener noreferrer">
+                  aboutads.info/choices
+                </a>
+                . Where a consent message is shown, you can reopen it to change your
+                choices.
               </p>
             </section>
 

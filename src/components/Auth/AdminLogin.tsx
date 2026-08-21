@@ -131,7 +131,7 @@ const AdminLogin = () => {
           <div className="login-footer">
             <p className="info-text">
               💡 <strong>Don't have access?</strong> Check out the{" "}
-              <a href="/#/dashboard-demo">public demo dashboard</a> instead.
+              <a href="/dashboard-demo">public demo dashboard</a> instead.
             </p>
           </div>
         </motion.div>

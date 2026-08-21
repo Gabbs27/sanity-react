@@ -20,10 +20,25 @@ interface SanityPostData {
   mainImage?: { asset: { _id: string; url: string } };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   body: any;
+  excerpt?: string;
   name?: string;
   publishedAt: string;
   sponsored?: boolean;
   affiliateDisclosure?: boolean;
+}
+
+// Flattens a Portable Text body to plain text, for posts published before the
+// excerpt field was wired up (the API silently dropped it until 91b485d).
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function toPlainText(blocks: any): string {
+  if (!Array.isArray(blocks)) return "";
+  return blocks
+    .filter((b) => b?._type === "block" && Array.isArray(b.children))
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .map((b: any) => b.children.map((c: any) => c?.text ?? "").join(""))
+    .join(" ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 // PortableText custom components — type assertions needed for block-level overrides
@@ -98,6 +113,7 @@ const OnePost = () => {
             }
           },
           body,
+          excerpt,
           "name": author->name,
           publishedAt,
           sponsored,
@@ -122,9 +138,17 @@ const OnePost = () => {
     <>
       <SEO
         title={postData.title}
-        description={postData.title}
+        // The excerpt, not the title: a description that merely repeats the
+        // title tells a search result nothing. Falls back to the opening of the
+        // body for the older posts that have no excerpt.
+        description={
+          postData.excerpt?.trim() ||
+          `${toPlainText(postData.body).slice(0, 155).trimEnd()}…`
+        }
         keywords="blog post, article, tutorial, web development"
         url={`https://codewithgabo.com/${slug}`}
+        image={postData.mainImage?.asset?.url}
+        type="article"
       />
       <AnimatedSection variant="fadeInUp" duration={0.6}>
         <article className='single-post'>
