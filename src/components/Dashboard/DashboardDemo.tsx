@@ -66,7 +66,7 @@ const DashboardDemo = () => {
         title="Analytics Dashboard Demo"
         description="Interactive analytics dashboard demo showcasing real-time data visualization with React and Recharts"
         keywords="analytics dashboard, data visualization, React dashboard, Recharts, interactive charts, web analytics"
-        url="https://codewithgabo.com/#/dashboard-demo"
+        url="https://codewithgabo.com/dashboard-demo"
       />
 
       <div className="dashboard">

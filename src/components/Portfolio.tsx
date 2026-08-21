@@ -58,7 +58,7 @@ const Portfolio = () => {
         title="Portfolio - Projects & Work"
         description="Explore Gabriel Abreu's portfolio featuring modern web applications built with React, TypeScript, and cutting-edge technologies."
         keywords="React projects, web development portfolio, TypeScript applications, full stack projects"
-        url="https://codewithgabo.com/#/portfolio"
+        url="https://codewithgabo.com/"
       />
       <div className='min-h-screen p-12'>
         <Greeting />
