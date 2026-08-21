@@ -1,8 +1,18 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
 Allow: /
-Disallow: /dashboard
-Disallow: /admin-login
+
+# Admin surfaces. This prefix covers /admin-login, /admin/posts and
+# /admin/write — the previous "Disallow: /admin-login" left the two
+# /admin/* routes crawlable.
+Disallow: /admin
+
+# Only the real dashboard, which sits behind auth. The previous rule was a
+# bare prefix, so it also blocked /dashboard-demo — the public, linkable
+# demo that is meant to be indexed.
+Disallow: /dashboard$
+
+# Personal page, never indexed.
 Disallow: /para-ti
 
 Sitemap: https://codewithgabo.com/sitemap.xml

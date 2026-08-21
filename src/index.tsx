@@ -1,6 +1,5 @@
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
-import { HelmetProvider } from "react-helmet-async";
 import "./index.css";
 import "./styles/theme.css";
 import "./components/common/common.css";
@@ -19,19 +18,17 @@ root.render(
   <ErrorBoundary>
     <ThemeProvider>
       <AuthProvider>
-        <HelmetProvider>
-          <BrowserRouter>
-            <a href="#main-content" className="skip-link">
-              Skip to main content
-            </a>
-            <Navbar />
-            <main id="main-content">
-              <App />
-            </main>
-            <Footer />
-            <InstallPWA />
-          </BrowserRouter>
-        </HelmetProvider>
+        <BrowserRouter>
+          <a href="#main-content" className="skip-link">
+            Skip to main content
+          </a>
+          <Navbar />
+          <main id="main-content">
+            <App />
+          </main>
+          <Footer />
+          <InstallPWA />
+        </BrowserRouter>
       </AuthProvider>
     </ThemeProvider>
   </ErrorBoundary>

@@ -63,7 +63,7 @@ export default function AllPosts() {
         title="Blog - Articles & Tutorials"
         description="Read Gabriel Abreu's blog featuring tutorials, insights, and articles about web development, React, and modern technologies."
         keywords="web development blog, React tutorials, programming articles, tech blog"
-        url="https://codewithgabo.com/#/allpost"
+        url="https://codewithgabo.com/allpost"
       />
       <div className='min-h-screen p-12'>
         <section className='container mx-auto py-12'>

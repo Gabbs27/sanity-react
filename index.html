@@ -28,7 +28,6 @@
     <meta name="keywords" content="Gabriel Abreu, Full Stack Developer, React, TypeScript, C#, Web Development, Portfolio, Code With Gabo">
     <meta name="author" content="Gabriel Abreu">
     <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://codewithgabo.com/">
     <link rel="apple-touch-icon" href="/logo192.png" />
     <link rel="manifest" href="/manifest.json" />
 
@@ -84,7 +83,7 @@
          sees the real route. -->
     <script>
       (function(l){
-        if (l.search[1] === '/' ) {
+        if (l.search[1] === '/' && l.pathname === '/') {
           var decoded = l.search.slice(1).split('&').map(function(s){
             return s.replace(/~and~/g, '&');
           }).join('?');

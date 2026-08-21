@@ -115,8 +115,12 @@ const NavBar = () => {
             role="menuitem">
             Projects
           </NavLink>
+          {/* Points at the public demo, not /dashboard: that route is behind
+              an auth wall, so every visitor who clicked this hit a login
+              screen — a dead end for readers and a navigation flag during
+              AdSense review. The real dashboard is still at /dashboard. */}
           <NavLink
-            to="/dashboard"
+            to="/dashboard-demo"
             className="nav-item nav-item-dashboard"
             onClick={handleMenuItemClick}
             role="menuitem">

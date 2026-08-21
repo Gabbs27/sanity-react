@@ -68,7 +68,8 @@ const Dashboard = () => {
       <SEO
         title="Analytics Dashboard"
         description="View analytics and insights for Gabriel Abreu's portfolio website"
-        url="https://codewithgabo.com/#/dashboard"
+        url="https://codewithgabo.com/dashboard"
+        noindex
       />
 
       <div className="dashboard">
