@@ -1,0 +1,1615 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+     xmlns:content="http://purl.org/rss/1.0/modules/content/"
+     xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Code With Gabo</title>
+    <link>https://codewithgabo.com</link>
+    <description>Notes from what Gabriel Abreu is building — React, TypeScript, C#, and what breaks along the way. In English and Spanish.</description>
+    <language>es</language>
+    <atom:link href="https://codewithgabo.com/rss.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title><![CDATA[Por qué construí mi propio editor de posts en vez de usar Sanity Studio]]></title>
+      <link>https://codewithgabo.com/editor-propio-vs-sanity-studio</link>
+      <guid isPermaLink="true">https://codewithgabo.com/editor-propio-vs-sanity-studio</guid>
+      <pubDate>Thu, 20 Aug 2026 14:10:00 GMT</pubDate>
+      <description><![CDATA[Sanity ya me daba un editor gratis, mantenido y con más funciones que el mío. Construí otro igualmente. Esta es la decisión, el código del conversor, y el precio que pagué por ella.]]></description>
+      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/bf7f30c887b594972cf7d3e77b9fe16ad64c9334-1200x630.png" alt="Por qué construí mi propio editor de posts en vez de usar Sanity Studio" />
+<p>Sanity viene con Studio, un editor de contenido completo, mantenido por gente que sabe más que yo del tema, gratis y ya integrado con mi esquema. Y aun así escribí el mío.</p>
+<p>Esto normalmente es mala señal. La mayoría de las veces que un desarrollador reconstruye algo que ya existía, la respuesta honesta es &quot;porque me dio la gana&quot;. Así que déjame defender la decisión con argumentos, enseñar el código de la parte interesante, y admitir lo que me costó. Al final hay una sección de cuándo <strong>no</strong> deberías hacer esto, que es probablemente la más útil.</p>
+<h2>El problema no era el editor</h2>
+<p>Studio es bueno. El problema nunca fue la calidad del editor.</p>
+<p>El problema era que publicar en mi propio blog requería salir de mi propio sitio. Studio corre aparte, con su propio despliegue, su propia interfaz y su propia sesión. Para escribir un post: abrir otra aplicación, entrar otra vez, escribir en una interfaz que no se parece en nada al sitio donde va a salir el texto, publicar, y volver a mi sitio a comprobar cómo quedó.</p>
+<p>Para un equipo de contenido con varios autores, revisiones y permisos, ese es exactamente el producto correcto. Para <strong>un blog de un solo autor que además es el desarrollador</strong>, es fricción sin contrapartida. Y la fricción en publicar tiene un efecto muy medible: publicas menos.</p>
+<p>Ya tenía sesión de administrador en mi sitio, un panel en <code>/admin</code>, y un backend con permisos de escritura sobre Sanity. Faltaba una pantalla.</p>
+<h2>Qué construí</h2>
+<p>Dos rutas:</p>
+<ul>
+<li><code>/admin/write</code> para un post nuevo</li>
+<li><code>/admin/write/:id</code> para editar uno existente</li>
+</ul>
+<p>Dentro, un editor de bloques con BlockNote, que da la experiencia tipo Notion que quería: menú de barra inclinada, arrastrar bloques, pegar imágenes directamente. Se conecta a mi tema claro/oscuro y a mi sesión de administrador, así que se siente parte del sitio y no un injerto.</p>
+<p>La subida de imágenes va al mismo endpoint que ya tenía, así que pegar una imagen en el editor la sube a Sanity y devuelve el identificador del asset sin que yo salga de la pantalla.</p>
+<p>Nada de esto es difícil. La parte difícil es otra.</p>
+<h2>La pieza interesante: traducir entre dos formatos</h2>
+<p>Aquí está el trabajo real, y es el motivo por el que este post existe.</p>
+<p>BlockNote guarda su contenido en su propio JSON de bloques. Sanity guarda el contenido enriquecido en <strong>Portable Text</strong>, que es un formato distinto con otra filosofía: en vez de HTML anidado, una lista plana de bloques donde el formato inline vive en marcas y los enlaces en definiciones separadas.</p>
+<p>No son compatibles. Hace falta un traductor, y tiene que funcionar en las dos direcciones: al guardar, de BlockNote a Portable Text; al abrir un post existente para editarlo, de Portable Text a BlockNote.</p>
+<p>Ese traductor vive en un archivo, <code>src/utils/blocknoteToPortable.ts</code>, y empieza declarando su propia tabla de equivalencias:</p>
+<pre><code>// Mapping table:
+//   BN paragraph / heading / bulletListItem / numberedListItem  -&gt;  PT block with style/listItem
+//   BN inline content (text + styles bold/italic/code, link)    -&gt;  PT spans with marks
+//   BN image                                                    -&gt;  PT type: image with asset reference</code></pre>
+<p>La conversión de formato inline es la parte que más se piensa. En BlockNote, un fragmento de texto lleva un objeto <code>styles</code> con banderas booleanas. En Portable Text, lleva un array de marcas con nombres:</p>
+<pre><code>if (styles.bold) marks.push('strong');
+if (styles.italic) marks.push('em');
+if (styles.code) marks.push('code');</code></pre>
+<p>Los enlaces son más sutiles, porque Portable Text no guarda la URL en el span. Guarda una definición aparte con una clave, y el span solo lleva esa clave entre sus marcas. Hay que generar la clave, registrar la definición, y luego pegársela a cada hijo del enlace:</p>
+<pre><code>const linkKey = makeKey();
+markDefs.push({ _type: 'link', _key: linkKey, href: node.href });
+const inner = inlineToSpans(node.content || []);
+for (const span of inner.spans) {
+  span.marks = [...(span.marks || []), linkKey];
+  spans.push(span);
+}</code></pre>
+<h2>La lección que me costó datos: nunca pierdas contenido</h2>
+<p>La primera versión hacía lo obvio con los tipos de bloque que no soportaba: ignorarlos.</p>
+<p>Eso significa que si pegabas una tabla, o un archivo incrustado, y guardabas, ese contenido <strong>desaparecía en silencio</strong>. Sin aviso, sin error. Escribías algo, le dabas a guardar, y ya no estaba.</p>
+<p>La versión actual, cuando encuentra un bloque que no sabe traducir, hace el mejor esfuerzo por rescatar el texto plano antes de rendirse:</p>
+<pre><code>// Unsupported block types (table, embed, file, audio, video, etc.) -
+// best-effort extract plain text so content isn't lost on save.
+if (block.type &amp;&amp; !SUPPORTED.has(block.type)) {
+  const fallback = Array.isArray(block.content)
+    ? block.content
+        .map((n) =&gt; (typeof n?.text === 'string' ? n.text : ''))
+        .join('')
+    : '';</code></pre>
+<p>El resultado queda feo: una tabla se convierte en un párrafo de texto corrido. Pero feo y recuperable es infinitamente mejor que limpio y perdido. Puedo arreglar un párrafo feo. No puedo recuperar un texto que se borró sin avisar.</p>
+<p>Hay una defensa parecida en el manejo de contenido inline, con un comentario que documenta por qué existe:</p>
+<pre><code>// Some BlockNote versions return objects we can't iterate (e.g. for table
+// cells, embeds). Skip rather than throw &quot;T is not iterable&quot;.</code></pre>
+<p>Ese comentario es el resumen de una tarde entera. Lo dejé escrito para no repetirla.</p>
+<p><strong>Si escribes un conversor entre dos formatos de contenido, esta es la regla:</strong> cuando no sepas qué hacer con algo, degrada. Nunca descartes. El contenido del usuario, aunque el usuario seas tú, no es tuyo para perderlo.</p>
+<h2>El precio</h2>
+<p>Toca ser honesto con los costes, porque son reales.</p>
+<p>Cuando audité este sitio, uno de los hallazgos fue que <strong>el chunk del `PostEditor` pesa 1,3 MB</strong>. BlockNote más Mantine no son ligeros. Es tanto que dispara el aviso de tamaño de chunk de Vite en cada build.</p>
+<p>El atenuante es que la ruta se carga de forma diferida, así que solo lo paga quien entra a <code>/admin/write</code>, que soy yo. Ningún visitante del blog descarga un solo byte de eso. Por eso quedó como prioridad baja y sigue ahí.</p>
+<p>Pero el coste real no es el megabyte. Es que <strong>ahora ese conversor es mío</strong>. Cuando BlockNote cambie su formato de bloques en una versión mayor, el problema es mío. Cuando aparezca un caso raro de Portable Text que no contemplé, lo arreglo yo. Studio no me habría cobrado nada de eso nunca.</p>
+<p>Escribir el código es la parte barata. Mantenerlo es la factura, y llega en cuotas.</p>
+<h2>Cuándo NO deberías hacer esto</h2>
+<p>Con lo que sé ahora, usa Studio y no mires atrás si te reconoces en algo de esto:</p>
+<ul>
+<li><strong>Hay más de un autor.</strong> En cuanto necesitas permisos, roles o saber quién cambió qué, estás reimplementando un producto entero, no una pantalla.</li>
+<li><strong>Hay revisión editorial.</strong> Borradores, estados, programación de publicaciones, historial de versiones. Studio te da todo eso; tú no lo vas a construir en un fin de semana.</li>
+<li><strong>Tu contenido no es sobre todo texto.</strong> Si tus documentos tienen referencias cruzadas, objetos anidados o campos complejos, los editores de Studio ya resuelven eso y a ti te tocaría inventarlo.</li>
+<li><strong>Quien escribe no eres tú.</strong> Si el editor lo va a usar alguien no técnico, la interfaz pulida y mantenida vale mucho más que la integración con tu tema.</li>
+<li><strong>Tu fricción para publicar no es el problema.</strong> Si publicas de forma constante y el cambio de contexto no te frena, no tienes el problema que esto resuelve. No construyas la solución.</li>
+</ul>
+<p>Mi caso cumplía justo lo contrario: un autor, sin revisión, contenido casi todo texto, y una fricción para publicar que se notaba en la cadencia. Por eso valió la pena.</p>
+<h2>Lo que haría igual</h2>
+<p>Volvería a construirlo. Pero la razón importa: no lo construí porque Studio fuera malo, sino porque mi problema no era el editor, era el cambio de contexto. Y ese, ninguna mejora de Studio me lo iba a quitar.</p>
+<p>Antes de reconstruir algo que ya existe, la pregunta útil no es &quot;¿puedo hacerlo mejor?&quot;. Casi siempre la respuesta es no. La pregunta es <strong>&quot;¿es mi problema el que esta herramienta resuelve?&quot;</strong>. Si no lo es, ninguna cantidad de calidad ajena te va a servir.</p>
+<p>Ahora escribo un post desde el mismo sitio donde se publica, con mi tema, con mi sesión, sin cambiar de aplicación. Ese era el objetivo entero. Todo lo demás fue el precio.</p>]]></content:encoded>
+    </item>
+    <item>
+      <title><![CDATA[Cómo programo con Claude Code: mi flujo real en un proyecto de verdad]]></title>
+      <link>https://codewithgabo.com/como-programo-con-claude-code-flujo-real</link>
+      <guid isPermaLink="true">https://codewithgabo.com/como-programo-con-claude-code-flujo-real</guid>
+      <pubDate>Thu, 20 Aug 2026 14:05:00 GMT</pubDate>
+      <description><![CDATA[No otro tutorial de "escribe un prompt y mira la magia". Este es el flujo real que uso sobre este mismo sitio, con tres tareas que delegué de verdad y la parte que casi nadie cuenta, que es dónde falla.]]></description>
+      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/22127458fb0f15b1d924b44b79ea03247eff07e5-1200x630.png" alt="Cómo programo con Claude Code: mi flujo real en un proyecto de verdad" />
+<p>Hay dos tipos de artículos sobre programar con IA. Los que te enseñan a generar una función de ordenamiento y concluyen que el oficio se acabó, y los que enseñan un bug tonto y concluyen que esto no sirve para nada.</p>
+<p>Ninguno de los dos se parece a mi trabajo diario.</p>
+<p>Este post es lo tercero: el flujo concreto que uso con Claude Code sobre este mismo sitio, con tres tareas que delegué de verdad, el rastro en el repositorio para probarlo, y una sección sobre dónde falla que va a ser tan larga como la de dónde funciona. Porque esa es la parte que a mí me habría servido leer.</p>
+<h2>Qué es, sin marketing</h2>
+<p>Claude Code es un agente que corre en tu terminal, dentro de tu repositorio. Lee tus archivos, corre tus comandos, edita tu código y hace tus commits. No es autocompletado en el editor y no es una ventana de chat aparte donde copias y pegas fragmentos.</p>
+<p>La diferencia importa más de lo que parece. Un asistente que ve un archivo te ayuda a escribir una función. Un agente que ve el repositorio entero, corre los tests y lee la salida puede encargarse de una tarea completa. Es la diferencia entre pedir consejo y delegar trabajo.</p>
+<h2>Mi setup</h2>
+<p>Nada exótico:</p>
+<ul>
+<li>El repositorio de este sitio, que es un frontend en React con Vite, Sanity como CMS y un backend pequeño de funciones en Vercel.</li>
+<li>Una carpeta <code>.claude/</code> en el proyecto con la configuración local y los permisos.</li>
+<li>Una carpeta <code>docs/plans/</code> donde vive todo lo que se ha diseñado y planificado. Esta es la pieza clave y ahora explico por qué.</li>
+<li>Worktrees de git cuando una tarea grande merece aislarse del árbol de trabajo actual.</li>
+</ul>
+<p>Y una regla propia, que es la que de verdad cambió mi resultado: <strong>nada grande se escribe sin un plan escrito antes.</strong></p>
+<h2>El flujo: diseñar, planificar, ejecutar</h2>
+<p>La tentación con un agente es abrir la terminal y decir &quot;añádeme un panel de administración&quot;. A veces sale. Muchas veces sale algo que funciona pero que no es lo que querías, y lo descubres cuando ya hay seiscientas líneas escritas.</p>
+<p>Así que separo en tres fases, y no dejo que se solapen:</p>
+<p><strong>Uno, diseñar.</strong> Antes de tocar código, una conversación. Qué problema resolvemos, dos o tres enfoques con sus contras, cuál elegimos y por qué. Sale un documento de diseño en <code>docs/plans/</code>. Corto, pero escrito.</p>
+<p><strong>Dos, planificar.</strong> Del diseño sale un plan por tareas. Qué archivos toca cada una, qué test se escribe primero, qué comando la verifica, dónde va el commit. En mi carpeta de planes hay archivos como <code>2026-04-28-slice-2-vercel-migration.md</code> o <code>2026-04-29-portfolio-audit-implementation.md</code>. Cada uno es un plan que se ejecutó tarea a tarea.</p>
+<p><strong>Tres, ejecutar.</strong> Ahora sí, código. Con el plan delante, la sesión no deriva. Si algo no encaja, se ve enseguida, porque hay un documento que dice qué debería estar pasando.</p>
+<p>Suena a burocracia y al principio lo pensé. No lo es. El plan escrito es lo que convierte &quot;el agente hizo algo raro&quot; en &quot;el agente se desvió del paso 4&quot;, que es un problema muy distinto y mucho más fácil de arreglar.</p>
+<h2>Tres tareas que delegué de verdad</h2>
+<h3>La auditoría del portfolio</h3>
+<p>Le pedí que auditara este sitio como si fuera de un cliente. Leer cada componente público, recorrer las rutas en celular y escritorio, medir el tamaño de los chunks del build, contar los posts reales en Sanity.</p>
+<p>Salieron <strong>20 hallazgos en cuatro áreas</strong>, cada uno con prioridad y esfuerzo estimado. Entre ellos: una ilustración de 993 KB sin optimizar, un sitemap con cero posts de nueve publicados, y una página 404 que se quedaba colgada para siempre en &quot;Loading post...&quot;.</p>
+<p>Lo escribí en detalle <a href="https://codewithgabo.com/auditoria-portfolio-20-problemas">en otro post</a>, pero lo relevante aquí es el reparto del trabajo: <strong>la máquina encontró, yo prioricé.</strong> El documento salió con hallazgos y sin arreglos, a propósito, para que yo decidiera qué tocaba y qué no. Tres de los veinte los descarté.</p>
+<h3>La migración de Express a Vercel Functions</h3>
+<p>Tenía un servidor Express pequeño en Railway envolviendo la API de Google Analytics. Funcionaba, pero costaba dinero todos los meses por estar encendido 24/7 sirviendo un dashboard que casi nadie visita.</p>
+<p>La migración a funciones sin servidor fue una tarea de manual: extraer los ayudantes a <code>api/_utils/</code>, convertir la ruta en un handler, mover las variables de entorno, verificar que el contrato externo no cambiara. El frontend nunca se enteró. La factura pasó a cero.</p>
+<p>Esta es exactamente la clase de tarea donde delegar gana: mecánica, bien definida, con un criterio de éxito objetivo. No requiere criterio, requiere no equivocarse en veinte detalles seguidos. Eso lo hace mejor una máquina que yo a las once de la noche.</p>
+<h3>El sitemap generado desde Sanity</h3>
+<p>Mi sitemap era un archivo estático que había que editar a mano cada vez que publicaba. O sea: nunca.</p>
+<p>Ahora es un script que corre en <code>prebuild</code>, consulta Sanity con GROQ, y escribe el archivo con todos los posts y sus fechas reales. Son ochenta líneas de Node sin dependencias nuevas.</p>
+<p>Tarea pequeña, y justamente por eso llevaba meses sin hacerla. Ese es el patrón que más he notado: lo que más me ha ahorrado no son las tareas grandes, sino las de cuarenta minutos que llevaban medio año en la lista porque nunca eran lo bastante urgentes.</p>
+<h2>Dónde falla</h2>
+<p>Aquí es donde la mayoría de estos artículos se ponen borrosos. Vamos al grano.</p>
+<p><strong>Acepta tu premisa demasiado rápido.</strong> Si le dices &quot;arregla este bug de CSS&quot;, va a buscar un bug de CSS. Si el problema real era el orden de las rutas, puede que te entregue un arreglo de CSS que tapa el síntoma. Ahora, cuando algo se rompe, describo el comportamiento y no mi diagnóstico. La diferencia en resultado es enorme.</p>
+<p><strong>Es demasiado agradable con tus ideas.</strong> Si propones un enfoque malo, la respuesta por defecto tiende a ser ayudarte a construirlo bien. Yo pido explícitamente que me den dos o tres opciones con contras antes de decidir nada, porque si no pido alternativas, no aparecen.</p>
+<p><strong>El contexto se degrada en sesiones largas.</strong> En una sesión de horas, las decisiones de la primera media hora se vuelven borrosas. Por eso el plan va a un archivo y no se queda en la conversación: el archivo no se olvida.</p>
+<p><strong>No sabe qué es feo.</strong> Puede escribir un componente correcto, accesible y que pasa los tests, y que se vea mal. El criterio visual sigue siendo tuyo. En este sitio he rehecho a mano bastante CSS que estaba técnicamente bien.</p>
+<p><strong>Y lo más importante: sigues siendo responsable de lo que se mergea.</strong> Reviso cada diff. No porque desconfíe más que de un compañero humano, sino exactamente igual que de un compañero humano. Un commit con mi nombre es mío, lo haya escrito quien lo haya escrito.</p>
+<p><strong>Cuándo sale más caro:</strong> tareas de menos de diez minutos que ya sé hacer, cambios de una línea, y cualquier cosa donde explicar el contexto tarde más que hacerlo. Escribir un buen prompt para un cambio trivial es trabajo neto negativo.</p>
+<h2>Cómo empezar mañana</h2>
+<p>Si quieres probar sin quemarte:</p>
+<ol>
+<li><strong>Empieza por una tarea aburrida y bien definida.</strong> Migrar un formato, escribir tests de algo que ya existe, actualizar dependencias. No empieces por la funcionalidad estrella de tu producto.</li>
+<li><strong>Pide un plan antes que código.</strong> Aunque la tarea sea pequeña. Leer el plan te dice en treinta segundos si se entendieron, y corregir un plan es gratis comparado con corregir una implementación.</li>
+<li><strong>Trabaja en una rama o en un worktree.</strong> Para poder tirarlo todo sin pensarlo si se tuerce.</li>
+<li><strong>Lee los diffs.</strong> Enteros. Si no vas a leerlos, no delegues.</li>
+<li><strong>Deja el contexto por escrito en el repositorio.</strong> Las decisiones que viven solo en una conversación se pierden. Las que viven en <code>docs/plans/</code> siguen ahí en tres meses, cuando ya no te acuerdes de por qué elegiste eso.</li>
+</ol>
+<h2>Lo que de verdad cambió</h2>
+<p>No programo más rápido. Programo con menos fricción en lo aburrido, que resulta ser la mayoría del trabajo.</p>
+<p>Las tareas que antes se quedaban en la lista por pereza ahora se hacen, porque el coste de arrancarlas bajó lo suficiente. El sitemap llevaba meses pendiente. La auditoría llevaba más. Ninguna era difícil; las dos eran tediosas, y lo tedioso es exactamente lo que se me acumulaba.</p>
+<p>Lo que no cambió: sigo decidiendo qué se construye, sigo revisando cada línea que entra, y sigo siendo el responsable cuando algo se rompe en producción.</p>
+<p>Eso me parece bien. Es la parte del trabajo que me gusta.</p>]]></content:encoded>
+    </item>
+    <item>
+      <title><![CDATA[Le hice una auditoría a mi propio portfolio y encontré 20 problemas]]></title>
+      <link>https://codewithgabo.com/auditoria-portfolio-20-problemas</link>
+      <guid isPermaLink="true">https://codewithgabo.com/auditoria-portfolio-20-problemas</guid>
+      <pubDate>Thu, 20 Aug 2026 14:00:00 GMT</pubDate>
+      <description><![CDATA[Auditar el sitio de otro es fácil. Auditar el tuyo, cuando llevas dos años defendiendo cada decisión, es otra cosa. Encontré 20 problemas, y cinco me dolieron de verdad.]]></description>
+      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/af03409c120b94dfeb2d753f1365ff5770cffa58-1200x630.png" alt="Le hice una auditoría a mi propio portfolio y encontré 20 problemas" />
+<p>Auditar el sitio de otra persona es fácil. Abres las herramientas de desarrollo, señalas lo que está mal, cobras y te vas. Auditar el tuyo es otra cosa, porque cada decisión mala la tomaste tú, normalmente un martes a las once de la noche, y llevas meses convencido de que estaba bien.</p>
+<p>Eso hice con codewithgabo.com: senté a revisarlo como si fuera de un cliente. Sin excusas, sin &quot;eso lo arreglo después&quot;. Salieron <strong>20 hallazgos</strong> repartidos en cuatro áreas. Cinco me dolieron de verdad.</p>
+<p>Este post es la lista honesta: qué encontré, por qué pasó, y qué número cambió al arreglarlo.</p>
+<h2>Cómo audité</h2>
+<p>No hay magia. El método fue aburrido a propósito, porque lo aburrido es lo que encuentra cosas:</p>
+<ul>
+<li>Leí <strong>cada componente público</strong> y cada definición de ruta en <code>src/</code>.</li>
+<li>Recorrí las <strong>10 rutas públicas</strong> en el navegador, a 375px y en escritorio, anotando el <code>h1</code> de cada una, el número de caracteres, los enlaces internos y las imágenes rotas.</li>
+<li>Consulté Sanity para contar posts y palabras reales, no las que yo creía tener.</li>
+<li>Corrí <code>npm audit</code> y <code>npm outdated</code>.</li>
+<li>Analicé el tamaño del build, chunk por chunk, en <code>build/assets/</code>.</li>
+</ul>
+<p>Ese último paso es el que más duele y el que más gente se salta. Mirar el peso real de lo que sirves es como pesarte después de las fiestas: sabes que va a estar mal, pero necesitas el número.</p>
+<h2>Hallazgo 1: una ilustración de 993 KB</h2>
+<p>El peor. En <code>/gabriel-abreu</code> servía una ilustración de desarrollador en PNG sin optimizar. <strong>993 KB.</strong> Casi un megabyte para un dibujo decorativo.</p>
+<p>Y no era el único. <code>nobggabo.png</code> pesaba 358 KB y se cargaba en <strong>todas</strong> las páginas públicas, porque lo importan las tres variantes del componente <code>Greeting</code> que uso en el inicio, en los posts y en los repositorios. Cada navegación pagaba esos 358 KB otra vez.</p>
+<p>La solución no tiene ningún mérito técnico: convertir a WebP con calidad 80.</p>
+<pre><code>developer-illustration:  993 KB  -&gt;  23 KB   (-98%)
+nobggabo:                358 KB  -&gt;  45 KB   (-87%)</code></pre>
+<p>Un 98%. Casi un megabyte por un dibujo que se ve exactamente igual. El mérito no está en la conversión, está en haberme molestado en mirar.</p>
+<p><strong>La lección:</strong> si no has revisado el peso de tus imágenes, ese es tu problema más grande ahora mismo. Estadísticamente, lo es.</p>
+<h2>Hallazgo 2: el sitemap no tenía ni un solo post</h2>
+<p>Tenía 9 posts publicados. Mi <code>sitemap.xml</code> listaba <strong>7 páginas estáticas y cero posts</strong>. Las fechas de <code>lastmod</code>, además, estaban congeladas meses atrás.</p>
+<p>O sea: llevaba tiempo escribiendo contenido y luego no se lo enseñaba a Google. Todo el trabajo de escribir, ninguno del de distribuir.</p>
+<p>El problema de fondo era que el sitemap era un archivo estático que había que actualizar a mano. Y a mano significa nunca.</p>
+<p>Ahora se genera en tiempo de build, con una consulta GROQ a Sanity, corriendo como <code>prebuild</code>:</p>
+<pre><code>*[_type==&quot;post&quot; &amp;&amp; !(_id in path(&quot;drafts.**&quot;)) &amp;&amp; defined(slug.current)]{
+  &quot;slug&quot;: slug.current,
+  _updatedAt
+}</code></pre>
+<p>Cada <code>npm run build</code> escribe un <code>sitemap.xml</code> fresco, con todos los posts y con fechas reales. Ya no depende de que yo me acuerde.</p>
+<p><strong>La lección:</strong> cualquier cosa que dependa de tu memoria, ya está rota. Solo que todavía no lo sabes.</p>
+<h2>Hallazgo 3: mi página 404 no existía en la práctica</h2>
+<p>Este es el que más vergüenza me da, porque era un bug de verdad, no un descuido.</p>
+<p>Si entrabas a <code>codewithgabo.com/cualquier-cosa</code>, el sitio se quedaba colgado para siempre en <strong>&quot;Loading post...&quot;</strong>. No mostraba un 404. No mostraba un error. Se quedaba ahí, girando, hasta que te aburrías y cerrabas la pestaña.</p>
+<p>La causa: mi ruta comodín de posts, <code>/:slug</code>, capturaba cualquier URL desconocida antes de que llegara a la ruta <code>*</code> del componente <code>NotFound</code>. <code>OnePost</code> consultaba Sanity, no recibía nada, y como no distinguía entre &quot;todavía cargando&quot; y &quot;esto no existe&quot;, se quedaba en el estado de carga eternamente.</p>
+<p>El arreglo fue separar esos dos estados:</p>
+<pre><code>const [postData, setPostData] = useState&lt;SanityPostData | null&gt;(null);
+const [notFound, setNotFound] = useState(false);
+
+// ...
+
+if (notFound) return &lt;NotFound /&gt;;
+if (!postData) return &lt;LoadingSpinner message=&quot;Loading post...&quot; /&gt;;</code></pre>
+<p>Tres líneas. Un <code>useState</code> más y dos returns en el orden correcto. Ese era el arreglo de un bug que llevaba meses echando visitantes del sitio en silencio.</p>
+<p>Aproveché para darle a la página 404 un diseño real: el número grande, un encabezado bilingüe, y tres botones que llevan a algún sitio útil en vez de dejarte tirado.</p>
+<p><strong>La lección:</strong> un estado de carga que nunca termina se ve igual que &quot;lento&quot;. Por eso nadie lo reporta.</p>
+<h2>Hallazgo 4: una funcionalidad que llevaba meses sin renderizarse</h2>
+<p>En <code>data.ts</code> tengo tres proyectos marcados con <code>badge: &quot;New&quot;</code>: Analytics Dashboard, NegocioRD y A2C International. El componente <code>Card</code> acepta la prop <code>badge</code> y la renderiza como una pastilla.</p>
+<p>La pastilla no aparecía nunca. Ni una sola vez.</p>
+<p>¿Por qué? Porque <code>Portfolio.tsx</code> desestructuraba <code>image</code>, <code>title</code>, <code>description</code>, <code>url</code> y <code>languages</code> de cada proyecto... y se olvidaba de pasar <code>badge</code>. El dato existía. El componente que lo renderiza existía. Simplemente nadie los presentó.</p>
+<pre><code>  description={project.description}
+  url={project.url}
+  languages={project.languages}
++ badge={project.badge}</code></pre>
+<p><strong>Una línea.</strong> Escribí el dato, escribí el componente, y se me olvidó el cable entre los dos. Llevaba meses así, y nunca lo noté porque nunca miré la parrilla preguntándome &quot;¿esto se ve como debería?&quot;. La miraba preguntándome &quot;¿carga?&quot;.</p>
+<p><strong>La lección:</strong> revisa tu interfaz contra lo que <em>debería</em> mostrar, no contra lo que muestra. Son preguntas distintas y solo una encuentra este bug.</p>
+<h2>Hallazgo 5: 405 KB de librería de gráficos para gente que no los quería</h2>
+<p>Tengo un dashboard de analítica en <code>/dashboard-demo</code>, público, para que se vea el trabajo. Usa recharts.</p>
+<p>Recharts es pesado. Y estaba metido dentro del chunk que se cargaba de forma eager al entrar en la ruta. Resultado: cualquiera que abriera la demo se descargaba <strong>405 KB</strong> de librería de gráficos antes de decidir si le interesaba siquiera.</p>
+<p>La solución fue envolver <code>ChartCard</code> en <code>React.lazy</code> con <code>Suspense</code>, para que recharts se convierta en su propio chunk y solo baje cuando los gráficos van a montarse de verdad:</p>
+<pre><code>antes:  useAnalyticsData chunk = 405 KB   (recharts dentro)
+después: useAnalyticsData chunk =   3 KB
+         ChartCard chunk        = 411 KB  (lazy)</code></pre>
+<p>De 405 KB a 3 KB en la carga inicial. La librería sigue pesando lo mismo, claro. La diferencia es <em>cuándo</em> la pagas, y quién.</p>
+<p><strong>La lección:</strong> el código dividido no hace tu aplicación más pequeña. Hace que la gente que rebota no pague por lo que no llegó a usar.</p>
+<h2>Los otros quince</h2>
+<p>No todos eran dramáticos. Hubo seis imágenes sin usar sumando más de un megabyte muerto en el repositorio. Una vulnerabilidad moderada en una dependencia. Una página, <code>/education</code>, que existía y renderizaba contenido pero no estaba enlazada desde ninguna parte del menú. <code>console.log</code> olvidados en cinco archivos. Ninguna página de política de privacidad ni de términos.</p>
+<p>Y también hubo cosas bien, que conviene anotar para no volverse loco: el diseño móvil estaba limpio, la densidad de contenido era buena, y la configuración de anuncios estaba correcta. Una auditoría honesta también dice qué no hay que tocar.</p>
+<h2>Cómo auditar el tuyo</h2>
+<p>Si te animas, este es el orden por el que yo iría. Está puesto de mayor a menor retorno por hora invertida:</p>
+<ol>
+<li><strong>Pesa tus imágenes.</strong> Ordena por tamaño y mira las tres primeras. Si hay algo por encima de 200 KB, ahí tienes tu tarde.</li>
+<li><strong>Escribe una URL que no exista</strong> en tu propio sitio. Mira qué pasa. Cuenta hasta diez. Si sigue cargando, tienes mi hallazgo número 3.</li>
+<li><strong>Abre tu sitemap</strong> y cuenta las URLs. ¿Está tu contenido de verdad ahí? ¿Las fechas son reales?</li>
+<li><strong>Mira el tamaño de los chunks del build.</strong> Cualquier cosa por encima de 300 KB que no sea imprescindible en la primera pintura, es candidata a carga diferida.</li>
+<li><strong>Recorre cada página preguntándote qué debería mostrar</strong>, no si carga. Ahí es donde salen los bugs como el badge.</li>
+<li><strong>Corre `npm audit` y `npm outdated`.</strong> Diez segundos.</li>
+<li><strong>Busca `console.log` en todo el proyecto.</strong> Otros diez segundos.</li>
+</ol>
+<p>Los siete pasos caben en una tarde. Yo tardé una en encontrarlos y otra en arreglar lo importante.</p>
+<h2>Lo que de verdad aprendí</h2>
+<p>Ninguno de estos problemas era difícil. Ni uno. El arreglo más complejo fueron tres líneas; el más impactante fue convertir un PNG a WebP, algo que se hace en un comando.</p>
+<p>No estaban ahí porque fueran difíciles. Estaban ahí porque <strong>nunca me senté a mirar</strong>. Construir es más divertido que revisar, así que uno sigue construyendo encima, y las cosas rotas se quedan abajo, sosteniendo el edificio con un bug de meses.</p>
+<p>Si tienes un portfolio, un blog o un proyecto paralelo que llevas tiempo sin revisar de verdad: agenda dos horas esta semana. No para añadir nada. Solo para mirar.</p>
+<p>Vas a encontrar tu propio PNG de 993 KB. Te lo prometo.</p>]]></content:encoded>
+    </item>
+    <item>
+      <title><![CDATA[Probé 3 prompts en Nano Banana 2 y los resultados me sorprendieron]]></title>
+      <link>https://codewithgabo.com/3-prompts-gemini-nano-banana-resultados</link>
+      <guid isPermaLink="true">https://codewithgabo.com/3-prompts-gemini-nano-banana-resultados</guid>
+      <pubDate>Wed, 13 May 2026 20:40:00 GMT</pubDate>
+      <description><![CDATA[Probé 3 prompts en Nano Banana 2 y los resultados me sorprendieron Llevaba un par de semanas viendo screenshots de gente sacando imágenes increíbles con Nano Banana 2 (el modelo de imagen de Gemini), ]]></description>
+      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/e269b43cf6c9f44d3cfe0e17613886b53a967a90-2160x2700.png" alt="Probé 3 prompts en Nano Banana 2 y los resultados me sorprendieron" />
+<h1>Probé 3 prompts en Nano Banana 2 y los resultados me sorprendieron</h1>
+<p>Llevaba un par de semanas viendo screenshots de gente sacando imágenes increíbles con Nano Banana 2 (el modelo de imagen de Gemini), pero la mayoría compartía el resultado sin el prompt. Decidí hacer mi propio experimento: tres prompts diseñados para sacar provecho de tres &quot;superpowers&quot; distintos del modelo, ejecutarlos en serio, y documentar todo —prompt, resultado, lo que falló, lo que aprendí—.</p>
+<p>Este post es ese registro completo. Si quieres replicar los resultados, los prompts están aquí en su forma final, listos para pegar.</p>
+<h2>Por qué Nano Banana 2 ≠ otro generador de imágenes</h2>
+<p>Antes de los prompts, vale la pena entender qué hace distinto a este modelo. Nano Banana 2 no es &quot;el Midjourney de Google&quot;. Es un modelo construido sobre el reasoning de Gemini, lo que significa tres diferencias prácticas que cambian cómo lo prompteas:</p>
+<ol>
+<li><strong>Procesa prompts conversacionales largos mejor que strings de keywords.</strong> Donde Midjourney premia listas tipo <code>cinematic, 8k, ultra-realistic, masterpiece</code>, Nano Banana premia descripciones tipo &quot;fotografía editorial estilo Kinfolk, luz golden hour, taza humeando&quot;.</li>
+<li><strong>Mantiene identidad facial al editar fotos.</strong> Esto es lo que más me sorprendió. Si le pasas una foto tuya y le pides que cambie el contexto, mantiene tu cara intacta —no te &quot;mejora&quot;, no te cambia los rasgos, no te hace genérico—.</li>
+<li><strong>Itera sobre resultados anteriores con instrucciones, no con prompts nuevos.</strong> Después del primer output puedes decirle &quot;más texturizado, menos AI-perfect&quot; y modifica el output sin empezar de cero.</li>
+</ol>
+<p>Cada uno de los 3 prompts que siguen está diseñado para demostrar uno de estos comportamientos.</p>
+<h2>El experimento</h2>
+<p>Mi setup:</p>
+<ul>
+<li>Modelo: Gemini 3 Pro con Nano Banana 2 activado</li>
+<li>Output: vertical 4:5 (1080x1350) — formato Instagram-friendly</li>
+<li>Brand visual: Editorial Zine, paleta cream + ink + terracotta</li>
+<li>Tiempo total: ~25 minutos para los 3 prompts (incluyendo iteraciones)</li>
+</ul>
+<p>Nada de hacks, nada de plugins, nada de wrappers. Solo el modelo y los prompts.</p>
+<h2>Prompt 1 — Foto cinematográfica de workspace</h2>
+<p><strong>Objetivo:</strong> generar una imagen que se vea como foto de stock premium, no como AI render genérico.</p>
+<p><strong>Superpower que demuestra:</strong> procesar prompts conversacionales largos.</p>
+<h3>El prompt completo</h3>
+<pre><code>Photograph of a minimalist developer workspace shot on
+35mm film. A vintage wooden desk by a window with golden
+hour light streaming in. On the desk: an open MacBook Pro
+displaying code in a dark editor (Catppuccin-style colors,
+purple and cyan accents), a ceramic mug with steam, a small
+notebook with a fountain pen, and a single dried flower in
+a clear glass.
+
+Background: warm cream-colored wall with subtle grain
+texture, a small framed art print partially visible.
+
+Mood: contemplative, editorial, &quot;build in public&quot; energy.
+Slight film grain, shallow depth of field, warm color
+grading with terracotta and ember accents. Vertical
+composition, 4:5 ratio.
+
+Style: editorial photography, Kinfolk magazine aesthetic,
+not generic stock. Imperfect by design.</code></pre>
+<h3>El resultado</h3>
+<img src="https://cdn.sanity.io/images/nnt7ytcd/production/e9a21cbb8659342bff577df6db44e8ccb69f451b-2160x2700.png" alt="" />
+<h3>Lo que funcionó</h3>
+<ul>
+<li>La luz golden hour real entrando por la ventana (no esa &quot;luz dorada AI&quot; plástica)</li>
+<li>El vapor de la taza se ve natural</li>
+<li>La pantalla del MacBook muestra código con sintaxis real</li>
+<li>La madera del escritorio tiene grano visible y patina</li>
+<li>El frasco de cristal con la flor seca refleja la luz</li>
+</ul>
+<h3>Lo que aprendí</h3>
+<p>Mientras más específico el prompt, menos genérico el output. &quot;MacBook Pro displaying code in a dark editor&quot; daría una pantalla negra random. &quot;Catppuccin-style colors, purple and cyan accents&quot; forzó al modelo a renderizar una paleta específica que se ve como código real.</p>
+<p>Regla: no describas la escena, descríbele al modelo qué cámara, qué luz, qué referencia visual quieres. Es la diferencia entre dirigir un set y pedir una imagen.</p>
+<h2>Prompt 2 — Poster editorial con typography</h2>
+<p><strong>Objetivo:</strong> diseñar un poster con texto, layout y elementos gráficos —sin abrir Figma—.</p>
+<p><strong>Superpower que demuestra:</strong> iteración sobre resultados anteriores.</p>
+<h3>El primer intento (el que no funcionó)</h3>
+<p>Mi primer prompt salió muy plain —tipografía limpia, sin textura, sin profundidad—. Looked like Canva. En lugar de descartarlo y empezar de cero, le pedí al modelo que iterara sobre el resultado anterior agregando capas. Eso fue el cambio de juego.</p>
+<h3>El prompt de iteración</h3>
+<pre><code>Iterate on this editorial poster. Keep the central
+composition (crossed-out &quot;M&quot; in serif italic, &quot;HTML&quot; in
+monospace below it, terracotta strikethrough), but make
+it MUCH richer and more textured:
+
+LAYERING &amp; DEPTH:
+- Add visible risograph misregistration — slight color
+  offset where the terracotta ink doesn't perfectly align
+  with the black ink. Like a real two-color print where
+  registration is intentionally imperfect.
+- Add visible paper texture: warm cream paper with
+  noticeable fiber grain, small specks, slight age marks.
+- The terracotta strikethrough should look like a real
+  brush stroke with visible texture, slight ink bleeding
+  at the edges, and a small dry-brush effect at the tail.
+- Subtle ink bleed on the serif &quot;M&quot; — like the ink soaked
+  into the paper slightly.
+
+ADDITIONAL ELEMENTS (break the symmetry):
+- Top-left corner: a faded, half-cropped photo of an old
+  computer terminal or vintage Macintosh, printed in
+  monochrome black on the cream paper. Small, like a
+  postage stamp size. Slightly rotated.
+- Right side, mid-height: a vertical strip of monospace
+  code text running sideways, very small and faded,
+  containing snippets like &quot;&lt;div&gt;&quot;, &quot;&lt;/section&gt;&quot;,
+  &quot;&lt;article&gt;&quot;. Rotated 90 degrees.
+- Bottom-left: a hand-drawn arrow pointing toward &quot;HTML&quot;
+  with a small handwritten annotation in terracotta ink
+  that reads &quot;← future&quot; in messy sans-serif.
+- Replace one of the brackets &quot;[ ]&quot; with a small circled
+  number &quot;1.&quot; in terracotta, like an editor's mark.
+- Add 2-3 small irregular ink dots/splatters scattered
+  across the composition, very subtle.
+
+OVERALL:
+- More layers, more density, more &quot;human zine&quot; feeling.
+- Less centered/symmetric, more intentional asymmetry.
+- Should look like a real printed zine page, not a digital
+  poster.
+- Vertical 4:5 composition.
+- Keep typography sharp and legible.</code></pre>
+<h3>El resultado</h3>
+<img src="https://cdn.sanity.io/images/nnt7ytcd/production/619e74c5b0bdd1793a5873247251c22db9915008-2160x2700.png" alt="" />
+<h3>Lo que funcionó</h3>
+<ul>
+<li>El misregistration de print real se ve perfectamente —esa silueta naranja detrás del &quot;M&quot; y &quot;HTML&quot;—</li>
+<li>El vintage Macintosh rotado arriba-izquierda</li>
+<li>La brush stroke del strikethrough tiene textura real, no es una línea perfecta</li>
+<li>El code strip vertical con <code>&lt;div&gt; &lt;/section&gt; &lt;article&gt;</code> rotado 90°</li>
+<li>El &quot;← future&quot; handwritten en terracotta</li>
+<li>El &quot;1.&quot; circled como editor's mark</li>
+<li>Los ink splatters scattered</li>
+<li>El paper grain visible</li>
+</ul>
+<h3>Lo que aprendí</h3>
+<p>No descartes outputs imperfectos. Itera sobre ellos. El segundo prompt no inventa la composición desde cero —respeta lo que ya estaba bien y agrega solo lo que faltaba—. Es como dirigir a un fotógrafo: &quot;esa toma estuvo bien, ahora hazla con menos luz&quot;.</p>
+<p>Esto solo funciona porque Nano Banana 2 puede ver el output anterior y editarlo, no regenerarlo. Es una capacidad única que la mayoría de generadores de imagen no tienen tan bien resuelta.</p>
+<h2>Prompt 3 — Selfie convertida en retrato editorial</h2>
+<p><strong>Objetivo:</strong> tomar una selfie y convertirla en una imagen que se vea como cover de revista —sin alterar la cara—.</p>
+<p><strong>Superpower que demuestra:</strong> mantener identidad facial al editar fotos.</p>
+<h3>El prompt completo</h3>
+<pre><code>Editorial magazine portrait, &quot;Developer Issue&quot; October
+2026 cover style. Transform this photo into a cinematic
+editorial portrait.
+
+SETTING:
+Place the person in a sun-drenched home developer studio.
+Key elements visible in the scene:
+- Warm wooden floors with visible grain
+- An olive-green accent wall behind them
+- A floating wooden shelf with dried flowers in a glass
+  vase and one small framed art print
+- A vintage wooden desk with an open MacBook (slightly
+  out of focus in foreground or mid-ground)
+- A ceramic mug
+- Natural late-afternoon golden hour light streaming
+  through an unseen window from camera-left
+
+COMPOSITION:
+- The person should be the clear focal point, slightly
+  off-center (not centered).
+- Medium portrait crop — head and upper torso visible.
+- Shallow depth of field, background slightly soft but
+  recognizable.
+- Vertical 4:5 ratio.
+
+COLOR GRADE:
+- Warm highlights with golden hour tone on skin and wood
+- Slightly desaturated shadows (not blue, just muted)
+- Terracotta and cream palette overall
+- Subtle film grain throughout
+- Slight teal-and-orange balance, very gentle
+
+MOOD:
+- Contemplative, &quot;build in public&quot; energy
+- Editorial magazine, NOT corporate headshot
+- Kinfolk magazine meets Wired profile aesthetic
+- Imperfect by design, photographic, NOT AI-perfect
+
+CRITICAL CONSTRAINTS:
+- Keep the person's face, identity, skin tone, hair,
+  beard, glasses (if any), and clothing EXACTLY as they
+  are in the source photo.
+- Do NOT alter their facial features.
+- Do NOT make them more attractive or &quot;AI-enhanced&quot;.
+- Do NOT change their ethnicity or skin tone.
+- Do NOT change their clothing.
+- Only modify the background, lighting, and color grade.
+
+This should look like a real photographer took it in
+the person's actual studio, not a CGI render.</code></pre>
+<h3>El resultado</h3>
+<img src="https://cdn.sanity.io/images/nnt7ytcd/production/e269b43cf6c9f44d3cfe0e17613886b53a967a90-2160x2700.png" alt="" />
+<h3>Lo que funcionó</h3>
+<ul>
+<li>La pared olive-green exacta, sin glitches</li>
+<li>El floating shelf de madera con lavender y eucalipto</li>
+<li>El vintage wooden desk con drawer y MacBook con código visible</li>
+<li>El golden hour real en la cara y el hombro (no luz dorada plástica)</li>
+<li>Mi cara intacta: lentes, sonrisa, rasgos, tono de piel, todo igual</li>
+<li>Tattoo del brazo preservado</li>
+<li>Apple Watch preservado</li>
+<li>Color grade warm + film grain editorial</li>
+</ul>
+<h3>Lo que aprendí</h3>
+<p>El bloque &quot;CRITICAL CONSTRAINTS&quot; al final del prompt es lo que evita que el modelo &quot;mejore&quot; tu cara —cosa que casi todos los generadores de imagen hacen por defecto—. Sin esas reglas explícitas, el modelo te haría más simétrico, te quitaría imperfecciones, te haría más AI-perfect.</p>
+<p>Regla: si estás editando fotos de personas reales, escribe las restricciones como si estuvieras hablando con un photo editor obsesivo. Cualquier cosa que no prohibas explícitamente, el modelo lo puede cambiar.</p>
+<h2>Las 3 lecciones que me llevo</h2>
+<p>Después de los 3 prompts, estos son los principios que aplicarían a cualquier prompt nuevo:</p>
+<h3>1. Conversación, no keywords</h3>
+<p>Gemini responde mejor a prompts largos y descriptivos que a strings tipo Midjourney. Olvídate del <code>8k, ultra-realistic, trending on artstation</code>. Describe la escena como se la describirías a un fotógrafo en un set.</p>
+<p>Mal: <code>developer workspace, cinematic, professional, 8k</code></p>
+<p>Bien: <code>Photograph of a minimalist developer workspace shot on 35mm film, vintage wooden desk by a window with golden hour light</code></p>
+<h3>2. Especifica el mood, no el estilo</h3>
+<p>&quot;Editorial zine, imperfecto, golden hour&quot; produce mejores resultados que &quot;professional photo, ultra-realistic, masterpiece&quot;. El primero le dice al modelo qué sentimiento debe transmitir; el segundo le dice qué adjetivos usar.</p>
+<p>Mal: <code>beautiful, stunning, masterpiece, award-winning</code></p>
+<p>Bien: <code>contemplative, build in public energy, Kinfolk magazine aesthetic</code></p>
+<h3>3. Itera con instrucciones, no con prompts nuevos</h3>
+<p>Si el primer output no te convence, no empieces de cero. Pídele al modelo que modifique lo que ya tiene: &quot;más texturizado, menos AI-perfect, agrega ink bleed, más asimetría&quot;. Vas a llegar mucho más rápido al resultado que quieres.</p>
+<h2>Lo que no funcionó (gotchas)</h2>
+<p>No todo fue perfecto:</p>
+<ul>
+<li>El primer intento del Prompt 2 salió completamente plain. Tuve que iterar 2 veces para llegar a algo decente.</li>
+<li>En el Prompt 1, el código en la pantalla del MacBook tiene typography &quot;AI&quot; (no es código real de un lenguaje específico). Si esto importa para tu use case, vas a tener que componer la imagen final con un mockup separado.</li>
+<li>Nano Banana 2 sigue luchando con texto largo dentro de las imágenes. Cualquier oración de más de 5 palabras dentro del frame puede salir warpeada o con typos. Si necesitas texto preciso, agrégalo después en Figma o Photoshop.</li>
+</ul>
+<h2>Cuándo (no) usar Nano Banana 2</h2>
+<p>Después de este experimento, mi take honesto:</p>
+<p><strong>Sí lo usaría para:</strong></p>
+<ul>
+<li>Hero images de blog posts</li>
+<li>Covers de Instagram donde necesito flexibilidad rápida</li>
+<li>Mockups iniciales de campañas</li>
+<li>Prototipos visuales de productos antes de la sesión fotográfica real</li>
+<li>Editar fotos personales con cambios de contexto (background, lighting)</li>
+</ul>
+<p><strong>No lo usaría para:</strong></p>
+<ul>
+<li>Producto final de campañas con presupuesto (sigue siendo AI, va a tener artifacts)</li>
+<li>Cualquier cosa que requiera texto preciso dentro de la imagen</li>
+<li>Imágenes que necesitan ser pixel-perfect a una guía de marca específica</li>
+<li>Reemplazar a un fotógrafo real cuando el tiempo y el budget lo permiten</li>
+</ul>
+<h2>Cierre</h2>
+<p>El mejor &quot;prompt engineering&quot; no es saber palabras mágicas. Es saber qué quieres ver, describirlo con la precisión de un director, y darle al modelo las restricciones para que no te sorprenda donde no quieres.</p>
+<p>Si tienes 25 minutos esta semana, replica el experimento con tus propios prompts. Los 3 que están arriba son un buen punto de partida —cópialos, modifícalos, comparte qué te salió—.</p>
+<p>¿Probaste alguno de los 3 prompts? Comparte el resultado en mis comentarios de Instagram <a href="https://instagram.com/codewithgabo">@codewithgabo</a> o en X <a href="https://x.com/Gabbs279">@Gabbs279</a>.</p>]]></content:encoded>
+    </item>
+    <item>
+      <title><![CDATA[Migrating an Express Backend to Vercel Functions Without Downtime]]></title>
+      <link>https://codewithgabo.com/vercel-express-node-js-serverless-ga4-migration</link>
+      <guid isPermaLink="true">https://codewithgabo.com/vercel-express-node-js-serverless-ga4-migration</guid>
+      <pubDate>Thu, 30 Apr 2026 03:56:00 GMT</pubDate>
+      <description><![CDATA[Migrating an Express Backend to Vercel Functions Without Downtime Last week I migrated the analytics backend behind this site from a long-running Express server on Railway to a set of Vercel Functions]]></description>
+      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/dc9d27737c95c1fd837f709d20f865243f1c8081-2400x1260.png" alt="Migrating an Express Backend to Vercel Functions Without Downtime" />
+<h1>Migrating an Express Backend to Vercel Functions Without Downtime</h1>
+<p>Last week I migrated the analytics backend behind this site from a long-running Express server on Railway to a set of Vercel Functions. The frontend never noticed. Cost dropped from a small monthly Railway bill to <strong>$0/month</strong> on Vercel's hobby tier. This post walks through how I did it, what broke, and when this kind of migration actually makes sense.</p>
+<h2>Why migrate at all</h2>
+<p>The backend was a tiny Express server that did two things:</p>
+<ol>
+<li>Wrap the Google Analytics 4 Data API behind an admin-only endpoint so the dashboard on this site could read GA4 metrics without exposing the service-account key.</li>
+<li>Validate an <code>ADMIN_TOKEN</code> to gate that endpoint.</li>
+</ol>
+<p>That was it. A few hundred lines of Node, three dependencies, one route. Running it as a 24/7 container on Railway was fine, but it had three quiet costs:</p>
+<ul>
+<li><strong>Money.</strong> Hobby tier on Railway isn't free anymore. Even a small workload was a recurring charge.</li>
+<li><strong>Cold starts I didn't need.</strong> The dashboard isn't visited often. The Express server sat idle 99% of the time, costing money to do nothing.</li>
+<li><strong>Deploy ceremony.</strong> Two repositories, two pipelines, two environments to keep aligned. Every backend change meant context-switching to the Railway dashboard.</li>
+</ul>
+<p>Vercel Functions felt like the right shape: stateless handlers that spin up on request, scale to zero when idle, deploy from the same <code>git push</code> flow as anything else.</p>
+<h2>The before / after</h2>
+<pre><code>BEFORE:
+  Frontend (GitHub Pages)
+        │ HTTPS
+        ▼
+  Railway: long-running Node + Express
+        ├─ /api/analytics
+        ├─ middleware: cors, helmet
+        └─ env: ADMIN_TOKEN, GA4 credentials
+
+AFTER:
+  Frontend (GitHub Pages)
+        │ HTTPS
+        ▼
+  Vercel Functions
+        ├─ api/analytics.js   (one handler per route)
+        ├─ api/health.js
+        └─ api/_utils/        (extracted helpers — auth, ga4 client)</code></pre>
+<p>Same external contract, completely different runtime model.</p>
+<h2>Step 1 — Turn each Express route into a Vercel handler</h2>
+<p>A Vercel Function is just a Node module that exports a handler matching <code>(req, res) =&gt; void | Promise&lt;void&gt;</code>. The shape is essentially <code>http.IncomingMessage</code> / <code>http.ServerResponse</code> with some extras.</p>
+<p>The Express version looked like this:</p>
+<pre><code>// Before
+app.get('/api/analytics', requireAuth, async (req, res) =&gt; {
+  const { startDate, endDate } = req.query;
+  const data = await runAnalyticsQuery(startDate, endDate);
+  res.json(data);
+});</code></pre>
+<p>The Vercel version is the same logic, no <code>app</code>, no <code>next</code>:</p>
+<pre><code>// After: api/analytics.js
+const { applyCors, requireAuth } = require('./_utils/auth');
+const { runAnalyticsQuery } = require('./_utils/ga4');
+
+module.exports = async (req, res) =&gt; {
+  if (!applyCors(req, res)) return;
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+  if (!requireAuth(req, res)) return;
+
+  const { startDate, endDate } = req.query;
+  const data = await runAnalyticsQuery(startDate, endDate);
+  res.json(data);
+};</code></pre>
+<p>Three things to notice:</p>
+<ul>
+<li><strong>No middleware chain.</strong> Each handler runs the few checks it needs explicitly. With one or two routes per file, this is clearer than a global middleware stack.</li>
+<li><strong>CORS becomes a function call.</strong> I extracted <code>applyCors</code> to share between handlers. It returns <code>false</code> and writes the response if the request was a preflight, so the handler can early-exit.</li>
+<li><strong>Auth, same.</strong> <code>requireAuth</code> reads the <code>Authorization: Bearer &lt;token&gt;</code> header, compares to <code>process.env.ADMIN_TOKEN</code>, and writes a 401 if it fails.</li>
+</ul>
+<h2>Step 2 — Extract helpers into <code>api/_utils/</code></h2>
+<p>Vercel ships every file in <code>api/</code> (excluding <code>_</code>-prefixed paths) as a public route. Anything starting with <code>_</code> is treated as a private utility. This is the convention I used for shared code:</p>
+<pre><code>api/
+├── analytics.js
+├── health.js
+└── _utils/
+    ├── auth.js
+    └── ga4.js</code></pre>
+<p>The GA4 helper memoises the client across invocations, which matters because Vercel Functions reuse warm container instances when traffic is steady:</p>
+<pre><code>// api/_utils/ga4.js
+const { BetaAnalyticsDataClient } = require('@google-analytics/data');
+
+let cached = null;
+
+function getClient() {
+  if (cached) return cached;
+  cached = new BetaAnalyticsDataClient({
+    credentials: {
+      client_email: process.env.GA4_CLIENT_EMAIL,
+      private_key: process.env.GA4_PRIVATE_KEY.replace(/\\n/g, '\n'),
+    },
+  });
+  return cached;
+}</code></pre>
+<p>That <code>replace(/\\n/g, '\n')</code> is the one consistent pain point of moving service-account keys between secret stores. Vercel preserves real newlines in multi-line env values, so if you paste with literal <code>\n</code> from a copied JSON file, you have to undo the escaping.</p>
+<h2>Step 3 — Configure <code>vercel.json</code></h2>
+<p>Vercel infers most of the project layout, but it's worth being explicit about CORS origins and Node version:</p>
+<pre><code>{
+  &quot;version&quot;: 2,
+  &quot;functions&quot;: {
+    &quot;api/**/*.js&quot;: {
+      &quot;runtime&quot;: &quot;nodejs20.x&quot;
+    }
+  },
+  &quot;headers&quot;: [
+    {
+      &quot;source&quot;: &quot;/api/(.*)&quot;,
+      &quot;headers&quot;: [
+        { &quot;key&quot;: &quot;Access-Control-Allow-Origin&quot;, &quot;value&quot;: &quot;https://codewithgabo.com&quot; }
+      ]
+    }
+  ]
+}</code></pre>
+<p>I keep the dynamic origin allowlist (which supports multiple domains during development) inside <code>applyCors</code> and use the static header here only as a defense-in-depth layer.</p>
+<h2>Step 4 — Migrate environment variables</h2>
+<p>I copied each env var from Railway's dashboard to Vercel's, set them for <strong>Production + Preview + Development</strong> so dev runs (<code>vercel dev</code>) work locally. The two non-trivial ones:</p>
+<ul>
+<li><code>GA4_PRIVATE_KEY</code> — multi-line value with real newlines. Pasted directly; no escaping.</li>
+<li><code>FRONTEND_URL</code> — a comma-separated list (<code>https://codewithgabo.com,https://gabbs27.github.io,http://localhost:3000</code>) consumed by the CORS helper. This was new — Express had it baked into a <code>cors()</code> middleware config.</li>
+</ul>
+<h2>Step 5 — Smoke-test before flipping traffic</h2>
+<p>The old Railway service was still live during the migration. I deployed Vercel to a preview URL, hit it from <code>curl</code> with a real <code>ADMIN_TOKEN</code>, confirmed the JSON response matched the Railway version, then updated the frontend's <code>VITE_ANALYTICS_API_URL</code> env to point at the new Vercel alias and redeployed.</p>
+<p>Once the dashboard rendered metrics from Vercel, I stopped the Railway service. No DNS games, no routing rules, no reverse proxy cutover. The frontend rebuild was the cutover.</p>
+<h2>Three gotchas I hit</h2>
+<p><strong>1. File uploads.</strong> A later endpoint (<code>api/upload.js</code>) accepts a multipart image and proxies it to Sanity's asset API. Express handled multipart through <code>multer</code> middleware. On Vercel I had to parse the multipart body manually because the platform's default body parser only handles JSON. Vercel exposes <code>req.body</code> as a <code>Buffer</code> for unknown content types — from there it's <code>busboy</code> or roll-your-own boundary parsing.</p>
+<p><strong>2. Cold starts on the first hit of the day.</strong> A Vercel Function that hasn't been invoked recently can take ~500–1500ms to spin up. For a dashboard that's only checked occasionally, this is fine. For a user-facing API on the critical path, it would be a real concern — pre-warming or pinning the function to a region helps, but it's a tradeoff to keep in mind.</p>
+<p><strong>3. The </strong><code>_utils/</code><strong> import path.</strong> The first time I deployed, I forgot that Vercel's build doesn't follow files outside <code>api/</code> automatically. Putting helpers under <code>api/_utils/</code> (with the leading underscore) lets the bundler find them while keeping them private.</p>
+<h2>The result</h2>
+<p>Concrete before / after:</p>
+<ul>
+<li><strong>Monthly cost:</strong> small but recurring → <strong>$0</strong></li>
+<li><strong>Cold start:</strong> ~50 ms (always warm on Railway) → 500–1500 ms on first hit, then cached</li>
+<li><strong>Deploy flow:</strong> separate Railway dashboard → <code>git push</code> from the same monorepo</li>
+<li><strong>Dependencies:</strong> <code>express</code>, <code>cors</code>, <code>helmet</code>, <code>nodemon</code> → <strong>none</strong> (the platform handles all of it)</li>
+<li><strong>Repo footprint:</strong> <code>server.js</code>, <code>routes/</code>, <code>middleware/</code> → a handful of small handlers under <code>api/</code></li>
+</ul>
+<p>For a small admin endpoint like this one, Vercel Functions are clearly the right fit. For a high-traffic API where every millisecond matters, Railway or Fly would still be the better answer.</p>
+<h2>When NOT to do this</h2>
+<p>A migration like this only makes sense if:</p>
+<ul>
+<li>Your traffic is bursty or low — cold starts won't dominate the user experience.</li>
+<li>Your handlers are stateless. Long-lived WebSocket connections, in-memory caches, or background workers don't translate cleanly.</li>
+<li>You can live with the 10-second per-invocation timeout on the hobby tier (or pay for longer on a higher tier).</li>
+</ul>
+<p>If you're running a chat server, a worker pool, or anything with sticky in-memory state, stay on a long-running container. For everything else — REST endpoints, webhooks, glue between services — serverless is hard to beat.</p>
+<h2>Closing thought</h2>
+<p>The most underrated part of this migration was deleting <code>server.js</code>, the <code>routes/</code> folder, and four packages from <code>package.json</code>. Less code is less to maintain. Less infrastructure is less to monitor. The new setup does exactly the same thing, on better terms, with fewer moving parts.</p>
+<p>If you have a small backend doing low-traffic admin work and you're paying month after month to keep it running, this is worth half a day of your time.</p>]]></content:encoded>
+    </item>
+    <item>
+      <title><![CDATA[Building a Simple Chatbot with Python and NLP: Your First Steps into Conversational AI]]></title>
+      <link>https://codewithgabo.com/building-a-simple-chatbot-with-python-and-nlp-your-first-steps-into-conversational-ai</link>
+      <guid isPermaLink="true">https://codewithgabo.com/building-a-simple-chatbot-with-python-and-nlp-your-first-steps-into-conversational-ai</guid>
+      <pubDate>Wed, 06 Dec 2023 03:37:00 GMT</pubDate>
+      <description><![CDATA[Chatbots look intimidating from the outside and turn out to be surprisingly approachable once you actually start one. In this post I want to build a small chatbot in Python using NLTK, the Natural Lan]]></description>
+      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/8881d90fcbe704667fc5444d3171bda9b7a5d197-1792x1024.png" alt="Building a Simple Chatbot with Python and NLP: Your First Steps into Conversational AI" />
+<p>Chatbots look intimidating from the outside and turn out to be surprisingly approachable once you actually start one. In this post I want to build a small chatbot in Python using NLTK, the Natural Language Toolkit. We'll start with the simplest version that works, then look honestly at where it breaks and fix it step by step.</p>
+<p>You don't need any machine learning background for this. If you can write a Python function and a <code>while</code> loop, you can follow along.</p>
+<h2>Setting up NLTK</h2>
+<p>NLTK is a library for working with human language in Python. Install it with pip:</p>
+<pre><code>pip install nltk</code></pre>
+<p>The library itself is small, but most of what makes it useful lives in separate data packages: tokenizer models, word lists, a dictionary of word forms. You download those once from Python:</p>
+<pre><code>import nltk
+
+nltk.download('popular')</code></pre>
+<p>A word of warning: <code>popular</code> is a bundle of the most commonly used datasets and it is a few hundred megabytes. It only needs to run once per machine. After that the data sits in your home directory and you can delete the <code>nltk.download</code> line from your script. If NLTK later complains about a missing resource, the error message names the exact package it wants and you download just that one. On my machine the tokenizer still asked for <code>punkt_tab</code> after installing <code>popular</code>, so I ran <code>nltk.download('punkt_tab')</code> once and moved on.</p>
+<h2>Splitting a sentence into tokens</h2>
+<p>The first thing NLTK gives you is tokenisation: turning a string into a list of words and punctuation marks.</p>
+<pre><code>from nltk.tokenize import word_tokenize
+
+text = &quot;Hello, welcome to Code With Gabo!&quot;
+print(word_tokenize(text))</code></pre>
+<p>Which prints:</p>
+<pre><code>['Hello', ',', 'welcome', 'to', 'Code', 'With', 'Gabo', '!']</code></pre>
+<p>Notice that the comma and the exclamation mark came out as their own items. That's the point. <code>text.split()</code> would have given you <code>'Gabo!'</code> as a single chunk, and <code>'Gabo!'</code> is not a word you can look up in anything. Tokenisation is what lets you compare against real words instead of against whatever the user happened to type around them.</p>
+<p>That matters more than it looks right now, so hold on to it.</p>
+<h2>The simplest chatbot that works</h2>
+<p>Here's the naive version. A dictionary of exact phrases, and a lookup with a fallback:</p>
+<pre><code>responses = {
+    &quot;hi&quot;: &quot;Hello! I am GaboBot.&quot;,
+    &quot;what is your name&quot;: &quot;My name is GaboBot.&quot;,
+    &quot;bye&quot;: &quot;See you around!&quot;,
+}
+
+def chatbot_response(user_input):
+    return responses.get(user_input, &quot;I'm not sure how to respond to that.&quot;)</code></pre>
+<p>And a loop to talk to it. This uses the <code>chatbot_response</code> defined above, so keep both in the same file:</p>
+<pre><code>print(&quot;Chatbot: Hi, I am GaboBot. Type 'quit' to exit.&quot;)
+
+while True:
+    user_input = input(&quot;You: &quot;)
+    if user_input.lower() == &quot;quit&quot;:
+        print(&quot;Chatbot: Bye!&quot;)
+        break
+    print(&quot;Chatbot:&quot;, chatbot_response(user_input))</code></pre>
+<p>Run it and type <code>hi</code>. It works. Now type <code>hi there</code>, or <code>Hi!</code>, or <code>hello</code>. All three fall through to &quot;I'm not sure how to respond to that.&quot;</p>
+<p>That's the real lesson of the naive version. A dictionary lookup asks &quot;is this string exactly equal to a key I know&quot;, and humans never type exactly the key you know. This is where tokenisation stops being a demo and starts being useful.</p>
+<h2>Matching on tokens instead of whole strings</h2>
+<p>Instead of comparing the entire sentence, break it into tokens and check whether any of them is a keyword we recognise:</p>
+<pre><code>from nltk.tokenize import word_tokenize
+
+KEYWORD_RESPONSES = {
+    &quot;hi&quot;: &quot;Hello! I am GaboBot.&quot;,
+    &quot;hello&quot;: &quot;Hello! I am GaboBot.&quot;,
+    &quot;hey&quot;: &quot;Hello! I am GaboBot.&quot;,
+    &quot;name&quot;: &quot;My name is GaboBot.&quot;,
+    &quot;help&quot;: &quot;I can greet you and tell you my name. That's about it so far.&quot;,
+    &quot;bye&quot;: &quot;See you around!&quot;,
+}
+
+DEFAULT_RESPONSE = &quot;I'm not sure how to respond to that.&quot;
+
+def chatbot_response(user_input):
+    tokens = [token.lower() for token in word_tokenize(user_input)]
+    for token in tokens:
+        if token in KEYWORD_RESPONSES:
+            return KEYWORD_RESPONSES[token]
+    return DEFAULT_RESPONSE</code></pre>
+<p>Drop this in place of the old <code>chatbot_response</code> and keep the same loop. Now <code>hi there</code> and <code>HI!</code> both get the greeting: <code>Hi!</code> tokenises to <code>['Hi', '!']</code>, lowercasing gives <code>['hi', '!']</code>, and <code>hi</code> is in the dictionary.</p>
+<p>It also shows you the next flaw, which is worth seeing rather than hiding. Type <code>Hey, what is your name?</code> and you get the greeting, not the name — the loop returns on the <em>first</em> token that matches, and <code>hey</code> comes before <code>name</code>. Whichever keyword appears earliest in the sentence wins, which is not a rule you ever meant to write. Keeping the first match is fine for a handful of rules; past that you want to score every candidate and pick the best one, which is exactly the road to intent classification further down.</p>
+<p>The bot went from matching a handful of exact sentences to matching an unlimited number of sentences that happen to contain a keyword. Same amount of code, much better behaviour.</p>
+<h2>Refining the tokens: stopwords and lemmatisation</h2>
+<p>Two more NLTK tools clean up the token list before you search it.</p>
+<p><strong>Stopwords</strong> are the extremely common words that carry almost no meaning on their own: <em>the</em>, <em>is</em>, <em>are</em>, <em>you</em>, <em>with</em>. <strong>Lemmatisation</strong> reduces a word to its dictionary form, so <em>helping</em> becomes <em>help</em> and <em>projects</em> becomes <em>project</em>.</p>
+<pre><code>from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+from nltk.tokenize import word_tokenize
+
+STOPWORDS = set(stopwords.words(&quot;english&quot;))
+lemmatizer = WordNetLemmatizer()
+
+def clean_tokens(text):
+    tokens = [token.lower() for token in word_tokenize(text) if token.isalpha()]
+    tokens = [token for token in tokens if token not in STOPWORDS]
+    return [lemmatizer.lemmatize(token, pos=&quot;v&quot;) for token in tokens]
+
+print(clean_tokens(&quot;Are you helping me with these projects?&quot;))</code></pre>
+<p>That prints:</p>
+<pre><code>['help', 'project']</code></pre>
+<p>Then swap the first line of <code>chatbot_response</code> to use it:</p>
+<pre><code>def chatbot_response(user_input):
+    for token in clean_tokens(user_input):
+        if token in KEYWORD_RESPONSES:
+            return KEYWORD_RESPONSES[token]
+    return DEFAULT_RESPONSE</code></pre>
+<p>What this buys you is fewer keys to maintain. You no longer need separate entries for <em>help</em>, <em>helping</em> and <em>helped</em> — they all collapse to <code>help</code>. What it costs you is precision, and you should know about both costs:</p>
+<ul>
+<li>Your dictionary keys now have to be in lemmatised form. <code>thanks</code> lemmatises to <code>thank</code>, so the key <code>&quot;thanks&quot;</code> will never match again.</li>
+<li>Stopword removal deletes <em>not</em>. After cleaning, &quot;I like this&quot; and &quot;I do not like this&quot; look identical to your bot.</li>
+<li>Passing <code>pos=&quot;v&quot;</code> lemmatises every token as if it were a verb, which is a blunt shortcut. The proper way is to tag each word with <code>nltk.pos_tag</code> and pass the matching part of speech. For a keyword bot, the shortcut is usually fine.</li>
+</ul>
+<h2>What this approach can't do</h2>
+<p>I want to be straight about the ceiling here, because it arrives quickly.</p>
+<ul>
+<li><strong>It has no memory.</strong> Every message is handled on its own. Ask &quot;what is your name&quot;, then &quot;and how old are you&quot; — the bot has no idea what <em>you</em> refers to, because nothing carries over between turns.</li>
+<li><strong>It doesn't understand intent, only keywords.</strong> &quot;I need help&quot; and &quot;I don't need help&quot; both contain <code>help</code> and both get the same answer.</li>
+<li><strong>First match wins.</strong> In a sentence with two keywords, the answer depends on word order, which is not a rule you ever meant to write.</li>
+<li><strong>It doesn't scale.</strong> Around a few dozen rules the dictionary starts contradicting itself and you spend more time debugging keyword collisions than adding features.</li>
+</ul>
+<p>When you outgrow it, there are two usual next steps. One is intent classification: you collect a handful of example phrasings for each intent and train a classifier to pick the intent, using the same cleaned tokens as input features. The other is calling an LLM API and letting the model handle the language, keeping your code for the actions the bot can actually take. Both are more machinery than a dictionary, and if your bot really only needs to answer ten fixed questions, the dictionary is still the right call — it's predictable, it's free, and it never invents an answer.</p>
+<h2>Where to go from here</h2>
+<p>The most fun next experiment is sentiment analysis: scoring whether a message reads as positive or negative, and having GaboBot respond differently to each. NLTK ships a rule-based scorer that needs one extra download:</p>
+<pre><code>import nltk
+nltk.download('vader_lexicon')
+
+from nltk.sentiment import SentimentIntensityAnalyzer
+
+sia = SentimentIntensityAnalyzer()
+print(sia.polarity_scores(&quot;I love this bot&quot;))</code></pre>
+<p>Wire that score into <code>chatbot_response</code> and you have a bot that reacts to <em>how</em> someone said something, not just <em>what</em> they said. That's a small change on top of everything above, and it's a good way to get a feel for how far simple tools can take you before you need the heavy ones.</p>]]></content:encoded>
+    </item>
+    <item>
+      <title><![CDATA[Introduction to Web Scraping with Python: Extracting Data with Ease]]></title>
+      <link>https://codewithgabo.com/introduction-to-web-scraping-with-python-extracting-data-with-ease</link>
+      <guid isPermaLink="true">https://codewithgabo.com/introduction-to-web-scraping-with-python-extracting-data-with-ease</guid>
+      <pubDate>Sun, 26 Nov 2023 16:04:00 GMT</pubDate>
+      <description><![CDATA[I reach for Python whenever I need data off a page that has no API. This post walks through the pieces I actually use — Requests, Beautiful Soup, robots.txt — and the habits that keep a scraper from b]]></description>
+      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/15a92bc39ccb0c5e8d86ee5bcb3e9d46070f40df-1792x1024.png" alt="Introduction to Web Scraping with Python: Extracting Data with Ease" />
+<p>I reach for Python whenever I need data off a page that has no API. This post walks through the pieces I actually use — Requests, Beautiful Soup, robots.txt — and the habits that keep a scraper from breaking or getting you blocked.</p>
+<h2>What is web scraping?</h2>
+<p>Web scraping involves programmatically gathering data from websites. This can be done for various purposes, such as analyzing content, aggregating data, or automating tasks that would otherwise require manual input.</p>
+<h2>Why Python for web scraping?</h2>
+<p>The libraries are the reason. Requests handles HTTP, Beautiful Soup parses broken HTML without complaining, and Scrapy takes over when a job outgrows a single script.</p>
+<h2>Step 1: Setting up your environment</h2>
+<p>Before we start, make sure you have Python installed on your system. You'll also need two key libraries: Beautiful Soup and Requests. Install them with pip:</p>
+<pre><code>python3 -m pip install beautifulsoup4 requests</code></pre>
+<h2>Step 2: Making your first request</h2>
+<p>Let's start by fetching the content of a webpage. We'll use the Requests library for this:</p>
+<pre><code>import requests
+
+url = &quot;https://quotes.toscrape.com/page/1/&quot;
+response = requests.get(url)
+html_content = response.text
+print(html_content[:500])</code></pre>
+<p>That works, but it has two problems that will bite you on a real site.</p>
+<h3>Send a User-Agent header</h3>
+<p>By default, Requests identifies itself with a <code>User-Agent</code> like <code>python-requests/2.x</code>. That string is a giveaway that you are not a browser, and plenty of sites either block it outright or serve a stripped-down page. Set a header that says who you are:</p>
+<pre><code>import requests
+
+HEADERS = {&quot;User-Agent&quot;: &quot;GaboScraper/1.0 (+https://codewithgabo.com)&quot;}
+
+url = &quot;https://quotes.toscrape.com/page/1/&quot;
+response = requests.get(url, headers=HEADERS, timeout=10)
+html_content = response.text</code></pre>
+<p>I prefer an honest custom string over pretending to be Chrome. If the site owner looks at their logs, they can see what hit them and where to complain. The <code>timeout</code> matters too: without it, a slow server can hang your script forever.</p>
+<h3>Check the response before you parse it</h3>
+<p>This is the mistake I see most often from beginners. A 404 or a 403 still returns HTML, so Beautiful Soup happily parses the error page, <code>find_all</code> returns an empty list, and you spend an hour debugging a selector that was fine all along. Check first:</p>
+<pre><code>response = requests.get(url, headers=HEADERS, timeout=10)
+print(response.status_code)   # 200 means OK
+response.raise_for_status()   # raises an exception on 4xx / 5xx
+html_content = response.text</code></pre>
+<p><code>raise_for_status()</code> turns a silent wrong answer into a loud error, which is exactly what you want while you are still building the thing.</p>
+<h2>Step 3: Parsing HTML with Beautiful Soup</h2>
+<p>Once you have the HTML content, use Beautiful Soup to parse and navigate the data. This snippet assumes <code>html_content</code> from the previous step:</p>
+<pre><code>from bs4 import BeautifulSoup
+
+soup = BeautifulSoup(html_content, &quot;html.parser&quot;)
+print(soup.prettify())</code></pre>
+<p><code>prettify()</code> prints the document with indentation. It is noisy, but early on it is the fastest way to see what you actually received rather than what you assumed you received.</p>
+<h2>Step 4: Extracting data</h2>
+<p>Now let's extract specific data. Suppose we want every top-level headline on a page:</p>
+<pre><code>headlines = soup.find_all(&quot;h1&quot;)
+for headline in headlines:
+    print(headline.text.strip())</code></pre>
+<p><code>.strip()</code> is not optional in practice. HTML is full of stray newlines and indentation, and without it your data ends up padded with whitespace.</p>
+<h2>Step 5: Handling more complex queries</h2>
+<p>For more complex data extraction, you can use CSS selectors. <code>select</code> returns every match, <code>select_one</code> returns the first or <code>None</code>:</p>
+<pre><code>quotes = soup.select(&quot;div.quote&quot;)
+for quote in quotes:
+    text = quote.select_one(&quot;span.text&quot;).text
+    print(text)</code></pre>
+<p>Careful: <code>select_one</code> returns <code>None</code> when nothing matches, and <code>None.text</code> raises <code>AttributeError</code>. On a page where one item is missing a heading, guard it:</p>
+<pre><code>for quote in quotes:
+    author = quote.select_one(&quot;small.author&quot;)
+    print(author.text.strip() if author else &quot;(unknown)&quot;)</code></pre>
+<h2>Step 6: Be a polite scraper</h2>
+<p>While web scraping is powerful, it's important to respect website terms and avoid overloading servers. Two concrete habits cover most of it.</p>
+<p><strong>Read robots.txt in code, not just with your eyes.</strong> Python ships with a parser, so your script can ask the question itself:</p>
+<pre><code>from urllib.parse import urljoin
+from urllib.robotparser import RobotFileParser
+
+USER_AGENT = &quot;GaboScraper/1.0 (+https://codewithgabo.com)&quot;
+BASE = &quot;https://quotes.toscrape.com&quot;
+
+rp = RobotFileParser()
+rp.set_url(urljoin(BASE, &quot;/robots.txt&quot;))
+try:
+    rp.read()
+except Exception:
+    print(&quot;could not read robots.txt - stopping&quot;)
+    raise SystemExit(1)
+
+print(rp.can_fetch(USER_AGENT, f&quot;{BASE}/page/1/&quot;))
+print(rp.crawl_delay(USER_AGENT))  # None if the site doesn't specify one</code></pre>
+<p>Read robots.txt once at startup and reuse the parser. <code>robots.txt</code> is a request, not a lock, but ignoring it is how you get your IP banned.</p>
+<p><strong>Slow down.</strong> One request per second is plenty for a hobby project and keeps you off anyone's radar:</p>
+<pre><code>import time
+
+time.sleep(1)  # between requests, every time</code></pre>
+<h2>Step 7: Pagination</h2>
+<p>Most listings span several pages. The reliable pattern is to follow the site's own &quot;next&quot; link and stop when it disappears, rather than guessing how many pages exist. Add a hard page cap so a bug can't turn into an accidental crawl of the whole internet.</p>
+<h2>Putting it all together</h2>
+<p>Here is the complete script. It reads robots.txt, sets a User-Agent, checks the status, walks the pages, and sleeps between requests. It runs against <code>quotes.toscrape.com</code>, a site built specifically for scraping practice:</p>
+<pre><code>import time
+import requests
+from bs4 import BeautifulSoup
+from urllib.parse import urljoin
+from urllib.robotparser import RobotFileParser
+
+BASE = &quot;https://quotes.toscrape.com&quot;
+USER_AGENT = &quot;GaboScraper/1.0 (+https://codewithgabo.com)&quot;
+HEADERS = {&quot;User-Agent&quot;: USER_AGENT}
+DELAY = 1.0
+MAX_PAGES = 5
+
+
+def fetch(url):
+    response = requests.get(url, headers=HEADERS, timeout=10)
+    response.raise_for_status()
+    return response.text
+
+
+def parse_page(html):
+    soup = BeautifulSoup(html, &quot;html.parser&quot;)
+    quotes = []
+    for quote in soup.select(&quot;div.quote&quot;):
+        text = quote.select_one(&quot;span.text&quot;)
+        author = quote.select_one(&quot;small.author&quot;)
+        quotes.append({
+            &quot;text&quot;: text.text.strip() if text else &quot;&quot;,
+            &quot;author&quot;: author.text.strip() if author else &quot;&quot;,
+            &quot;tags&quot;: [tag.text.strip() for tag in quote.select(&quot;a.tag&quot;)],
+        })
+    next_link = soup.select_one(&quot;li.next a&quot;)
+    next_url = urljoin(BASE, next_link[&quot;href&quot;]) if next_link else None
+    return quotes, next_url
+
+
+def main():
+    rp = RobotFileParser()
+    rp.set_url(urljoin(BASE, &quot;/robots.txt&quot;))
+    rp.read()
+
+    url = f&quot;{BASE}/page/1/&quot;
+    collected = []
+    pages = 0
+
+    while url and pages &lt; MAX_PAGES:
+        if not rp.can_fetch(USER_AGENT, url):
+            print(f&quot;robots.txt disallows {url} - stopping&quot;)
+            break
+        print(f&quot;Fetching {url}&quot;)
+        quotes, url = parse_page(fetch(url))
+        collected.extend(quotes)
+        pages += 1
+        time.sleep(DELAY)
+
+    for quote in collected:
+        print(f&quot;{quote['author']}: {quote['text']}&quot;)
+    print(f&quot;\n{len(collected)} quotes from {pages} page(s)&quot;)
+
+
+if __name__ == &quot;__main__&quot;:
+    main()</code></pre>
+<p>Save it as <code>scrape.py</code>, run <code>python3 scrape.py</code>, and you should see quotes printed one page at a time.</p>
+<h2>When not to scrape</h2>
+<p>This is the part I wish someone had told me first.</p>
+<ul>
+<li><strong>If the site has an API, use the API.</strong> It returns structured JSON, it is versioned, and it won't break because a designer renamed a CSS class. Check for <code>/api</code>, a developer subdomain, or an RSS feed before you write a single selector.</li>
+<li><strong>Scrapers are fragile by design.</strong> You are depending on markup that nobody promised to keep stable. Expect your script to break, and write it so a failure is loud rather than silently producing empty rows.</li>
+<li><strong>Some sites forbid it in their terms of service.</strong> Read them. &quot;Technically possible&quot; and &quot;allowed&quot; are different questions.</li>
+<li><strong>Personal data brings legal obligations</strong> no matter how you obtained it. Rules vary by jurisdiction and by site, and I'm a developer, not a lawyer. If you are collecting anything that identifies a person, get real advice before you collect it.</li>
+</ul>
+<p>For bigger jobs, look at <a href="https://scrapy.org/">Scrapy</a> for large crawls with retries and throttling built in, and <a href="https://playwright.dev/python/">Playwright</a> for pages whose content is rendered by JavaScript after load.</p>
+<p>Start with simple targets, keep the volume low, and let the site's own signals tell you what is fair game. Practice is key to getting comfortable with scraping, and the good habits are much easier to build on day one than to retrofit later.</p>]]></content:encoded>
+    </item>
+    <item>
+      <title><![CDATA[State Management in React – Props vs the Context API]]></title>
+      <link>https://codewithgabo.com/state-management-in-react-props-vs-the-context-api</link>
+      <guid isPermaLink="true">https://codewithgabo.com/state-management-in-react-props-vs-the-context-api</guid>
+      <pubDate>Wed, 31 May 2023 01:39:00 GMT</pubDate>
+      <description><![CDATA[State Management in React – Props vs the Context API Figuring out state management in React applications can feel like finding your way through a labyrinth. You'll constantly be searching for the most]]></description>
+      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/3821cfe1824e0d5306aeb6fbeafea3a8263aa28f-1180x664.jpg" alt="State Management in React – Props vs the Context API" />
+<h1>State Management in React – Props vs the Context API</h1>
+<p>Figuring out state management in React applications can feel like finding your way through a labyrinth. You'll constantly be searching for the most efficient, scalable, and maintainable solution. The journey often leads to two primary paths: Using Props or the Context API. As you embark on this quest for state management mastery, it's crucial to understand the intricacies, trade-offs, and use cases of each approach.</p>
+<p>In this tutorial, we'll delve into React state management, dissecting the advantages and disadvantages of using props and the Context API and providing valuable insights to help you make informed decisions for your application. You'll be able to unravel the mysteries of state management in React and discover which path will lead you to success.</p>
+<h2>Prerequisites</h2>
+<p>Before proceeding, you should have the following:</p>
+<ul>
+<li>React Fundamentals such as components, JSX syntax, props, and state.</li>
+<li>Familiarity with different state management techniques in React, such as using props and the Context API.</li>
+</ul>
+<h2>What is State Management in React?</h2>
+<p>State management refers to the methods and techniques used to handle, organize, and share data within a React application. It involves the systematic management and manipulation of data, ensuring seamless integration and synchronization across various components.</p>
+<h2>Benefits of React State Management</h2>
+<p>State management plays a pivotal role in developing dynamic and interactive applications that need to handle evolving data. This data can come from user interactions or other triggering events. By implementing robust state management techniques, React applications can maintain data integrity, enhance performance, and provide a smooth user experience.</p>
+<h2>State Management Using Props</h2>
+<p>Using props for state management is a technique where the state is managed in a parent component and passed down to child components via props. This approach is suitable for small-scale applications with simple state requirements and a shallow component hierarchy. Using props is considered a local state management method, as the state is maintained and shared within a limited scope of closely related components.</p>
+<p>To illustrate how this works, let's create a ParentComponent that maintains the state and passes it down to a ChildComponent:</p>
+<img src="https://cdn.sanity.io/images/nnt7ytcd/production/60661dd6c6c81f56e0e620454823c40a7462c505-1992x1700.png" alt="" />
+<p>While props are straightforward and intuitive for small applications, they can become cumbersome and inefficient as your app grows, leading to &quot;prop drilling&quot; where props need to be passed through multiple component levels.</p>
+<h2>Introducing the Context API</h2>
+<p>The Context API is a feature provided by React that allows you to share state and other data without having to pass props through intermediate components. Using the Context API, you can avoid the problems of &quot;prop drilling&quot;.</p>
+<p>Here's an example of the previous ParentComponent and ChildComponent using the Context API instead:</p>
+<img src="https://cdn.sanity.io/images/nnt7ytcd/production/7d952fda3f9730fa5aa623edbce10d72e3336a64-1994x1908.png" alt="" />
+<h2></h2>
+<h2>Choosing between Props and the Context API</h2>
+<p>When choosing between using props or the Context API for state management, consider the scale and complexity of your project.</p>
+<p>For small-scale projects with a simple component hierarchy, using props may be more suitable. However, as the scale of your project grows and the component tree becomes deeper, the Context API can provide a more scalable and maintainable solution. But remember to use Context sparingly, as overusing it can lead to unnecessary re-renders and lower reusability of components.</p>
+<h2>Conclusion</h2>
+<p>State management is a core concept in React and essential for building dynamic and interactive applications. Both props and the Context API are powerful tools for managing state in React, each with their own advantages and suitable scenarios. Whether you choose to use props or the Context API, understanding their implications will help you make the best choice for your application.</p>]]></content:encoded>
+    </item>
+    <item>
+      <title><![CDATA[Embracing Fluent UI: The Future of Interface Design]]></title>
+      <link>https://codewithgabo.com/embracing-fluent-ui-the-future-of-interface-design</link>
+      <guid isPermaLink="true">https://codewithgabo.com/embracing-fluent-ui-the-future-of-interface-design</guid>
+      <pubDate>Fri, 21 Apr 2023 23:17:00 GMT</pubDate>
+      <description><![CDATA[The Fluent UI Revolution: A Comprehensive Guide to the Future of Interface Design Introduction As technology continues to permeate every aspect of our lives, the importance of creating user-friendly a]]></description>
+      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/103df4acff20e06fee5a327140ee08ec9a17df06-1080x1080.png" alt="Embracing Fluent UI: The Future of Interface Design" />
+<h1>The Fluent UI Revolution: A Comprehensive Guide to the Future of Interface Design</h1>
+<h2>Introduction</h2>
+<p>As technology continues to permeate every aspect of our lives, the importance of creating user-friendly and accessible interfaces cannot be overstated. Fluent UI, developed by Microsoft, is a game-changing design system that has emerged as a powerful tool for designers and developers alike. In this comprehensive guide, we'll delve into the core principles of Fluent UI, its benefits, and how it's shaping the future of interface design. We'll also explore how to implement Fluent UI in your projects and examine some real-world applications of this innovative design system.</p>
+<h2>Part 1: The Core Principles of Fluent UI</h2>
+<p><strong>1.1</strong> Clarity Fluent UI aims to provide clear and straightforward user experiences by minimizing visual clutter and unnecessary elements. This helps reduce the learning curve for new users, ensuring that interfaces remain intuitive and easy to navigate. Clarity is achieved by using clear typography, meaningful icons, and a consistent visual hierarchy.</p>
+<p><strong>1.2</strong> Efficiency The design system offers a range of versatile components and tools that enable designers and developers to create efficient and streamlined interfaces. By focusing on common design patterns and reusable components, Fluent UI ensures minimal effort from users while maximizing productivity.</p>
+<p><strong>1.3</strong> Consistency One of the main goals of Fluent UI is to maintain consistency across platforms and devices. By using a consistent design language, users can quickly adapt to different environments without confusion. This consistency is achieved through a shared set of design principles, components, and styles that can be applied to various platforms and products.</p>
+<p><strong>1.4</strong> Flexibility Fluent UI acknowledges the diverse needs of users and offers adaptable components that can be customized to cater to different preferences and use cases. By providing a flexible foundation, Fluent UI enables designers and developers to build interfaces that can accommodate a wide range of user requirements and scenarios.</p>
+<h2>Part 2: The Benefits of Fluent UI</h2>
+<p><strong>2.1</strong> Enhanced User Experience Focusing on clarity, efficiency, and consistency, Fluent UI helps deliver a seamless and enjoyable user experience. By reducing the likelihood of user frustration and disengagement, Fluent UI enables products to better retain and satisfy users.</p>
+<p><strong>2.2</strong> Faster Development Fluent UI's comprehensive set of tools and components allows developers to create interfaces more quickly and efficiently. This results in faster project completion, reduced development costs, and the ability to rapidly prototype and iterate on designs.</p>
+<p><strong>2.3</strong> Improved Accessibility Fluent UI is designed with accessibility in mind, ensuring that interfaces are usable and comprehensible for users of all abilities. This focus on accessibility not only complies with legal requirements but also creates more inclusive products that cater to a wider audience.</p>
+<p><strong>2.4</strong> Cross-Platform Compatibility Fluent UI's consistent design language enables seamless adaptation across various platforms, devices, and screen sizes. This provides a cohesive experience for users, regardless of their preferred device or platform.</p>
+<h2>Part 3: Implementing Fluent UI in Your Projects</h2>
+<p><strong>3.1 </strong>Getting Started with Fluent UI To begin using Fluent UI, you'll first need to install the necessary packages and dependencies for your chosen platform (e.g., React, Web, or Xamarin). Microsoft provides extensive documentation and resources to help you get started, including sample code, tutorials, and a library of pre-built components.</p>
+<p><strong>3.2</strong> Customizing Fluent UI Components One of the strengths of Fluent UI is its flexibility, allowing you to customize components to fit your specific needs. You can modify the appearance, behavior, and layout of components by adjusting their properties or applying custom styles.</p>
+<p><strong>3.3</strong> Building Custom Components While Fluent UI offers an extensive library of pre-built components, you may encounter situations where you need to create a custom component from scratch. Fluent UI provides guidance and best practices for building custom components that adhere to the design system's principles and are compatible with existing Fluent UI components.</p>
+<p><strong>3.4</strong> Design Tokens and Theming Fluent UI utilizes design tokens to maintain consistency across different platforms and devices. Design tokens are a set of predefined variables that store design-related values, such as colors, typography, and spacing. By leveraging design tokens, you can easily create and apply themes to your application, ensuring a consistent look and feel throughout.</p>
+<p><strong>3.5</strong> Responsive Design with Fluent UI Creating responsive interfaces is essential for catering to various screen sizes and devices. Fluent UI provides tools and guidance for implementing responsive design, such as using CSS Grid, Flexbox, and media queries. This ensures that your interface can adapt to different screen sizes while maintaining a consistent user experience.</p>
+<h2>Part 4: Real-World Applications of Fluent UI</h2>
+<p><strong>4.1</strong> Microsoft Office Suite One of the most prominent implementations of Fluent UI can be found in the Microsoft Office Suite, which includes applications like Word, Excel, PowerPoint, and Outlook. Fluent UI has helped create a consistent and cohesive experience across these applications, making it easier for users to navigate and use the software.</p>
+<p><strong>4.2</strong> Microsoft Teams, a popular collaboration and communication platform, also utilizes Fluent UI to deliver a consistent and intuitive user experience. The platform's interface is designed to facilitate seamless communication, file sharing, and project management among team members.</p>
+<p><strong>4.3</strong> Third-Party Applications Many third-party developers have adopted Fluent UI to build their applications, taking advantage of the design system's flexibility, consistency, and efficiency. By using Fluent UI, these developers can ensure their applications are accessible, user-friendly, and compatible with Microsoft products and services.</p>
+<h2>Conclusion</h2>
+<p><strong>Fluent UI</strong> has emerged as a powerful design system that is shaping the future of interface design. Its focus on clarity, efficiency, consistency, and flexibility makes it an ideal choice for creating intuitive, efficient, and enjoyable experiences that cater to diverse user needs. By harnessing the power of Fluent UI, designers, and developers can build user interfaces that not only provide a seamless experience across platforms and devices but also promote inclusivity and accessibility. As the adoption of Fluent UI continues to grow, its influence on the world of interface design is poised to revolutionize the way we interact with technology.</p>]]></content:encoded>
+    </item>
+    <item>
+      <title><![CDATA[Creating a Weather App using JavaScript, HTML, CSS]]></title>
+      <link>https://codewithgabo.com/creating-a-weather-app-using-javascript-html-css</link>
+      <guid isPermaLink="true">https://codewithgabo.com/creating-a-weather-app-using-javascript-html-css</guid>
+      <pubDate>Fri, 24 Mar 2023 22:56:00 GMT</pubDate>
+      <description><![CDATA[Build a simple but genuinely useful weather app that displays real-time weather data for any city using JavaScript, HTML, CSS, and WeatherAPI. It is a good project to pick up after your first few tuto]]></description>
+      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/471e0255b7cd53bd780fd12fcee9de43e8f84867-1080x1080.png" alt="Creating a Weather App using JavaScript, HTML, CSS" />
+<p>Build a simple but genuinely useful weather app that displays real-time weather data for any city using JavaScript, HTML, CSS, and WeatherAPI. It is a good project to pick up after your first few tutorials, because it makes you deal with three things at once: talking to an API, writing asynchronous code, and handling the moment when the request comes back wrong.</p>
+<p>No framework, no build step, no dependencies. Three files and a free API key.</p>
+<h2>Step 1: Set up the project structure</h2>
+<p>Create a new folder for the project and add three files:</p>
+<ul>
+<li><code>index.html</code></li>
+<li><code>style.css</code></li>
+<li><code>script.js</code></li>
+</ul>
+<p>You can open <code>index.html</code> directly in the browser. That is all the tooling this needs.</p>
+<h2>Step 2: index.html</h2>
+<p>The markup is small. What matters is the IDs, because the JavaScript looks each element up by ID: <code>city-input</code>, <code>weather-info</code>, <code>city-name</code>, <code>temperature</code>, and <code>description</code>.</p>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+  &lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot; /&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot; /&gt;
+    &lt;title&gt;Weather App&lt;/title&gt;
+    &lt;link rel=&quot;stylesheet&quot; href=&quot;style.css&quot; /&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;header&gt;
+      &lt;h1&gt;Weather App&lt;/h1&gt;
+    &lt;/header&gt;
+
+    &lt;main&gt;
+      &lt;label for=&quot;city-input&quot;&gt;Type a city and press Enter&lt;/label&gt;
+      &lt;input
+        type=&quot;text&quot;
+        id=&quot;city-input&quot;
+        name=&quot;city&quot;
+        autocomplete=&quot;off&quot;
+        placeholder=&quot;Santo Domingo&quot;
+      /&gt;
+
+      &lt;section id=&quot;weather-info&quot; class=&quot;hidden&quot; aria-live=&quot;polite&quot;&gt;
+        &lt;h2 id=&quot;city-name&quot;&gt;&lt;/h2&gt;
+        &lt;p id=&quot;temperature&quot;&gt;&lt;/p&gt;
+        &lt;p id=&quot;description&quot;&gt;&lt;/p&gt;
+      &lt;/section&gt;
+    &lt;/main&gt;
+
+    &lt;script src=&quot;script.js&quot;&gt;&lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+<p>Two details worth noticing. The <code>&lt;label&gt;</code> is tied to the input with <code>for=&quot;city-input&quot;</code>, so clicking the text focuses the field and screen readers announce it. And <code>aria-live=&quot;polite&quot;</code> on the results container means the new weather is read out when it appears, instead of changing silently.</p>
+<p>The <code>&lt;script&gt;</code> tag goes at the end of <code>&lt;body&gt;</code> on purpose. The JavaScript calls <code>getElementById</code> as soon as it runs, so the elements have to exist already.</p>
+<h2>Step 3: style.css</h2>
+<pre><code>body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background-color: #f0f0f0;
+}
+
+header {
+  background-color: #3b3b3b;
+  padding: 20px;
+}
+
+header h1 {
+  color: #ffffff;
+  margin: 0;
+  font-size: 24px;
+}
+
+input[type=&quot;text&quot;] {
+  font-size: 18px;
+  padding: 10px;
+  width: 80%;
+  max-width: 300px;
+  margin-top: 40px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+#weather-info {
+  margin-top: 40px;
+}
+
+.hidden {
+  display: none;
+}</code></pre>
+<p>Add these two rules at the bottom of the same file so the label sits on its own line above the input. They come later in the stylesheet, so the smaller <code>margin-top</code> wins over the earlier one:</p>
+<pre><code>label {
+  display: block;
+  margin-top: 40px;
+  color: #3b3b3b;
+}
+
+input[type=&quot;text&quot;] {
+  margin-top: 10px;
+}</code></pre>
+<p><code>.hidden</code> is the whole show/hide mechanism. The results block starts hidden and the JavaScript removes the class once there is something to show.</p>
+<h2>Step 4: Register for WeatherAPI</h2>
+<p>Go to <a href="https://www.weatherapi.com/">weatherapi.com</a> and sign up for a free account, then generate an API key from your dashboard. Keep the key somewhere handy, you need it in the next step.</p>
+<h2>Step 5: script.js</h2>
+<pre><code>const cityInput = document.getElementById(&quot;city-input&quot;);
+const weatherInfo = document.getElementById(&quot;weather-info&quot;);
+const cityName = document.getElementById(&quot;city-name&quot;);
+const temperature = document.getElementById(&quot;temperature&quot;);
+const description = document.getElementById(&quot;description&quot;);
+
+cityInput.addEventListener(&quot;keyup&quot;, (event) =&gt; {
+  if (event.key === &quot;Enter&quot;) {
+    fetchWeatherData(cityInput.value);
+  }
+});
+
+async function fetchWeatherData(city) {
+  const API_KEY = &quot;your_weatherapi_key_here&quot;;
+  try {
+    const response = await fetch(
+      `https://api.weatherapi.com/v1/current.json?key=${API_KEY}&amp;q=${city}&amp;aqi=no`
+    );
+    if (!response.ok) {
+      throw new Error(&quot;Failed to fetch weather data&quot;);
+    }
+    const data = await response.json();
+    displayWeatherData(data);
+  } catch (error) {
+    console.error(&quot;Error:&quot;, error);
+  }
+}
+
+function displayWeatherData(data) {
+  cityName.textContent = data.location.name;
+  temperature.textContent = `${data.current.temp_c}°C`;
+  description.textContent = data.current.condition.text;
+  weatherInfo.classList.remove(&quot;hidden&quot;);
+}</code></pre>
+<p>Replace <code>your_weatherapi_key_here</code> with your actual WeatherAPI key. Save all three files, open <code>index.html</code>, type a city, press Enter.</p>
+<h2>What the async function is actually doing</h2>
+<p>This is the real lesson of the project, so it is worth slowing down on the three pieces.</p>
+<h3>await</h3>
+<p><code>fetch</code> does not return the response. It returns a promise, an object that stands in for a result that has not arrived yet. <code>await</code> pauses the function until that promise settles, then hands you the value. The rest of the page keeps running while it waits, which is why nothing freezes.</p>
+<p>You need two <code>await</code>s here because there are two waits: one for the response headers to arrive, and a second one for <code>response.json()</code> to finish reading and parsing the body.</p>
+<h3>response.ok</h3>
+<p><code>fetch</code> only rejects when the request itself fails, for example when the network is down. A 400 or a 401 from the server is still a successful round trip as far as <code>fetch</code> is concerned, so it resolves normally. If you skip the <code>response.ok</code> check, a bad API key or a misspelled city gives you a <code>data</code> object with no <code>location</code> in it, and the error you eventually see is a confusing <code>Cannot read properties of undefined</code>.</p>
+<p><code>response.ok</code> is simply <code>true</code> for any status in the 200 range. Checking it turns a silent wrong answer into a clear one.</p>
+<h3>try/catch</h3>
+<p><code>throw</code> inside an <code>async</code> function jumps straight to <code>catch</code>, and so does any rejected promise you awaited. That means one <code>catch</code> block covers the network failing, the JSON being unparseable, and the error you threw yourself.</p>
+<h2>Handling a city that doesn't exist</h2>
+<p>This is the first thing a beginner hits, and right now the app does nothing visible: it logs to the console and the old weather stays on screen. When you send an unknown city, WeatherAPI responds with a non-OK status and a JSON body containing an <code>error</code> object with a <code>message</code> field explaining what went wrong. You can read that and put it in front of the user.</p>
+<p>Add a place to show it, right after the <code>&lt;/section&gt;</code> in <code>index.html</code>:</p>
+<pre><code>&lt;p id=&quot;error-message&quot; class=&quot;hidden&quot; role=&quot;alert&quot;&gt;&lt;/p&gt;</code></pre>
+<p>Then replace <code>fetchWeatherData</code> in <code>script.js</code> with this version, and add the two helpers below it:</p>
+<pre><code>const errorMessage = document.getElementById(&quot;error-message&quot;);
+
+async function fetchWeatherData(city) {
+  const API_KEY = &quot;your_weatherapi_key_here&quot;;
+  if (!city.trim()) return;
+
+  hideError();
+  try {
+    const response = await fetch(
+      `https://api.weatherapi.com/v1/current.json?key=${API_KEY}&amp;q=${encodeURIComponent(
+        city
+      )}&amp;aqi=no`
+    );
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error?.message || &quot;Failed to fetch weather data&quot;);
+    }
+
+    displayWeatherData(data);
+  } catch (error) {
+    console.error(&quot;Error:&quot;, error);
+    showError(error.message);
+  }
+}
+
+function showError(message) {
+  errorMessage.textContent = message;
+  errorMessage.classList.remove(&quot;hidden&quot;);
+  weatherInfo.classList.add(&quot;hidden&quot;);
+}
+
+function hideError() {
+  errorMessage.classList.add(&quot;hidden&quot;);
+}</code></pre>
+<p>Three changes matter here. The body is parsed <em>before</em> the <code>ok</code> check, so the error message is available to throw. <code>encodeURIComponent</code> means city names with spaces or accents survive the trip. And <code>showError</code> hides the stale weather, so the user is never looking at yesterday's city next to today's error.</p>
+<p>A network failure lands in the same <code>catch</code>, but with a browser message like &quot;Failed to fetch&quot;. If that bothers you, check <code>error instanceof TypeError</code> and show your own wording.</p>
+<h2>About that API key</h2>
+<p>Your key is sitting in <code>script.js</code>, which the browser downloads in full. Anyone who opens DevTools can read it, copy it, and spend your quota. Minifying does not help, and neither does moving it to another file.</p>
+<p>For learning, this is fine. Use a free key, and rotate it if you ever paste the file publicly. For anything real, the request belongs behind a small server endpoint of your own: your page calls <code>/api/weather?city=London</code>, the server holds the key, adds it, calls WeatherAPI, and returns the result. The key never reaches the browser. That is one short serverless function, and it is the right moment to learn one.</p>
+<h2>Make it yours</h2>
+<p><strong>Show the weather icon.</strong> <code>data.current.condition.icon</code> comes back as a URL with no protocol, like <code>//cdn.weatherapi.com/...</code>, so prefix it: <code>iconEl.src = &quot;https:&quot; + data.current.condition.icon;</code>. Give the <code>&lt;img&gt;</code> an <code>alt</code> of <code>data.current.condition.text</code>.</p>
+<p><strong>Add a three day forecast.</strong> Swap the endpoint to <code>https://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&amp;q=${encodeURIComponent(city)}&amp;days=3&amp;aqi=no&amp;alerts=no</code>. The response still has <code>location</code> and <code>current</code>, plus <code>data.forecast.forecastday</code>, an array you can loop over.</p>
+<p><strong>Remember the last city.</strong> Call <code>localStorage.setItem(&quot;lastCity&quot;, data.location.name)</code> inside <code>displayWeatherData</code>, then on load read it back and fetch it if it exists. Two lines, and the app feels like it knows you.</p>
+<h2>Where this stops</h2>
+<p>The Enter key is the only way to trigger a search, which means no mouse and no comfortable path on mobile. Add a button that calls the same function before you show this to anyone. There is no loading state either, so on a slow connection the page looks broken for a second.</p>
+<p>Beyond that, this is a learning project and it should stay one until the key moves to a server. If you want to build a weather feature people actually use, you will also want caching, since free tiers have request limits and hitting the API on every keystroke will burn through them fast. Get this version working first, then move the key, then worry about the rest.</p>]]></content:encoded>
+    </item>
+    <item>
+      <title><![CDATA[A Brief Full Stack Engineer Guide]]></title>
+      <link>https://codewithgabo.com/what-is-a-full-stack-developer-2023-full-stack-engineer-guide</link>
+      <guid isPermaLink="true">https://codewithgabo.com/what-is-a-full-stack-developer-2023-full-stack-engineer-guide</guid>
+      <pubDate>Sat, 11 Mar 2023 14:05:00 GMT</pubDate>
+      <description><![CDATA[A Brief Full Stack Engineer Guide What is a Full Stack Developer? A full-stack developer is a software engineer who can develop both the front-end and back-end of a web application. This means a full-]]></description>
+      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/533ccb16b6863843e5a32a0983ba35ec81895b8d-1080x1080.png" alt="A Brief Full Stack Engineer Guide" />
+<h1>A Brief Full Stack Engineer Guide</h1>
+<h3>What is a Full Stack Developer?</h3>
+<p>A full-stack developer is a software engineer who can develop both the front-end and back-end of a web application. This means a full-stack developer has knowledge and experience with multiple programming languages, databases, servers, and frameworks.</p>
+<p>Front-end development involves creating the user interface and experience of a web application, while back-end development involves writing code that runs on the server and communicates with databases and other resources.</p>
+<p>Full-stack developers need to be proficient in both areas to create a complete, functional web application. They are also responsible for integrating different components of a web application and making sure everything works together smoothly.</p>
+<h4>Skills Required for Full Stack Development</h4>
+<p>To become a full-stack developer, you need to have a solid foundation in a variety of technical skills. Here are some of the most important skills you should focus on:</p>
+<ol>
+<li>HTML, CSS, and JavaScript: These are the fundamental building blocks of front-end development. You need to understand how to use these technologies to create user interfaces and make web applications interactive.</li>
+<li>Server-side languages: Popular server-side languages include Java, Python, Ruby, and PHP. You need to have a solid understanding of at least one of these languages to develop the back end of a web application.</li>
+<li>Databases: You need to understand how to store and retrieve data from databases, as well as how to optimize queries and manage data efficiently. Some popular databases include MySQL, MongoDB, and PostgreSQL.</li>
+<li>Web frameworks: Frameworks like React, Angular, and Vue.js can help you create complex front-end applications quickly and efficiently. You also need to be familiar with server-side frameworks like Node.js, Django, or Flask.</li>
+<li>DevOps: DevOps refers to the set of practices that combine software development and IT operations to improve the delivery of software. You need to understand how to use tools like Git, Docker, and Kubernetes to deploy and manage web applications.</li>
+</ol>
+<h4></h4>
+<h4>Steps to Becoming a Full-Stack Developer</h4>
+<p>Here are some steps you can take to become a full-stack developer:</p>
+<ol>
+<li>Learn the fundamentals of programming: Start by learning a programming language like Python, Java, or JavaScript. You need to have a strong foundation in programming concepts before you can start developing web applications.</li>
+<li>Learn front-end technologies: HTML, CSS, and JavaScript are essential front-end technologies. You can start learning these technologies by taking online courses or watching tutorial videos.</li>
+<li>Learn a server-side language: Once you have a solid understanding of front-end technologies, you can start learning a server-side language like Java, Python, or Ruby.</li>
+<li>Learn databases: You need to understand how to work with databases to create dynamic web applications. Take online courses or read documentation to learn how to work with databases like MySQL or MongoDB.</li>
+<li>Learn web frameworks: Web frameworks can help you develop web applications more efficiently. Start by learning front-end frameworks like React or Angular, then move on to server-side frameworks like Node.js, Django, or Flask.</li>
+<li>Learn DevOps: DevOps skills are essential for deploying and managing web applications. Start by learning how to use version control systems like Git, and then move on to containerization technologies like Docker.</li>
+<li>Practice building projects: Building projects is the best way to solidify your skills and gain practical experience. Start by building simple applications and gradually move on to more complex projects.</li>
+<li>Get involved in the developer community: Join developer communities online or in person to network and learn from other developers. Attend meetups, hackathons, and conferences to stay up-to-date with the latest technologies and trends.</li>
+</ol>
+<h3>Conclusion</h3>
+<p>Becoming a full-stack developer requires a lot of hard work and dedication, but it can be a rewarding career path for those who enjoy working with both front-end and back-end technologies. To become a successful full-stack developer, you need to have a solid foundation in programming fundamentals, front-end technologies, server-side languages, databases, web frameworks, and DevOps.</p>
+<p>Remember to focus on building practical experience by working on projects and collaborating with other developers. By continually learning and growing your skills, you can become a valuable asset to any team and develop innovative web applications that meet the needs of users.</p>
+<p>In 2023, full-stack development is a fast-growing and constantly evolving field, with new tools and technologies always emerging. By staying up-to-date with the latest trends and best practices, you can remain competitive and continue to grow your skills and career as a full-stack developer.</p>
+<p>Thank you for reading, and remember &quot;Success is not linear.&quot;</p>]]></content:encoded>
+    </item>
+    <item>
+      <title><![CDATA[The Six Most Common HTTP Errors]]></title>
+      <link>https://codewithgabo.com/commons-http-errors</link>
+      <guid isPermaLink="true">https://codewithgabo.com/commons-http-errors</guid>
+      <pubDate>Fri, 03 Mar 2023 14:02:00 GMT</pubDate>
+      <description><![CDATA[HTTP errors are response status codes that indicate that something has gone wrong with a website or web application. These errors can be caused by a variety of factors, such as invalid input, server i]]></description>
+      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/cb4b51846dd8cc741f44d51242c87034d378e362-1080x1080.png" alt="The Six Most Common HTTP Errors" />
+<p>HTTP errors are response status codes that indicate that something has gone wrong with a website or web application. These errors can be caused by a variety of factors, such as invalid input, server issues, or user authentication problems. In this blog post, we'll cover some of the most common HTTP errors and how to handle them.</p>
+<h2>404 (Not Found) Error</h2>
+<p>The 404 error occurs when a user tries to access a web page that doesn't exist on the server. This can happen for a variety of reasons, such as a mistyped URL or a broken link.</p>
+<p>To handle a 404 error, you should provide a custom error page that explains to the user what has happened and provides suggestions for what they can do next. The error page should have a clear message and a search bar to help users find what they're looking for.</p>
+<p>You can also customize the error page with your own branding and design, but make sure that it's still easy to use and navigate. Additionally, you should include a link to your homepage or other relevant pages to help users get back on track.</p>
+<h2>403 (Forbidden) Error</h2>
+<p>The 403 error occurs when a user tries to access a resource that they don't have permission to access. This can happen when a user tries to access a page or file that is restricted to certain users or groups.</p>
+<p>To handle a 403 error, you should display a message to the user explaining that they don't have permission to access the resource. Additionally, you can provide a link to the login page or a button to retry the request once the user has been granted the necessary permissions.</p>
+<h2>401 (Unauthorized) Error</h2>
+<p>The 401 error occurs when a user tries to access a protected resource without proper authentication. This can happen when a user tries to access a page that requires a login, but they haven't logged in yet or their session has expired.</p>
+<p>To handle a 401 error, you should redirect the user to the login page and display a message explaining that they need to log in to access the resource. If the user is already logged in, you can display a message telling them that they don't have permission to access the resource.</p>
+<p>Additionally, you can provide a link to the login page or a button to retry the request once the user has logged in.</p>
+<h2>400 (Bad Request) Error</h2>
+<p>The 400 error occurs when the server cannot process a request due to invalid input or a malformed request. This can happen when a user submits a form with missing or incorrect data, or when a request is made with invalid parameters.</p>
+<p>To handle a 400 error, you should display a message to the user explaining that the request could not be processed due to invalid input. Additionally, you can provide guidance on how to correct the input and resubmit the request.</p>
+<h2>500 (Internal Server Error) Error</h2>
+<p>The 500 error occurs when the server encounters an unexpected error that prevents it from fulfilling the user's request. This can happen for a variety of reasons, such as database errors, server configuration issues, or application bugs.</p>
+<p>To handle a 500 error, you should display a message to the user explaining that there was an error and that the problem is being investigated. Additionally, you should log the error on the server and provide information to the development team so that they can fix the problem.</p>
+<h2>503 (Service Unavailable) Error</h2>
+<p>The 503 error occurs when the server is temporarily unavailable due to maintenance or overload. This can happen when a website experiences a sudden surge in traffic or when the server is being updated.</p>
+<p>To handle a 503 error, you should display a message to the user explaining that the server is temporarily unavailable and provide an estimated time when it will be available again. Additionally, you can provide links to related resources or a button to retry the request once the server is back online.</p>
+<p>In conclusion, HTTP errors can be frustrating for users and can negatively impact the performance and reputation of your web application. By being prepared to handle these errors, you can provide a more positive user experience and minimize the impact of errors on your application.</p>
+<p>Remember to always provide clear and informative error messages, along with relevant links and suggestions for what users can do next. It's also important to log errors on the server and provide information to your development team so that they can identify and fix any underlying issues.</p>
+<p>By taking these steps, you can help ensure that your web application runs smoothly and that your users have a positive experience, even in the face of errors and other unexpected events.</p>
+<p>In the next post i will be showing how to fix or handle those errors, stay tuned!!!</p>]]></content:encoded>
+    </item>
+    <item>
+      <title><![CDATA[Axios Or Fetch]]></title>
+      <link>https://codewithgabo.com/axios-or-fetch</link>
+      <guid isPermaLink="true">https://codewithgabo.com/axios-or-fetch</guid>
+      <pubDate>Sun, 19 Feb 2023 01:30:00 GMT</pubDate>
+      <description><![CDATA[Consuming REST APIs is a fundamental part of building modern web applications. In React, several libraries are available to handle this task, including Fetch and Axios. They look almost identical in a]]></description>
+      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/abb06f27487e874f8563763076f344e2afa28155-1080x1080.png" alt="Axios Or Fetch" />
+<p>Consuming REST APIs is a fundamental part of building modern web applications. In React, several libraries are available to handle this task, including Fetch and Axios. They look almost identical in a simple example, which is why the choice feels arbitrary at first — but they behave differently in the exact places where beginners get stuck. Let's go through both, and then through the differences that actually matter.</p>
+<h2>Fetch</h2>
+<p>Fetch is a built-in browser API for making HTTP requests. It is a promise-based API, which means it returns a promise that resolves to a Response object when the request is complete.</p>
+<pre><code>import React, { useEffect, useState } from 'react';
+
+// eslint-disable-next-line no-unused-vars
+function TodoList() {
+  const [todos, setTodos] = useState([]);
+
+  useEffect(() =&gt; {
+    fetch('https://jsonplaceholder.typicode.com/todos')
+      .then(response =&gt; response.json())
+      .then(data =&gt; setTodos(data));
+  }, []);
+
+  return (
+    &lt;ul&gt;
+      {todos.map(todo =&gt; (
+        &lt;li key={todo.id}&gt;{todo.title}&lt;/li&gt;
+      ))}
+    &lt;/ul&gt;
+  );
+}</code></pre>
+<p>In the example above, we're using the useEffect hook to make the API call when the component mounts. We then use the <code>json()</code> method to convert the response to a JSON object, which we then set as the state of our component using the <code>setTodos</code> function.</p>
+<h2>Axios</h2>
+<p>Axios is a popular third-party library for making HTTP requests in JavaScript. It is also promise-based, and it provides a simple API for making requests and handling responses. You install it first with <code>npm install axios</code>.</p>
+<pre><code>import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+
+// eslint-disable-next-line no-unused-vars
+function TodoList() {
+  const [todos, setTodos] = useState([]);
+
+  useEffect(() =&gt; {
+    axios.get('https://jsonplaceholder.typicode.com/todos')
+      .then(response =&gt; setTodos(response.data));
+  }, []);
+
+  return (
+    &lt;ul&gt;
+      {todos.map(todo =&gt; (
+        &lt;li key={todo.id}&gt;{todo.title}&lt;/li&gt;
+      ))}
+    &lt;/ul&gt;
+  );
+}</code></pre>
+<p>In the example above, we're using the <code>get()</code> method of the Axios library to make the API call. We then use the <code>data</code> property of the response object to set the state of our component. Notice there is no <code>json()</code> step — Axios already parsed the body for you.</p>
+<h2>The difference that actually bites you: errors</h2>
+<p>This is the one I wish someone had told me on day one. <strong>Fetch does not reject on a 404 or a 500.</strong> As far as fetch is concerned, the server answered, so the promise resolves. Only a network failure (no connection, DNS error, CORS block) rejects it. That means a broken endpoint quietly flows into your success path, <code>response.json()</code> tries to parse an error page, and you end up debugging the wrong thing.</p>
+<p>You have to check <code>response.ok</code> yourself. The two snippets below are just the <code>useEffect</code> from the components above, with one extra piece of state alongside <code>todos</code> to hold the message:</p>
+<pre><code>const [error, setError] = useState(null);</code></pre>
+<pre><code>useEffect(() =&gt; {
+  fetch('https://jsonplaceholder.typicode.com/todos/999999')
+    .then(response =&gt; {
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data =&gt; setTodos(data))
+    .catch(error =&gt; setError(error.message));
+}, []);</code></pre>
+<p>Axios rejects on any non-2xx status by default, so the failure lands in <code>catch</code> where you expect it. The error object carries a <code>response</code> when the server replied, and doesn't when the request never got there:</p>
+<pre><code>useEffect(() =&gt; {
+  axios.get('https://jsonplaceholder.typicode.com/todos/999999')
+    .then(response =&gt; setTodos(response.data))
+    .catch(error =&gt; {
+      if (error.response) {
+        setError(`Request failed with status ${error.response.status}`);
+      } else {
+        setError(error.message);
+      }
+    });
+}, []);</code></pre>
+<p>Both are fine. Fetch just makes you opt in to the behaviour most people assumed they already had.</p>
+<h2>Cleaning up when the component unmounts</h2>
+<p>If the user navigates away before your request finishes, your <code>.then</code> still runs and calls <code>setTodos</code> on a component that no longer exists. The fix is an <code>AbortController</code> and a cleanup function returned from <code>useEffect</code>:</p>
+<pre><code>useEffect(() =&gt; {
+  const controller = new AbortController();
+
+  fetch('https://jsonplaceholder.typicode.com/todos', { signal: controller.signal })
+    .then(response =&gt; response.json())
+    .then(data =&gt; setTodos(data))
+    .catch(error =&gt; {
+      if (error.name === 'AbortError') return;
+      console.error(error);
+    });
+
+  return () =&gt; controller.abort();
+}, []);</code></pre>
+<p>Axios accepts the same <code>AbortController</code> signal in current versions:</p>
+<pre><code>useEffect(() =&gt; {
+  const controller = new AbortController();
+
+  axios.get('https://jsonplaceholder.typicode.com/todos', { signal: controller.signal })
+    .then(response =&gt; setTodos(response.data))
+    .catch(error =&gt; {
+      if (axios.isCancel(error)) return;
+      console.error(error);
+    });
+
+  return () =&gt; controller.abort();
+}, []);</code></pre>
+<p>The aborted request throws, so remember to swallow that specific error instead of showing it to the user.</p>
+<h2>Timeouts</h2>
+<p>Neither one waits forever by default in a useful way. Axios has a <code>timeout</code> option in milliseconds:</p>
+<pre><code>axios.get('https://jsonplaceholder.typicode.com/todos', { timeout: 5000 })
+  .then(response =&gt; console.log(response.data))
+  .catch(error =&gt; {
+    if (error.code === 'ECONNABORTED') {
+      console.log('The request timed out');
+    }
+  });</code></pre>
+<p>Fetch has no option, but you can pass <code>AbortSignal.timeout()</code> as the signal:</p>
+<pre><code>fetch('https://jsonplaceholder.typicode.com/todos', { signal: AbortSignal.timeout(5000) })
+  .then(response =&gt; response.json())
+  .then(data =&gt; console.log(data))
+  .catch(error =&gt; {
+    if (error.name === 'TimeoutError') {
+      console.log('The request timed out');
+    }
+  });</code></pre>
+<h2>Sending data</h2>
+<p>With fetch you serialise the body and set the header yourself. Forget the <code>Content-Type</code> and many APIs will reject the request:</p>
+<pre><code>fetch('https://jsonplaceholder.typicode.com/todos', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ title: 'Write a blog post', completed: false })
+})
+  .then(response =&gt; response.json())
+  .then(data =&gt; console.log(data));</code></pre>
+<p>Axios does both for you when you hand it a plain object:</p>
+<pre><code>axios.post('https://jsonplaceholder.typicode.com/todos', {
+  title: 'Write a blog post',
+  completed: false
+}).then(response =&gt; console.log(response.data));</code></pre>
+<h2>Instances and interceptors</h2>
+<p>This is the real reason teams reach for Axios once an app grows. You create one configured client and every call inherits the base URL, the timeout, and the auth header — and you write the &quot;token expired, log the user out&quot; logic once instead of in every component.</p>
+<pre><code>// src/api/client.js
+import axios from 'axios';
+
+const client = axios.create({
+  baseURL: 'https://jsonplaceholder.typicode.com',
+  timeout: 5000,
+  headers: { 'Content-Type': 'application/json' }
+});
+
+client.interceptors.request.use(config =&gt; {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+client.interceptors.response.use(
+  response =&gt; response,
+  error =&gt; {
+    if (error.response &amp;&amp; error.response.status === 401) {
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
+export default client;</code></pre>
+<p>Your components then import that file instead of Axios directly:</p>
+<pre><code>import client from '../api/client';
+
+// inside useEffect
+client.get('/todos').then(response =&gt; setTodos(response.data));</code></pre>
+<p>You can build the same thing on top of fetch — it's just a wrapper function you write and maintain yourself.</p>
+<h2>So which one should you pick</h2>
+<p>For a small app with a handful of requests, use fetch. It's built into every modern browser and into recent versions of Node, it's zero bytes of dependency, and the only tax is remembering to check <code>response.ok</code>.</p>
+<p>Reach for Axios once you have auth headers on every call, refresh-token logic, a dozen endpoints, or a team that will otherwise each invent their own wrapper. Paying for a dependency to delete that duplication is a good trade.</p>
+<p>Two honest limits. First, Axios is a dependency you have to keep updated, and if you only ever make two GET requests it's weight you don't need. Second — and more important — neither of these solves caching, request deduplication, refetching on focus, or loading and error state. If you find yourself writing the same <code>useState</code> trio in every component, the answer isn't switching HTTP clients; it's a data-fetching library like React Query or SWR, which sits on top of either one.</p>]]></content:encoded>
+    </item>
+    <item>
+      <title><![CDATA[Tailwind CSS]]></title>
+      <link>https://codewithgabo.com/tailwind-css</link>
+      <guid isPermaLink="true">https://codewithgabo.com/tailwind-css</guid>
+      <pubDate>Fri, 10 Feb 2023 20:05:00 GMT</pubDate>
+      <description><![CDATA[Having trouble with CSS? Try Tailwind. Are you tired of writing countless lines of CSS to style your web pages, only to end up with messy, hard-to-maintain code? Or perhaps you're just starting out wi]]></description>
+      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/915392f6454e0d8235f6e62064722238633927a4-1080x1080.png" alt="Tailwind CSS" />
+<p>Having trouble with CSS? Try Tailwind.</p>
+<p>Are you tired of writing countless lines of CSS to style your web pages, only to end up with messy, hard-to-maintain code? Or perhaps you're just starting out with web development and feeling overwhelmed by the complexity of CSS? If so, you might want to consider giving Tailwind CSS a try.</p>
+<p>Tailwind is a utility-first CSS framework. Instead of giving you components like <code>.btn</code> or <code>.card</code>, it gives you hundreds of tiny single-purpose classes — <code>p-4</code>, <code>text-sm</code>, <code>flex</code>, <code>rounded-xl</code> — and you compose them directly in your markup. That sentence is easy to say and hard to picture, so the rest of this post is one small component built both ways.</p>
+<h2>The same card, twice</h2>
+<p>Here's a card: an image, a title, a paragraph, a link. First the way most of us learned to write it.</p>
+<pre><code>&lt;article class=&quot;card&quot;&gt;
+  &lt;img class=&quot;card__image&quot; src=&quot;/coffee.jpg&quot; alt=&quot;A cup of cold brew on a wooden table&quot;&gt;
+  &lt;div class=&quot;card__body&quot;&gt;
+    &lt;h2 class=&quot;card__title&quot;&gt;Cold brew, at home&lt;/h2&gt;
+    &lt;p class=&quot;card__text&quot;&gt;Twelve hours, a jar, and coarse ground coffee. That's the whole recipe.&lt;/p&gt;
+    &lt;a class=&quot;card__link&quot; href=&quot;/recipes/cold-brew&quot;&gt;Read the recipe&lt;/a&gt;
+  &lt;/div&gt;
+&lt;/article&gt;</code></pre>
+<p>And the stylesheet that makes it real:</p>
+<pre><code>.card {
+  max-width: 20rem;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+}
+
+.card__image {
+  display: block;
+  width: 100%;
+  height: 10rem;
+  object-fit: cover;
+}
+
+.card__body { padding: 1rem; }
+
+.card__title {
+  margin: 0 0 0.5rem;
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.card__text {
+  margin: 0 0 1rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: #4b5563;
+}
+
+.card__link {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  background-color: #2563eb;
+  color: #ffffff;
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+
+.card__link:hover { background-color: #1d4ed8; }</code></pre>
+<p>Nothing is wrong with that code. But notice what it costs: six class names you had to invent, a naming convention you have to remember, a second file you have to keep in sync with the first, and — the part that actually hurts six months later — no way to tell from the HTML what any of it looks like.</p>
+<p>Now the same card in Tailwind:</p>
+<pre><code>&lt;article class=&quot;max-w-xs overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm&quot;&gt;
+  &lt;img class=&quot;block h-40 w-full object-cover&quot; src=&quot;/coffee.jpg&quot; alt=&quot;A cup of cold brew on a wooden table&quot;&gt;
+  &lt;div class=&quot;p-4&quot;&gt;
+    &lt;h2 class=&quot;mb-2 text-lg font-semibold text-gray-900&quot;&gt;Cold brew, at home&lt;/h2&gt;
+    &lt;p class=&quot;mb-4 text-sm text-gray-600&quot;&gt;Twelve hours, a jar, and coarse ground coffee. That's the whole recipe.&lt;/p&gt;
+    &lt;a href=&quot;/recipes/cold-brew&quot;
+       class=&quot;inline-block rounded-md bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700&quot;&gt;
+      Read the recipe
+    &lt;/a&gt;
+  &lt;/div&gt;
+&lt;/article&gt;</code></pre>
+<p>Same card — near enough. The hex values above are v3-era approximations of v4's palette, which is defined in <code>oklch</code> and renders a slightly different blue. No stylesheet, no invented names, nothing to keep in sync.</p>
+<p>To run it you need the build step wired up, not just the import. On a Vite project — which is how this site is set up — that means installing <code>tailwindcss</code> and <code>@tailwindcss/vite</code>, adding <code>tailwindcss()</code> to the <code>plugins</code> array in <code>vite.config.ts</code>, and then putting one line at the top of your CSS file:</p>
+<pre><code>@import &quot;tailwindcss&quot;;</code></pre>
+<h2>So what does &quot;utility-first&quot; actually mean</h2>
+<p>Look at <code>p-4</code>. It is a class whose entire definition is <code>padding: 1rem</code>. That's it. <code>text-sm</code> sets a font size and a line height. <code>rounded-md</code> sets a border radius. Every class does one thing and its name tells you which thing.</p>
+<p>Because each class is a fixed, self-contained rule, three things follow:</p>
+<ul>
+<li><strong>The styles live in the markup, which is where you're already looking.</strong> You read <code>mb-4 text-sm text-gray-600</code> and you know exactly what that paragraph looks like without opening another file.</li>
+<li><strong>You stop naming things.</strong> Naming is genuinely one of the hardest parts of CSS, and utilities delete the problem. There is no <code>.card__body--compact</code> to argue about.</li>
+<li><strong>Deleting an element deletes its styles.</strong> No orphaned rules accumulating in a stylesheet nobody dares to clean up.</li>
+</ul>
+<p>The values aren't arbitrary either. <code>p-1</code> through <code>p-8</code> walk a consistent spacing scale, so a page built out of utilities tends to look coherent almost by accident.</p>
+<h2>Responsive, hover, focus, dark mode</h2>
+<p>This is the part I would miss most if I stopped using it. Any utility takes a prefix, and the prefix is the condition:</p>
+<pre><code>&lt;article class=&quot;max-w-xs overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm
+                md:flex md:max-w-2xl
+                dark:border-gray-800 dark:bg-gray-900&quot;&gt;
+  &lt;img class=&quot;block h-40 w-full object-cover md:h-auto md:w-48&quot;
+       src=&quot;/coffee.jpg&quot; alt=&quot;A cup of cold brew on a wooden table&quot;&gt;
+  &lt;div class=&quot;p-4&quot;&gt;
+    &lt;h2 class=&quot;mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100&quot;&gt;Cold brew, at home&lt;/h2&gt;
+    &lt;p class=&quot;mb-4 text-sm text-gray-600 dark:text-gray-400&quot;&gt;Twelve hours, a jar, and coarse ground coffee.&lt;/p&gt;
+    &lt;a href=&quot;/recipes/cold-brew&quot;
+       class=&quot;inline-block rounded-md bg-blue-600 px-4 py-2 text-sm text-white
+              hover:bg-blue-700
+              focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900
+              dark:bg-blue-500 dark:hover:bg-blue-400&quot;&gt;
+      Read the recipe
+    &lt;/a&gt;
+  &lt;/div&gt;
+&lt;/article&gt;</code></pre>
+<p><code>md:flex</code> means &quot;flex, from the medium breakpoint up&quot;. <code>hover:bg-blue-700</code> means &quot;this background, on hover&quot;. <code>dark:bg-gray-900</code> follows the reader's system theme by default. No media queries, no pseudo-class selectors, no jumping between files to check which breakpoint you used.</p>
+<h2>Customising the design tokens</h2>
+<p>You are not stuck with Tailwind's defaults. In Tailwind v4, configuration moved into your CSS file as an <code>@theme</code> block:</p>
+<pre><code>@import &quot;tailwindcss&quot;;
+
+@theme {
+  --color-brand: oklch(58% 0.11 180);
+  --color-brand-dark: oklch(48% 0.10 180);
+  --font-display: &quot;Inter&quot;, ui-sans-serif, system-ui, sans-serif;
+  --radius-card: 0.75rem;
+}</code></pre>
+<p>Those variables generate classes. <code>--color-brand</code> gives you <code>bg-brand</code>, <code>text-brand</code>, <code>border-brand</code>; <code>--font-display</code> gives you <code>font-display</code>; <code>--radius-card</code> gives you <code>rounded-card</code>. So the link becomes:</p>
+<pre><code>&lt;a href=&quot;/recipes/cold-brew&quot;
+   class=&quot;inline-block rounded-card bg-brand px-4 py-2 font-display text-sm text-white hover:bg-brand-dark&quot;&gt;
+  Read the recipe
+&lt;/a&gt;</code></pre>
+<p>One note if you're reading older tutorials: projects still on Tailwind v3 configure all of this in a <code>tailwind.config.js</code> file instead, and that file is not how v4 works.</p>
+<h2>&quot;But now my markup is ugly&quot;</h2>
+<p>This is the honest complaint about Tailwind and it deserves an honest answer: yes, a long class list is ugly, and the fix is not a shorter class list — it's fewer copies of it.</p>
+<p>If you're writing that card once, leave it inline. If you're writing it twenty times, extract a component. In React:</p>
+<pre><code>export function Card({ image, alt, title, href, children }) {
+  return (
+    &lt;article className=&quot;max-w-xs overflow-hidden rounded-card border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900&quot;&gt;
+      &lt;img className=&quot;block h-40 w-full object-cover&quot; src={image} alt={alt} /&gt;
+      &lt;div className=&quot;p-4&quot;&gt;
+        &lt;h2 className=&quot;mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100&quot;&gt;{title}&lt;/h2&gt;
+        &lt;p className=&quot;mb-4 text-sm text-gray-600 dark:text-gray-400&quot;&gt;{children}&lt;/p&gt;
+        &lt;a
+          href={href}
+          className=&quot;inline-block rounded-md bg-brand px-4 py-2 text-sm text-white hover:bg-brand-dark&quot;
+        &gt;
+          Read the recipe
+        &lt;/a&gt;
+      &lt;/div&gt;
+    &lt;/article&gt;
+  );
+}</code></pre>
+<p>Now the ugly class list exists in exactly one place, and every usage reads <code>&lt;Card title=&quot;Cold brew, at home&quot; ... /&gt;</code>. That's better than a CSS class would have been, because the structure is reused too, not just the styles.</p>
+<p>Tailwind also has an <code>@apply</code> directive that folds utilities into a regular CSS class. It works, and it's the right tool when you can't create a component — but reach for a component first. <code>@apply</code> quietly reintroduces the naming problem and the second file you were trying to escape.</p>
+<h2>When Tailwind is the wrong choice</h2>
+<p>I use Tailwind on most things I build, but &quot;most&quot; is not &quot;all&quot;.</p>
+<ul>
+<li><strong>A tiny static page.</strong> If you're styling one landing page with forty lines of CSS, a build step and a new vocabulary are more overhead than the CSS you're avoiding. Just write the CSS.</li>
+<li><strong>A team that already has a working design system.</strong> If your company ships a component library people are happy with, replacing it with utilities is a large migration in exchange for a smaller win than you think.</li>
+<li><strong>Markup you can't easily edit.</strong> Utility-first assumes you control the HTML. If your output comes from a CMS's rich text, a third-party widget, or an email template, you can't sprinkle classes onto elements you never see — that's a job for regular CSS selectors.</li>
+<li><strong>A project where nobody will learn the class names.</strong> Tailwind has a real learning curve, and its payoff is fluency. If you're handing the project to someone who'll fight the vocabulary for the rest of its life, you've made their job harder, not easier.</li>
+</ul>
+<p>If you're new to Tailwind, its syntax will feel overwhelming at first — I found the same thing. But once you get the hang of it, it's a much more direct way to write CSS, and the card above is the reason why: everything that card looks like is right there in the file you're already reading.</p>]]></content:encoded>
+    </item>
+  </channel>
+</rss>
