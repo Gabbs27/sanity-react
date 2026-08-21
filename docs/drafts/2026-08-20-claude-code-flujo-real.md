@@ -46,7 +46,7 @@ Suena a burocracia y al principio lo pensé. No lo es. El plan escrito es lo que
 
 ### La auditoría del portfolio
 
-Le pedí que auditara este sitio como si fuera de un cliente. Leer cada componente público, recorrer las rutas en móvil y escritorio, medir el tamaño de los chunks del build, contar los posts reales en Sanity.
+Le pedí que auditara este sitio como si fuera de un cliente. Leer cada componente público, recorrer las rutas en celular y escritorio, medir el tamaño de los chunks del build, contar los posts reales en Sanity.
 
 Salieron **20 hallazgos en cuatro áreas**, cada uno con prioridad y esfuerzo estimado. Entre ellos: una ilustración de 993 KB sin optimizar, un sitemap con cero posts de nueve publicados, y una página 404 que se quedaba colgada para siempre en "Loading post...".
 
@@ -89,7 +89,7 @@ Aquí es donde la mayoría de estos artículos se ponen borrosos. Vamos al grano
 Si quieres probar sin quemarte:
 
 1. **Empieza por una tarea aburrida y bien definida.** Migrar un formato, escribir tests de algo que ya existe, actualizar dependencias. No empieces por la funcionalidad estrella de tu producto.
-2. **Pide un plan antes que código.** Aunque la tarea sea pequeña. Leer el plan te dice en treinta segundos si os habéis entendido, y corregir un plan es gratis comparado con corregir una implementación.
+2. **Pide un plan antes que código.** Aunque la tarea sea pequeña. Leer el plan te dice en treinta segundos si se entendieron, y corregir un plan es gratis comparado con corregir una implementación.
 3. **Trabaja en una rama o en un worktree.** Para poder tirarlo todo sin pensarlo si se tuerce.
 4. **Lee los diffs.** Enteros. Si no vas a leerlos, no delegues.
 5. **Deja el contexto por escrito en el repositorio.** Las decisiones que viven solo en una conversación se pierden. Las que viven en `docs/plans/` siguen ahí en tres meses, cuando ya no te acuerdes de por qué elegiste eso.
