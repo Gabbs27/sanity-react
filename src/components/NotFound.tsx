@@ -12,6 +12,7 @@ export default function NotFound() {
         title="Page Not Found - 404"
         description="The page you're looking for doesn't exist on codewithgabo.com."
         url="https://codewithgabo.com/404"
+        noindex
       />
       <main className="min-h-screen flex items-center justify-center p-12">
         <AnimatedSection variant="fadeInUp" duration={0.6}>

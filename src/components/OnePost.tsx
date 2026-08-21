@@ -98,7 +98,7 @@ const OnePost = () => {
         title={postData.title}
         description={postData.title}
         keywords="blog post, article, tutorial, web development"
-        url={`https://codewithgabo.com/#/${slug}`}
+        url={`https://codewithgabo.com/${slug}`}
       />
       <AnimatedSection variant="fadeInUp" duration={0.6}>
         <article className='single-post'>

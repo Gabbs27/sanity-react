@@ -67,7 +67,7 @@ const Repos = () => {
         title="Repositories - GitHub Projects"
         description="Explore Gabriel Abreu's GitHub repositories showcasing diverse development skills across various projects and technologies."
         keywords="GitHub repositories, open source projects, code portfolio, development projects"
-        url="https://codewithgabo.com/#/repositorios"
+        url="https://codewithgabo.com/repositorios"
       />
       <div className='min-h-screen p-12'>
         <section className='container mx-auto py-12'>
