@@ -67,8 +67,8 @@ const Terms = () => {
               <p>
                 The site may serve ads via <strong>Google AdSense</strong>. Ad
                 content is selected by Google and is not endorsed by the site.
-                European, UK, and Swiss visitors see a Google CMP consent banner;
-                see the{" "}
+                Once ads are enabled, European, UK, and Swiss visitors will be shown
+                Google&rsquo;s consent message; see the{" "}
                 <a className="underline" href="/privacy">Privacy Policy</a> for cookie
                 details and consent controls.
               </p>
