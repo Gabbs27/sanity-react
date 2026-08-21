@@ -69,7 +69,7 @@ const Repos = () => {
         keywords="GitHub repositories, open source projects, code portfolio, development projects"
         url="https://codewithgabo.com/repositorios"
       />
-      <div className='min-h-screen p-12'>
+      <div className='min-h-screen p-4 sm:p-8 md:p-12'>
         <section className='container mx-auto py-12'>
           <ReposGreeting />
 
