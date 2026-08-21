@@ -22,7 +22,16 @@ export default function AllPosts() {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
-  const postsPerPage = 6;
+  // Every post has to be reachable by following links, not just listed in the
+  // sitemap. Paging at 6 with <button> controls that never change the URL left
+  // 8 of 14 posts with zero inbound links anywhere on the site — including four
+  // that had just been rewritten — and a URL that nothing links to is crawled
+  // last and often not indexed at all.
+  //
+  // At 14 posts the whole archive fits on one page, so the pagination below
+  // simply never renders. Past this number it has to become real <Link> hrefs
+  // (/allpost/page/2) rather than buttons.
+  const postsPerPage = 24;
   const indexOfLastPost = currentPage * postsPerPage;
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
   const filteredPosts = allPostsData.filter((post) =>
