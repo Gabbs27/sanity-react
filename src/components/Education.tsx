@@ -1,8 +1,10 @@
 
 import { educationData } from "../assets/educationData";
 import SEO from "./common/SEO";
+import usePageTracking from "../hooks/useAnalytics";
 
 const Education = () => {
+  usePageTracking();
   return (
     <>
       <SEO

@@ -7,7 +7,12 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-76H28FJYRY');
+      // send_page_view is off because this is a single-page app: gtag would
+      // only ever report the first URL, and every client-side navigation would
+      // go unmeasured. usePageTracking owns page_view instead, so it fires on
+      // the first load and on every route change. Leaving both on double-counts
+      // the landing page.
+      gtag('config', 'G-76H28FJYRY', { send_page_view: false });
     </script>
     <meta charset="utf-8" />
     <link rel="icon" href="/favicon.ico" sizes="any" />
