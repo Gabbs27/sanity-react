@@ -24,9 +24,9 @@ export const ADSENSE_CLIENT_ID = 'ca-pub-2464529747764309'
  */
 export const AD_SLOTS = {
   /** In-article unit, placed a third of the way into a post body. */
-  inArticle: '',
+  inArticle: '2970675007',
   /** Display unit, between the post body and the newsletter CTA. */
-  endOfPost: '',
+  endOfPost: '9344511662',
 } as const
 
 /** AdSense ad unit IDs are numeric. Anything else will never fill. */
