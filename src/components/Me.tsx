@@ -18,7 +18,7 @@ const Me = () => {
         keywords="contact Gabriel Abreu, hire developer, web development services, collaboration"
         url="https://codewithgabo.com/gabriel-abreu"
       />
-      <div className='min-h-screen p-12 bg-background'>
+      <div className='min-h-screen p-4 sm:p-8 md:p-12 bg-background'>
         <div className='container mx-auto'>
           <AnimatedSection variant="fadeInUp" duration={0.6}>
             <article className='contact-container'>

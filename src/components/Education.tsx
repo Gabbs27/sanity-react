@@ -10,7 +10,7 @@ const Education = () => {
         description="Gabriel Abreu's academic background, degrees and certifications in software engineering and web development."
         url="https://codewithgabo.com/education"
       />
-    <div className='min-h-screen p-12'>
+    <div className='min-h-screen p-4 sm:p-8 md:p-12'>
       <div className='container mx-auto py-12'>
         <h1 className='text-4xl font-bold mb-8'>Education</h1>
         <div className='grid md:grid-cols-2 gap-8'>

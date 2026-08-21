@@ -16,7 +16,16 @@ body {
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1.5rem;
+  /* 1.5rem each side stacked on top of the page wrapper's own padding, which
+     left ~214px of usable width on a 390px phone and pushed the layout wider
+     than the viewport. */
+  padding: 0 1rem;
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding: 0 1.5rem;
+  }
 }
 
 /* Modern Button Styles */

@@ -14,7 +14,7 @@ const About = () => {
         keywords="About Gabriel Abreu, developer bio, full stack developer background"
         url="https://codewithgabo.com/about"
       />
-      <div className='min-h-screen p-12 bg-background'>
+      <div className='min-h-screen p-4 sm:p-8 md:p-12 bg-background'>
         <div className='container mx-auto'>
           <AnimatedSection variant="fadeInUp" duration={0.6}>
             <article className='about-container'>

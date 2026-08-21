@@ -65,7 +65,7 @@ export default function AllPosts() {
         keywords="web development blog, React tutorials, programming articles, tech blog"
         url="https://codewithgabo.com/allpost"
       />
-      <div className='min-h-screen p-12'>
+      <div className='min-h-screen p-4 sm:p-8 md:p-12'>
         <section className='container mx-auto py-12'>
           <PostGreeting />
 

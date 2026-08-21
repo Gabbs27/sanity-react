@@ -136,6 +136,20 @@
 }
 
 @media (max-width: 480px) {
+  /* The bar is a non-wrapping flex row: a 1.75rem logo plus 3rem of container
+     padding, the theme toggle and the menu button added up to more than a
+     390px phone, so the whole document ended up wider than the viewport and
+     every page rendered clipped on the right. */
+  .nav-container {
+    padding: 0.75rem 1rem;
+    gap: 0.5rem;
+  }
+
+  .nav-logo {
+    font-size: 1.25rem;
+    letter-spacing: -0.25px;
+  }
+
   .valentine-nav-flowers {
     font-size: 0.9rem;
     letter-spacing: 0.15rem;

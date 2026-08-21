@@ -60,7 +60,7 @@ const Portfolio = () => {
         keywords="React projects, web development portfolio, TypeScript applications, full stack projects"
         url="https://codewithgabo.com/"
       />
-      <div className='min-h-screen p-12'>
+      <div className='min-h-screen p-4 sm:p-8 md:p-12'>
         <Greeting />
         <div className='container mx-auto'>
           <AnimatedSection variant="fadeIn" duration={0.6}>
