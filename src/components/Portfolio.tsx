@@ -55,7 +55,10 @@ const Portfolio = () => {
   return (
     <>
       <SEO
-        title="Portfolio - Projects & Work"
+        // Matches the <title> in index.html verbatim. They used to differ, so the
+        // home page painted the static title and then swapped it for a worse one
+        // that led with "Portfolio" and pushed the name to the end.
+        title="Gabriel Abreu — Full Stack Developer | Code With Gabo"
         description="Explore Gabriel Abreu's portfolio featuring modern web applications built with React, TypeScript, and cutting-edge technologies."
         keywords="React projects, web development portfolio, TypeScript applications, full stack projects"
         url="https://codewithgabo.com/"
