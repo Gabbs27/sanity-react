@@ -1,7 +1,17 @@
-import { Helmet } from "react-helmet-async";
+import { useEffect } from "react";
 
 /**
- * SEO Component - Manejo de meta tags dinámicos para mejor SEO
+ * SEO Component — per-page meta tags.
+ *
+ * Writes the tags imperatively instead of rendering them.
+ *
+ * The previous implementation used react-helmet-async, which does not work
+ * under React 19: every route shipped the index.html title and canonical, so
+ * Google saw 23 URLs all declaring themselves the homepage. React 19 can hoist
+ * <title>/<meta>/<link> natively, but hoisting *appends* — it would leave two
+ * of each, since index.html already ships a default set for crawlers that
+ * don't run JS. Upserting by selector guarantees exactly one of each tag and
+ * updates cleanly on every route change.
  */
 
 interface SEOProps {
@@ -12,6 +22,28 @@ interface SEOProps {
   image?: string;
   url?: string;
   type?: string;
+  /** Keep a page out of the index (admin, auth, 404). */
+  noindex?: boolean;
+}
+
+function upsertMeta(attr: "name" | "property", key: string, content: string) {
+  let el = document.head.querySelector<HTMLMetaElement>(`meta[${attr}="${key}"]`);
+  if (!el) {
+    el = document.createElement("meta");
+    el.setAttribute(attr, key);
+    document.head.appendChild(el);
+  }
+  el.setAttribute("content", content);
+}
+
+function upsertLink(rel: string, href: string) {
+  let el = document.head.querySelector<HTMLLinkElement>(`link[rel="${rel}"]`);
+  if (!el) {
+    el = document.createElement("link");
+    el.setAttribute("rel", rel);
+    document.head.appendChild(el);
+  }
+  el.setAttribute("href", href);
 }
 
 const SEO = ({
@@ -22,42 +54,37 @@ const SEO = ({
   image = "https://codewithgabo.com/og-image.png",
   url = "https://codewithgabo.com",
   type = "website",
+  noindex = false,
 }: SEOProps) => {
   const siteTitle = title.includes("Gabriel Abreu")
     ? title
     : `${title} | Gabriel Abreu`;
 
-  return (
-    <Helmet>
-      {/* Primary Meta Tags */}
-      <title>{siteTitle}</title>
-      <meta name="title" content={siteTitle} />
-      <meta name="description" content={description} />
-      <meta name="keywords" content={keywords} />
-      <meta name="author" content={author} />
+  useEffect(() => {
+    document.title = siteTitle;
 
-      {/* Open Graph / Facebook */}
-      <meta property="og:type" content={type} />
-      <meta property="og:url" content={url} />
-      <meta property="og:title" content={siteTitle} />
-      <meta property="og:description" content={description} />
-      <meta property="og:image" content={image} />
-      <meta property="og:site_name" content="Code With Gabo" />
+    upsertMeta("name", "description", description);
+    upsertMeta("name", "keywords", keywords);
+    upsertMeta("name", "author", author);
+    upsertMeta("name", "robots", noindex ? "noindex, nofollow" : "index, follow");
 
-      {/* Twitter */}
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:url" content={url} />
-      <meta name="twitter:title" content={siteTitle} />
-      <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={image} />
+    upsertMeta("property", "og:type", type);
+    upsertMeta("property", "og:url", url);
+    upsertMeta("property", "og:title", siteTitle);
+    upsertMeta("property", "og:description", description);
+    upsertMeta("property", "og:image", image);
+    upsertMeta("property", "og:site_name", "Code With Gabo");
 
-      {/* Additional SEO */}
-      <link rel="canonical" href={url} />
-      <meta name="robots" content="index, follow" />
-      <meta name="language" content="English" />
-      <meta name="revisit-after" content="7 days" />
-    </Helmet>
-  );
+    upsertMeta("name", "twitter:card", "summary_large_image");
+    upsertMeta("name", "twitter:url", url);
+    upsertMeta("name", "twitter:title", siteTitle);
+    upsertMeta("name", "twitter:description", description);
+    upsertMeta("name", "twitter:image", image);
+
+    upsertLink("canonical", url);
+  }, [siteTitle, description, keywords, author, image, url, type, noindex]);
+
+  return null;
 };
 
 export default SEO;

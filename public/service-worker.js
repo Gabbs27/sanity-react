@@ -16,7 +16,7 @@
  * so a single deploy invalidates every visitor's stale cache.
  */
 
-const CACHE_VERSION = 'v3';
+const CACHE_VERSION = 'v4';
 const STATIC_CACHE = `codewithgabo-static-${CACHE_VERSION}`;
 const HTML_CACHE = `codewithgabo-html-${CACHE_VERSION}`;
 
@@ -76,10 +76,16 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(request)
         .then((response) => {
-          const copy = response.clone();
-          caches.open(HTML_CACHE).then((cache) => {
-            cache.put(request, copy).catch(() => {});
-          });
+          // Only cache successful documents. This branch used to cache the
+          // response whatever its status, so while GitHub Pages answered every
+          // deep link with a 404, returning visitors had those 404 bodies
+          // pinned and kept seeing them after the route was fixed.
+          if (response.ok) {
+            const copy = response.clone();
+            caches.open(HTML_CACHE).then((cache) => {
+              cache.put(request, copy).catch(() => {});
+            });
+          }
           return response;
         })
         .catch(() =>

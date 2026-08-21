@@ -63,6 +63,8 @@ const AdminLogin = () => {
       <SEO
         title="Admin Login"
         description="Admin login page for dashboard access"
+        url="https://codewithgabo.com/admin-login"
+        noindex
       />
 
       <div className="admin-login">

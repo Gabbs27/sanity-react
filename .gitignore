@@ -28,3 +28,6 @@ yarn-error.log*
 
 # Local tooling state (Claude Code, IDE, etc.)
 .claude/
+
+# Generated post cover rasters
+scripts/covers/out/

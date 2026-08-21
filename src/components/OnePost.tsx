@@ -7,6 +7,7 @@ import SEO from "./common/SEO";
 import LoadingSpinner from "./common/LoadingSpinner";
 import NewsletterSignup from "./Newsletter/NewsletterSignup";
 import AdSlot from "./Ads/AdSlot";
+import { AD_SLOTS } from "../config/adsense";
 import NotFound from "./NotFound";
 import "./OnePost.css";
 import usePageTracking from "../hooks/useAnalytics";
@@ -123,7 +124,7 @@ const OnePost = () => {
         title={postData.title}
         description={postData.title}
         keywords="blog post, article, tutorial, web development"
-        url={`https://codewithgabo.com/#/${slug}`}
+        url={`https://codewithgabo.com/${slug}`}
       />
       <AnimatedSection variant="fadeInUp" duration={0.6}>
         <article className='single-post'>
@@ -175,7 +176,7 @@ const OnePost = () => {
                   value={postData.body.slice(0, 3)}
                   components={portableTextComponents}
                 />
-                <AdSlot slotId="in-article-1" format="fluid" layout="in-article" />
+                <AdSlot slotId={AD_SLOTS.inArticle} format="fluid" layout="in-article" />
                 <PortableText
                   value={postData.body.slice(3)}
                   components={portableTextComponents}
@@ -190,7 +191,7 @@ const OnePost = () => {
           </div>
 
           {/* End-of-post ad — between content and the newsletter CTA. */}
-          <AdSlot slotId="end-of-post-1" format="auto" />
+          <AdSlot slotId={AD_SLOTS.endOfPost} format="auto" />
 
           <NewsletterSignup variant="inline" />
         </article>
