@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import sanityClient, { urlFor } from "../client";
 import { PortableText } from "@portabletext/react";
 import AnimatedSection from "./common/AnimatedSection";
@@ -14,6 +14,12 @@ import usePageTracking from "../hooks/useAnalytics";
 
 import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
 import { nightOwl } from "react-syntax-highlighter/dist/esm/styles/hljs";
+interface RelatedPost {
+  title: string;
+  slug: { current: string };
+  mainImage?: { asset: { url: string } };
+}
+
 interface SanityPostData {
   title: string;
   slug: { current: string };
@@ -96,6 +102,7 @@ const OnePost = () => {
   usePageTracking();
   const [postData, setPostData] = useState<SanityPostData | null>(null);
   const [notFound, setNotFound] = useState(false);
+  const [related, setRelated] = useState<RelatedPost[]>([]);
   const { slug } = useParams();
 
   useEffect(() => {
@@ -129,6 +136,25 @@ const OnePost = () => {
         }
       })
       .catch(() => setNotFound(true));
+  }, [slug]);
+
+  // Every post links to three others. Without this the only path between posts
+  // was /allpost, so a reader who finished an article had nowhere to go — and
+  // crawlers had no route between them either.
+  useEffect(() => {
+    if (!slug) return;
+    sanityClient
+      .fetch(
+        `*[_type == "post" && slug.current != $slug && defined(slug.current)]
+          | order(publishedAt desc)[0...3]{
+            title,
+            slug,
+            mainImage{asset->{url}}
+          }`,
+        { slug }
+      )
+      .then((data: RelatedPost[]) => setRelated(data || []))
+      .catch(() => setRelated([]));
   }, [slug]);
 
   if (notFound) return <NotFound />;
@@ -216,6 +242,33 @@ const OnePost = () => {
 
           {/* End-of-post ad — between content and the newsletter CTA. */}
           <AdSlot slotId={AD_SLOTS.endOfPost} format="auto" />
+
+          {related.length > 0 && (
+            <section className='post-related'>
+              <h2 className='post-related__title'>Sigue leyendo</h2>
+              <div className='post-related__grid'>
+                {related.map((r) => (
+                  <Link
+                    key={r.slug.current}
+                    to={`/${r.slug.current}`}
+                    className='post-related__card'>
+                    {r.mainImage?.asset?.url && (
+                      <img
+                        src={r.mainImage.asset.url}
+                        alt=""
+                        loading="lazy"
+                        className='post-related__img'
+                      />
+                    )}
+                    <span className='post-related__name'>{r.title}</span>
+                  </Link>
+                ))}
+              </div>
+              <Link to='/allpost' className='post-related__all'>
+                Ver todos los posts &rarr;
+              </Link>
+            </section>
+          )}
 
           <NewsletterSignup variant="inline" />
         </article>
