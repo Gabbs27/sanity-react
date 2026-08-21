@@ -13,5 +13,23 @@
   width: 100%;
 }
 
-/* In dev environments where AdSense isn't loaded, the .ad-slot wrapper
-   never renders (component returns null). No fallback styles needed. */
+/* AdSense requires ad units to be labelled, and the label must not be
+   mistakable for site content. */
+.ad-slot__label {
+  display: block;
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary, #94a3b8);
+  margin-bottom: 0.375rem;
+}
+
+/* An unfilled slot is normal — new ad units take hours to start filling, and
+   no-fill happens routinely afterwards. Without this the reserved band plus
+   its margins leave ~164px of blank space mid-article every time. */
+.ad-slot[data-ad-state='unfilled'],
+.ad-slot[data-ad-state='no-response'] {
+  display: none;
+  min-height: 0;
+  margin: 0;
+}
