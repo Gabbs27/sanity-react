@@ -254,10 +254,15 @@ const OnePost = () => {
                 extra cost to you. It helps keep this blog running — thank you.
               </aside>
             )}
-            {/* In-article ad: split the body so AdSense can place a slot
-                roughly a third of the way through. Falls back to a single
-                <PortableText> render when the body is too short to split
-                cleanly (under 4 blocks). */}
+            {/* In-article ad after the first three blocks — three paragraphs
+                in, roughly 400px into the body regardless of post length.
+                This used to claim "a third of the way through", which the
+                fixed slice(0, 3) never did: the shortest post has 28 blocks
+                and the longest 107, so the cut lands between 3% and 11%.
+                Three paragraphs is the conventional in-article position and
+                a real one-third cut would read far worse; the comment was
+                what was wrong, not the number. The fallback below is
+                unreachable in practice for the same reason. */}
             {Array.isArray(postData.body) && postData.body.length >= 4 ? (
               <>
                 <PortableText

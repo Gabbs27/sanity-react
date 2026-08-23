@@ -23,7 +23,7 @@ export const ADSENSE_CLIENT_ID = 'ca-pub-2464529747764309'
  * so the site ships no broken <ins> markup for the AdSense reviewer to see.
  */
 export const AD_SLOTS = {
-  /** In-article unit, placed a third of the way into a post body. */
+  /** In-article unit, rendered after the first three blocks of a post body. */
   inArticle: '2970675007',
   /** Display unit, between the post body and the newsletter CTA. */
   endOfPost: '9344511662',

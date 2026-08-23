@@ -31,7 +31,11 @@
    keep its box: this rule previously also matched a "no-response" state the
    component invented after 3 seconds, which hid the container while AdSense was
    still measuring it and made a fill impossible. */
-.ad-slot[data-ad-state='unfilled'] {
+/* 'unfilled' is AdSense's own no-fill verdict. 'no-fill' is ours, set when
+   AdSense reports the element done and then never returns a verdict at all —
+   the case that used to leave a labelled empty box at the foot of every post. */
+.ad-slot[data-ad-state='unfilled'],
+.ad-slot[data-ad-state='no-fill'] {
   display: none;
   min-height: 0;
   margin: 0;
