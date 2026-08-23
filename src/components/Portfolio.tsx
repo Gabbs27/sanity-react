@@ -5,7 +5,7 @@ import PostCard from "./card/PostCard";
 import AnimatedSection from "./common/AnimatedSection";
 import SEO from "./common/SEO";
 import NewsletterSignup from "./Newsletter/NewsletterSignup";
-import sanityClient from "../client";
+import sanityClient, { sizedImage } from "../client";
 import { data } from "../assets/data";
 import usePageTracking from "../hooks/useAnalytics";
 import Greeting from "./Greeting/Greeting";
@@ -103,7 +103,7 @@ const Portfolio = () => {
                         className='block no-underline text-inherit'
                       >
                         <PostCard
-                          image={p.mainImage?.asset?.url || ""}
+                          image={sizedImage(p.mainImage?.asset?.url, 600)}
                           title={p.title}
                           date={formatDate(p.publishedAt)}
                         />

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import AnimatedSection from "./common/AnimatedSection";
 import SEO from "./common/SEO";
-import sanityClient from "../client";
+import sanityClient, { sizedImage } from "../client";
 import PostCard from "./card/PostCard";
 import PostGreeting from "./Greeting/PostGreeting";
 import NewsletterSignup from "./Newsletter/NewsletterSignup";
@@ -104,7 +104,7 @@ export default function AllPosts() {
                     to={"/" + post.slug.current}
                     style={{ textDecoration: "none" }}>
                     <PostCard
-                      image={post.mainImage?.asset?.url || ""}
+                      image={sizedImage(post.mainImage?.asset?.url, 600)}
                       title={post.title}
                       date={formatDate(post.publishedAt)}
                     />

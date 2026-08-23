@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import sanityClient, { urlFor } from "../client";
+import sanityClient, { urlFor, sizedImage } from "../client";
 import { PortableText } from "@portabletext/react";
 import AnimatedSection from "./common/AnimatedSection";
 import SEO from "./common/SEO";
@@ -219,7 +219,7 @@ const OnePost = () => {
           <header className='post-header'>
             {postData.mainImage && (
               <img
-                src={postData.mainImage.asset.url}
+                src={sizedImage(postData.mainImage.asset.url, 1600)}
                 alt={postData.title}
                 className='post-main-image'
               />
@@ -297,7 +297,7 @@ const OnePost = () => {
                     className='post-related__card'>
                     {r.mainImage?.asset?.url && (
                       <img
-                        src={r.mainImage.asset.url}
+                        src={sizedImage(r.mainImage.asset.url, 600)}
                         alt=""
                         loading="lazy"
                         className='post-related__img'
