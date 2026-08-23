@@ -18,6 +18,12 @@ import './AdSlot.css';
  *   <AdSlot slotId={AD_SLOTS.inArticle} format="fluid" layout="in-article" />
  */
 
+// How long to wait for AdSense's verdict after it reports the element done.
+// Only spent once AdSense has finished processing, so it is not a guess about
+// whether AdSense is still working — it is a bound on how late a verdict that
+// may never come is allowed to arrive.
+const VERDICT_GRACE_MS = 3000;
+
 interface Props {
   slotId: string;
   format?: 'auto' | 'fluid' | 'rectangle' | 'horizontal' | 'vertical';
@@ -74,29 +80,53 @@ export default function AdSlot({
     }
 
     // The try/catch cannot see the common failures: AdSense reports them
-    // asynchronously from its own queue, so data-ad-status is the only way to
+    // asynchronously from its own queue, so the attributes are the only way to
     // tell "filled" from "unfilled" from "never processed".
     //
-    // Observed rather than sampled once. A single delayed reading would latch
-    // whatever was true at that instant, and a slot that filled a moment later
-    // would stay in the display:none branch below — serving a real ad inside a
-    // hidden container, which is exactly the kind of unviewable impression that
-    // gets an AdSense account limited.
-    const observer = new MutationObserver(() => {
-      const value = ins.getAttribute('data-ad-status');
-      if (value) setStatus(value);
-    });
-    observer.observe(ins, { attributes: true, attributeFilter: ['data-ad-status'] });
-
-    // Deliberately no timeout that invents a status. An earlier version set
-    // "no-response" after 3s when the attribute was still missing, and the CSS
-    // hid the slot on that state — so the container went display:none while
-    // AdSense was still measuring it, and an ad could never be placed into a
-    // hidden, zero-width box. The slot's own guard was what kept it empty.
+    // AdSense writes two different attributes and they do not always both
+    // arrive. data-adsbygoogle-status="done" means it has finished processing
+    // the element. data-ad-status is the verdict, "filled" or "unfilled".
     //
-    // Only AdSense's own verdict changes the state now. Missing simply means
-    // "still pending", which reserves space rather than collapsing it.
-    return () => observer.disconnect();
+    // In production the end-of-post unit reaches done WITHOUT ever getting a
+    // verdict: status done, data-ad-status null, zero iframes. Watching only
+    // for the verdict left that slot in "pending" permanently, so a 303px
+    // empty box labelled "Advertisement" sat at the foot of every post.
+    //
+    // A previous version had the opposite bug: it invented "no-response" 3s
+    // after mount regardless of what AdSense was doing, hiding the container
+    // while AdSense was still measuring it — and an ad cannot be placed into a
+    // zero-width hidden box, so the guess made itself come true. The grace
+    // period below only starts once AdSense itself reports done, and the
+    // observer stays attached afterwards, so a late verdict still wins.
+    let grace: ReturnType<typeof setTimeout> | undefined;
+
+    const read = () => {
+      const verdict = ins.getAttribute('data-ad-status');
+      if (verdict) {
+        clearTimeout(grace);
+        setStatus(verdict);
+        return;
+      }
+      if (ins.getAttribute('data-adsbygoogle-status') === 'done' && grace === undefined) {
+        grace = setTimeout(() => {
+          if (!ins.getAttribute('data-ad-status')) setStatus('no-fill');
+        }, VERDICT_GRACE_MS);
+      }
+    };
+
+    const observer = new MutationObserver(read);
+    observer.observe(ins, {
+      attributes: true,
+      attributeFilter: ['data-ad-status', 'data-adsbygoogle-status'],
+    });
+    // AdSense may have stamped the element before the observer attached; a
+    // MutationObserver only reports changes made after observe().
+    read();
+
+    return () => {
+      observer.disconnect();
+      clearTimeout(grace);
+    };
   }, [enabled, slotId]);
 
   useEffect(() => {
