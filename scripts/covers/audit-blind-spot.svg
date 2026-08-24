@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1E293B"/>
+      <stop offset="1" stop-color="#0F172A"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#g1)"/>
+  <rect x="0" y="0" width="10" height="630" fill="#6366F1"/>
+
+  <!-- Mismo lenguaje de barras que la portada de la auditoría, porque es su
+       secuela. Lo que dice: la auditoría midió 1.35 MB, la página servía 9.88.
+       La barra grande es la que el método no podía ver, por eso va punteada. -->
+  <g transform="translate(790,140)">
+    <!-- lo que la auditoría sí midió -->
+    <rect x="0" y="292" width="80" height="48" rx="6" fill="#6366F1" opacity="0.62"/>
+    <text x="0" y="272" font-family="Helvetica,Arial,sans-serif" font-size="26" font-weight="700" fill="#64748B">1.35</text>
+    <text x="0" y="374" font-family="Helvetica,Arial,sans-serif" font-size="18" fill="#475569">MEASURED</text>
+
+    <!-- lo que servía la página, invisible para el método -->
+    <rect x="120" y="0" width="80" height="340" rx="6"
+          fill="none" stroke="#F97316" stroke-width="3" stroke-dasharray="9 7"/>
+    <text x="120" y="-20" font-family="Helvetica,Arial,sans-serif" font-size="26" font-weight="700" fill="#F97316">9.88</text>
+    <text x="120" y="374" font-family="Helvetica,Arial,sans-serif" font-size="18" fill="#F97316">UNSEEN</text>
+
+    <!-- después -->
+    <rect x="240" y="332" width="80" height="8" rx="4" fill="#38BDF8"/>
+    <text x="240" y="312" font-family="Helvetica,Arial,sans-serif" font-size="26" font-weight="700" fill="#38BDF8">0.18</text>
+    <text x="240" y="374" font-family="Helvetica,Arial,sans-serif" font-size="18" fill="#475569">AFTER</text>
+
+    <text x="0" y="412" font-family="Helvetica,Arial,sans-serif" font-size="20" fill="#475569">MEGABYTES</text>
+  </g>
+
+  <text x="72" y="150" font-family="Helvetica,Arial,sans-serif" font-size="24" font-weight="700" letter-spacing="4" fill="#38BDF8">AUDIT · PART TWO</text>
+  <text x="72" y="272" font-family="Helvetica,Arial,sans-serif" font-size="86" font-weight="700" fill="#F8FAFC">The audit's</text>
+  <text x="72" y="364" font-family="Helvetica,Arial,sans-serif" font-size="86" font-weight="700" fill="#F97316">blind spot</text>
+  <text x="72" y="452" font-family="Helvetica,Arial,sans-serif" font-size="30" fill="#94A3B8">I weighed the build. The page was heavier.</text>
+  <text x="72" y="548" font-family="Helvetica,Arial,sans-serif" font-size="27" fill="#64748B">codewithgabo.com</text>
+</svg>
