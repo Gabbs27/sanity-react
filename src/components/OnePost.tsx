@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import sanityClient, { urlFor, sizedImage } from "../client";
+import sanityClient, { urlFor, sizedImage, socialImage } from "../client";
 import { PortableText } from "@portabletext/react";
 import AnimatedSection from "./common/AnimatedSection";
 import SEO from "./common/SEO";
@@ -209,7 +209,7 @@ const OnePost = () => {
         }
         keywords="blog post, article, tutorial, web development"
         url={`https://codewithgabo.com/${slug}`}
-        image={postData.mainImage?.asset?.url}
+        image={socialImage(postData.mainImage?.asset?.url)}
         type="article"
         lang={langForSlug(slug)}
         alternates={alternatesForSlug(slug)}

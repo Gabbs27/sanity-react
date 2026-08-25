@@ -95,7 +95,13 @@ for (const post of posts) {
     ? post.title
     : `${post.title} | Gabriel Abreu`;
   const desc = description(post);
-  const image = post.image || FALLBACK_IMAGE;
+  // Cropped to the card's frame here rather than left to whoever renders it.
+  // Seven of the covers are portrait or 1.75:1; those were being framed by
+  // Twitter's rules. fm=jpg because a social crawler is not a browser and may
+  // not advertise WebP, so auto=format would gamble the card on a guess.
+  const image = post.image
+    ? `${post.image}?w=1200&h=630&fit=crop&fm=jpg&q=80`
+    : FALLBACK_IMAGE;
 
   const head = `
     <meta charset="utf-8" />

@@ -42,4 +42,25 @@ export function sizedImage(url: string | undefined | null, width: number): strin
   return `${url}${sep}w=${width}&fit=max&auto=format&q=75`;
 }
 
+/**
+ * Sizes an image for a social card.
+ *
+ * Separate from sizedImage because the constraint is different. A card is a
+ * fixed 1.91:1 frame, and an image that does not match it gets cropped by
+ * whoever renders the card. Seven of eighteen covers here are portrait or
+ * 1.75:1, including one 2160x2700, so those cards were being framed by
+ * Twitter's rules instead of mine. fit=crop moves that decision somewhere I
+ * can see it.
+ *
+ * Format is forced rather than negotiated: a social crawler is not a browser
+ * and may not advertise WebP in its Accept header, so auto=format would be
+ * gambling the card on a guess about a client I never see.
+ */
+export function socialImage(url: string | undefined | null): string {
+  if (!url) return "";
+  if (!url.includes("cdn.sanity.io")) return url;
+  const sep = url.includes("?") ? "&" : "?";
+  return `${url}${sep}w=1200&h=630&fit=crop&fm=jpg&q=80`;
+}
+
 export default client;
