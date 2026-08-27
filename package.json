@@ -41,7 +41,8 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
     "postbuild": "node scripts/prerender.mjs",
-    "test": "node --test scripts/__tests__/"
+    "test": "node --test scripts/__tests__/",
+    "comments": "node scripts/devto-comments.mjs"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.18",
