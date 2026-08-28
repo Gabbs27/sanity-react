@@ -41,7 +41,7 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
     "postbuild": "node scripts/prerender.mjs",
-    "test": "node --test scripts/__tests__/",
+    "test": "node --test scripts/__tests__/*.test.mjs",
     "comments": "node scripts/devto-comments.mjs",
     "budget": "node scripts/byte-budget.mjs",
     "capture": "node scripts/capture-static.mjs"

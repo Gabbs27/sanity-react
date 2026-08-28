@@ -10,7 +10,12 @@
  * It runs against build/, not production, so a broken surface fails before the
  * deploy rather than after it.
  *
- *   npm run build && node --test scripts/__tests__/
+ *   npm run build && npm test
+ *
+ * The glob in that script is load-bearing: `node --test scripts/__tests__/`
+ * discovers the files under Node 20 and fails as a single unnamed test under
+ * Node 22, which is the version scripts/byte-budget.mjs and
+ * scripts/capture-static.mjs require. Both versions handle the glob.
  *
  * Two ideas from Heinrich Neb's comments on dev.to shaped this:
  *
