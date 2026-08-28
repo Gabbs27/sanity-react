@@ -9,6 +9,129 @@
     <language>es</language>
     <atom:link href="https://codewithgabo.com/rss.xml" rel="self" type="application/rss+xml" />
     <item>
+      <title><![CDATA[El punto ciego de la auditoría: pesé el build, no la página]]></title>
+      <link>https://codewithgabo.com/el-punto-ciego-de-la-auditoria</link>
+      <guid isPermaLink="true">https://codewithgabo.com/el-punto-ciego-de-la-auditoria</guid>
+      <pubDate>Fri, 28 Aug 2026 01:56:25 GMT</pubDate>
+      <description><![CDATA[Le hice una auditoría a mi portfolio y llamé al paso de pesar el build el que casi nadie hace. También era el paso que garantizaba que nunca vería los 9.88 MB que servía el índice del blog.]]></description>
+      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/739ad1aa821374911116d49b91b50f847d2a06ce-1200x630.png" alt="El punto ciego de la auditoría: pesé el build, no la página" />
+<p>Publiqué un post que se llamaba &quot;Le hice una auditoría a mi propio portfolio y encontré 20 problemas&quot;. Era un inventario: recorrí mi propio sitio —una SPA de React 19 + Vite con Sanity como CMS—, anoté todo lo que estaba mal, arreglé lo que importaba y puse los números de antes y después al lado de cada punto. Si no lo has leído, la única parte que importa aquí es la metodología, y una línea de ella en particular:</p>
+<blockquote><p>Analicé el tamaño del build, chunk por chunk, en <code>build/assets/</code>.</p></blockquote>
+<p>Lo llamé el paso que más duele y el que más gente se salta. Sigo pensando que es verdad. También es el paso que garantizó que se me escapara el problema más grande que tenía el sitio.</p>
+<h2>El paso que funcionó</h2>
+<p>Pesar la salida del build funcionó exactamente como prometía. El hallazgo 1 de esa auditoría fue un PNG sin optimizar de una ilustración de desarrollador en <code>/gabriel-abreu</code>, mi página de contacto, 993 KB, servidos a cada visitante que caía ahí. Quedó en 23 KB. Una segunda imagen, el recorte mío que aparece en las tres variantes del componente <code>Greeting</code>, pasó de 358 KB a 45 KB.</p>
+<p>Esas dos son assets empaquetados. Un componente importa una:</p>
+<pre><code>import p from &quot;../assets/developer-illustration.webp&quot;;</code></pre>
+<p>Vite sigue esa importación, le pone un hash al archivo y lo emite en <code>build/assets/</code>. Después del build es un archivo en disco con un tamaño. Listar el directorio lo encuentra. Ordenar el listado por tamaño lo encuentra de primero. No hay forma de servirlo sin que aparezca en ese paso.</p>
+<p>Así que el método era sólido dentro de su dominio: esas dos imágenes son assets empaquetados, y el paso encontró las dos.</p>
+<p>El 23 de agosto abrí el índice del blog en un navegador y miré lo que pedía de verdad. Dieciséis portadas de posts, 9.88 MB.</p>
+<p>Nada de eso podía haber aparecido en la auditoría. No porque ese día estuviera descuidado, sino por el lugar del que vienen esos bytes.</p>
+<h2>Dos ciclos de vida</h2>
+<p>Un asset empaquetado existe en tiempo de build. Una importación lo convierte en entrada del build, el bundler lo convierte en salida del build, y cualquier cosa que lea la salida del build lo ve.</p>
+<p>Una imagen del CMS nunca es una entrada del build. Nadie la importa. Llega como un string en el resultado de una consulta, después de que la página ya cargó. Esta es la consulta que alimenta el índice del blog:</p>
+<pre><code>*[_type == &quot;post&quot;] | order(publishedAt desc){
+  title,
+  slug,
+  mainImage{ asset-&gt;{ _id, url } },
+  publishedAt
+}</code></pre>
+<p>Eso corre en un <code>useEffect</code> después del montaje. La <code>url</code> que regresa apunta a <code>cdn.sanity.io</code>, React la mete en un <code>img src</code>, y el navegador la baja de un CDN que yo no construyo. En ningún momento del ciclo de vida de esa imagen aterriza un archivo en <code>build/assets/</code>.</p>
+<p>Dos ciclos de vida distintos, y el paso más riguroso de mi auditoría solo podía observar uno de ellos. No &quot;no lo observó de casualidad&quot;. No podía, por diseño. La balanza estaba bien. No estaba pesando toda la carga.</p>
+<h2>Lo que de verdad había en la página</h2>
+<p>Cuando medí con el Accept header real de un navegador en vez de con un listado de directorio:</p>
+<pre><code>/allpost, 16 post covers ........ 9.88 MB
+one post page, 4 images ......... 4.54 MB
+peor imagen suelta .............. 3.13 MB  (PNG 2160x2700, mostrada a ~250px)
+another cover ................... 2.27 MB  (rendered at 433x227)</code></pre>
+<p>Las dos imágenes que atrapó la auditoría sumaban 1,351 KB entre las dos. Una sola ruta estaba sirviendo 9.88 MB.</p>
+<p>Todos mis cross-posts en dev.to cierran con un enlace a <code>/allpost</code>. La ruta más pesada que medí era la página a la que mando a la gente.</p>
+<h2><code>urlFor</code> se llamaba una sola vez</h2>
+<p>Sanity trae un builder de URLs de imagen, <code>urlFor</code>, que aplica transformaciones en el CDN: ancho, fit, formato. Antes del arreglo, <code>urlFor</code> se llamaba exactamente una vez en toda la aplicación. No una vez por componente. Una. Estaba en <code>OnePost.tsx</code>, dentro del serializador de PortableText para las imágenes incrustadas en el cuerpo de un artículo:</p>
+<pre><code>const src = value?.asset
+  ? urlFor(value).width(1600).fit(&quot;max&quot;).auto(&quot;format&quot;).url()
+  : value?.url;</code></pre>
+<p>Ancho topado, <code>fit: max</code> para que nada se escale hacia arriba, <code>auto: format</code> para que los navegadores modernos reciban WebP. Esa es la llamada correcta. Vale para las imágenes que un autor soltó en medio de un párrafo, las que un lector casi ni nota.</p>
+<p><code>AllPosts.tsx</code> no tenía ni una sola referencia a él. El encabezado del post tampoco. Esas tarjetas renderizaban <code>mainImage.asset.url</code> —el archivo original subido, directo del CDN— y dejaban que el CSS lo encogiera dentro de una caja de 250px. El navegador se baja los 3.13 MB completos primero y después lo pinta pequeño.</p>
+<p>El sitio se veía como uno que servía sus imágenes del tamaño correcto. No lo era.</p>
+<h2>El arreglo</h2>
+<p>Las consultas que alimentan esas tarjetas proyectan <code>asset-&gt;{url}</code>, no el objeto de referencia que <code>urlFor</code> quiere, así que pasar por el constructor significaba reescribir las consultas. En vez de eso, el helper toma la URL que la consulta ya devuelve:</p>
+<pre><code>export function sizedImage(url: string | undefined | null, width: number): string {
+  if (!url) return &quot;&quot;;
+  // Non-Sanity URLs (the BlockNote editor stores upload-endpoint URLs directly)
+  // do not understand these parameters.
+  if (!url.includes(&quot;cdn.sanity.io&quot;)) return url;
+  const sep = url.includes(&quot;?&quot;) ? &quot;&amp;&quot; : &quot;?&quot;;
+  return `${url}${sep}w=${width}&amp;fit=max&amp;auto=format&amp;q=75`;
+}</code></pre>
+<p><code>auto=format</code> negocia según el Accept header de la petición, así que un navegador moderno recibe WebP y uno viejo recibe el formato original. <code>fit=max</code> solo escala hacia abajo, así que un original pequeño nunca se agranda. El chequeo de <code>cdn.sanity.io</code> está ahí porque mi editor BlockNote guarda directamente URLs del endpoint de subida y esas no entienden los parámetros: agregárselos habría roto imágenes que estaban funcionando.</p>
+<p>Medidas otra vez de la misma manera, esas dieciséis portadas sumaron 182 KB, 56 veces menos que antes. El PNG de 2160x2700 pesa 24 KB.</p>
+<p>Ese es el número de esas imágenes en esas rutas, medido con un navegador y en un solo día. No he medido el tiempo de carga en una conexión real, y no te voy a decir que ahora el sitio es rápido.</p>
+<h2>El alcance es la afirmación que no audité</h2>
+<p>Una auditoría contesta la pregunta que le hagas, y nada más. La mía preguntaba: ¿qué pesa mucho dentro de lo que sirvo? La respuesta era correcta.</p>
+<p>Pero &quot;lo que sirvo&quot; es una frontera que dibuja el bundler, y el navegador no sabe que esa frontera existe. Pide lo que la página le dice que pida, venga de donde venga. Mi método trataba un artefacto de build como sustituto de una carga de página, y en un sitio como este esas dos cosas se traslapan sin ser el mismo conjunto.</p>
+<p>Lo que hacía que ese paso se sintiera riguroso es lo mismo que lo hacía estrecho: era mecánico. Un directorio, una lista de archivos, tamaños, ordenados. Una medición que puede ser exhaustiva es exhaustiva sobre su propio dominio y muda sobre todo lo demás, y no parece incompleta: parece terminada. Veinte hallazgos, todos reales, y 9.88 MB saliendo todavía por la ruta que anuncio.</p>
+<p>La lista de hallazgos es la parte de una auditoría que sí se revisa. El alcance también es una afirmación —una afirmación sobre dónde pueden estar los problemas— y es la que sale sin examinar. La próxima vez voy a escribir esa afirmación al lado del método, en el mismo documento: esto fue lo que medí, y esto es lo que esta medición no puede ver.</p>]]></content:encoded>
+    </item>
+    <item>
+      <title><![CDATA[Verde y ciego: cuando un check que pasa no significa nada]]></title>
+      <link>https://codewithgabo.com/verde-y-ciego</link>
+      <guid isPermaLink="true">https://codewithgabo.com/verde-y-ciego</guid>
+      <pubDate>Fri, 28 Aug 2026 01:56:22 GMT</pubDate>
+      <description><![CDATA[Un mensaje de commit que era exacto y un sitio sirviendo lo contrario. Dos fallos de esta semana: un check mirando la superficie equivocada, y un slot que nadie estaba mirando.]]></description>
+      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/b321328beb77d3e70f65e1d5efe202de2f5741a8-1200x630.png" alt="Verde y ciego: cuando un check que pasa no significa nada" />
+<p>Escribí un mensaje de commit que dice que <code>SEO.tsx</code> &quot;pone documentElement.lang&quot; y &quot;emite enlaces hreflang&quot;. Abrí un post en español en el navegador, miré el documento, y ahí estaba: <code>documentElement.lang === &quot;es&quot;</code>, y tres etiquetas <code>&lt;link rel=&quot;alternate&quot; hreflang&gt;</code> para <code>es</code>, <code>en</code> y <code>x-default</code>. Idioma correcto, pares correctos, default correcto.</p>
+<p>El mensaje de commit era exacto. El sitio también estaba sirviendo <code>&lt;html lang=&quot;en&quot;&gt;</code> en cada post en español, con cero anotaciones hreflang.</p>
+<p>Las dos frases son ciertas. Pero cada una habla de una superficie distinta.</p>
+<h2>La anotación que estaba y no estaba</h2>
+<p>Este sitio es una SPA de React 19 en Vercel con un paso de prerender en tiempo de build. El prerender escribe el <code>&lt;head&gt;</code> dentro del HTML estático para que los crawlers reciban títulos y meta tags sin ejecutar nada. <code>SEO.tsx</code> es un componente de React. Corre en el navegador, después de que React monta, y hace exactamente lo que dice su mensaje de commit.</p>
+<p><code>scripts/prerender.mjs</code> escribe el HTML que el servidor manda de verdad. En ese commit:</p>
+<pre><code>$ git show 86569b0:scripts/prerender.mjs | grep -c hreflang
+0</code></pre>
+<p>El prerender reescribía solo el elemento <code>&lt;head&gt;</code>. Nunca tocaba la etiqueta <code>&lt;html&gt;</code>, así que el atributo <code>lang</code> se quedaba con lo que <code>index.html</code> traía de fábrica, que era <code>en</code>. Y no emitía ningún alternate, porque nada dentro de él sabía que la tabla de traducciones existía.</p>
+<p>Lo confirmé con <code>curl</code> en las cuatro URLs emparejadas: original en inglés y traducción en español, en las dos direcciones. Después probé otra vez con un user-agent de Googlebot, por si Vercel estaba haciendo alguna jugada con los crawlers. Respuesta idéntica byte a byte. No había una segunda vía de entrega. El sitemap tampoco tenía alternates <code>xhtml:link</code>.</p>
+<p>Aquí hay una trampa que vale la pena nombrar, porque es lo que deja que el error sobreviva un rato. Cada página del sitio sirve esto:</p>
+<pre><code>&lt;link rel=&quot;alternate&quot; type=&quot;application/rss+xml&quot; ...&gt;</code></pre>
+<p>Le haces grep a <code>alternate</code> sobre el HTML servido y encuentras una coincidencia. Si estás revisando rápido, y ya estás bastante seguro de que la funcionalidad jala porque la viste funcionar, una coincidencia es suficiente. La cadena que buscaste estaba presente. Era el feed.</p>
+<p>La consecuencia práctica es más limitada de lo que suena. Google renderiza JavaScript, así que para Google esto fue un retraso y no una pérdida. El riesgo estaba en los motores que no renderizan, que veían posts en español declarados como inglés y sin ninguna indicación de que existiera una traducción.</p>
+<p>Arreglado el 21 de agosto. <code>prerender.mjs</code> ahora pone <code>lang</code> en el elemento <code>&lt;html&gt;</code> y emite los alternates, leyendo <code>src/config/translations.json</code>, el mismo archivo que lee <code>src/config/translations.ts</code>. La tabla vive en JSON porque un script de build en <code>.mjs</code> no puede importar un módulo <code>.ts</code>, y tener dos copias de ella es precisamente la forma en que las dos mitades se volverían a separar.</p>
+<p>Verificado después: <code>lang=&quot;es&quot;</code> en los dos posts en español, <code>lang=&quot;en&quot;</code> en los dos en inglés, tres enlaces hreflang en cada uno de los cuatro posts emparejados, y cero en un post sin pareja como <code>/tailwind-css</code>, que es el número correcto, porque un hreflang que apunta a una traducción que no existe es una afirmación falsa.</p>
+<p>Aquí no verifiqué lo equivocado. Verifiqué algo real en la superficie que era más fácil de alcanzar.</p>
+<h2>El slot que ningún test estaba mirando</h2>
+<p>El segundo no se trata de revisar la superficie equivocada. No había superficie que revisar.</p>
+<p>Cada post lleva dos unidades de anuncio: una dentro del artículo y otra al pie del post. El 20 de agosto a las 22:48 subí esta línea:</p>
+<pre><code>setStatus(ins.getAttribute('data-ad-status') ?? 'no-response');</code></pre>
+<p>Tres segundos después del montaje, si AdSense no había escrito un veredicto sobre el elemento, el código se inventaba uno. El CSS colapsaba el contenedor en <code>no-response</code>, así que el slot pasaba a <code>display: none</code>, mientras AdSense todavía lo estaba midiendo. No se puede colocar un anuncio dentro de una caja oculta y de ancho cero. La suposición se cumplía sola.</p>
+<p>Eso estuvo en producción unas diez horas. El arreglo, a las 08:46 de la mañana siguiente, quitó el timeout por completo: solo el veredicto propio de AdSense cambia el estado, y un veredicto ausente significa &quot;pending&quot;, que reserva espacio en vez de colapsarlo.</p>
+<p>Eso metió el mismo bug, pero al revés.</p>
+<p>En producción, la unidad del final del post llega a <code>data-adsbygoogle-status=&quot;done&quot;</code> y después nunca recibe <code>data-ad-status</code>. Con la regla nueva, &quot;nunca&quot; es indistinguible de &quot;todavía no&quot;. Se quedaba en <code>pending</code> permanentemente. Medido en un navegador real el 23 de agosto, en /portfolio-audit-20-problems, los dos slots en el mismo momento:</p>
+<pre><code>slot 9344511662  (end of post)
+  data-adsbygoogle-status   &quot;done&quot;
+  data-ad-status            null
+  iframes                   0
+  height                    303px
+  display                   block
+  &quot;Advertisement&quot; label     visible
+
+slot 2970675007  (in-article)
+  data-adsbygoogle-status   &quot;done&quot;
+  data-ad-status            &quot;unfilled&quot;
+  height                    0px
+  display                   none</code></pre>
+<p>Misma página, misma carga. La asimetría estaba en mi máquina de estados, no en AdSense.</p>
+<p>Así que durante dos días y medio, cada post de este sitio terminaba con un rectángulo vacío etiquetado &quot;Advertisement&quot;, de 303 píxeles de alto en la página que medí. Nada estaba en rojo. Ningún test falló. El build pasó, la página renderizó.</p>
+<p>El arreglo de verdad: el periodo de gracia ahora empieza solo cuando el propio AdSense reporta <code>done</code>, y el observer se queda escuchando después para que un veredicto tardío igual gane. También lee el atributo una vez, de inmediato, al engancharse, porque un <code>MutationObserver</code> no te dice nada de lo que pasó antes de que llamaras a <code>observe()</code>. Verificado después: los dos slots en 0px, <code>display: none</code>.</p>
+<h2>Verde porque nadie pregunta</h2>
+<p>Los dos fallos no tienen la misma forma.</p>
+<p>En el caso del hreflang había un check, y estaba mirando el DOM del navegador en vez del cuerpo de la respuesta. Superficie equivocada, error honesto, encontrable.</p>
+<p>En el caso del anuncio no había check. No uno débil: ninguno. Y desde afuera, &quot;no hay check&quot; y &quot;el check pasó&quot; producen una señal idéntica: un build que se pone verde. La ausencia de un test que falla se ve exactamente igual que la presencia de uno que pasa cuando lo único que puedes ver es el color. Un assert que falta no se anuncia. Uno roto sí.</p>
+<p>Por eso la caja vacía duró dos días y medio y el bug del hreflang duró hasta que se me ocurrió correr <code>curl</code>.</p>
+<h2>El hilo del que salió esto</h2>
+<p>Escribo esto por un comentario. En el cross-post de dev.to de &quot;How I Actually Code with Claude Code&quot;, Heinrich Neb lo dijo mejor de lo que yo puedo: un check puede estar verde y ciego. Su ejemplo era un test que afirmaba que un número de benchmark aparecía en la salida de su servidor, y el número era una cadena escrita a mano. El check vigilaba la frase, no la medición. Se quedó verde durante semanas. Debashish Ghosal, en el mismo hilo, sugirió escribir una nota de resultado en cada archivo de plan después de ejecutarlo, que es otra manera de atacar el mismo problema: que el registro diga lo que pasó, no lo que se pretendía.</p>
+<p>No tengo una solución general. No voy a terminar esto con una filosofía de testing, porque me la estaría inventando en el momento para que el post parezca terminado.</p>
+<p>Lo que sí tengo es una costumbre: abrir un navegador, buscar el elemento específico y medirlo. No la idea que el framework tiene del elemento: el elemento. Hacerle <code>curl</code> a la URL en vez de confiar en el componente que escribe la etiqueta. Leer la altura de la caja en vez de confiar en el estado que decide la altura.</p>
+<p>Así fue como aparecieron los dos: uno a la vez, a mano, porque se me ocurrió mirar. No habría encontrado un tercero.</p>]]></content:encoded>
+    </item>
+    <item>
       <title><![CDATA[The Audit's Blind Spot: I Weighed the Build, Not the Page]]></title>
       <link>https://codewithgabo.com/the-audits-blind-spot</link>
       <guid isPermaLink="true">https://codewithgabo.com/the-audits-blind-spot</guid>
