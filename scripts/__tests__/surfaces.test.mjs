@@ -250,3 +250,55 @@ test('the served og:image is cropped to the card frame', () => {
     );
   }
 });
+
+// ── surface 6: what a consumer without JavaScript reads ─────────────────────
+// Every page used to serve 46 characters — "You need to enable JavaScript to
+// run this app." — and zero links. Google's own list of AdSense rejection
+// reasons describes that shape twice, under insufficient content and under site
+// navigation. The noscript block is the fix; these assertions are what keep it.
+const textOf = (html) => {
+  const body = html.match(/<body[^>]*>([\s\S]*)<\/body>/i)?.[1] ?? '';
+  return body
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+};
+
+test('every page carries real text and real links without JavaScript', () => {
+  const MIN_TEXT = 500;
+  const MIN_LINKS = 3;
+  const pages = [['', read(join(BUILD, 'index.html'))]].concat(
+    slugs.map((s) => [s, read(join(BUILD, s, 'index.html'))])
+  );
+  for (const [name, html] of pages) {
+    const text = textOf(html);
+    assert.ok(
+      !/^You need to enable JavaScript/.test(text),
+      `/${name}: the whole body is still the JavaScript notice`
+    );
+    assert.ok(
+      text.length >= MIN_TEXT,
+      `/${name}: ${text.length} characters without JavaScript, want >= ${MIN_TEXT}`
+    );
+    const links = (html.match(/<a\s/g) ?? []).length;
+    assert.ok(links >= MIN_LINKS, `/${name}: ${links} links without JavaScript`);
+  }
+});
+
+test('the noscript content sits outside #root, so React never discards it', () => {
+  for (const slug of slugs) {
+    const html = read(join(BUILD, slug, 'index.html'));
+    // createRoot replaces everything inside #root. Content placed in there
+    // would vanish the moment the bundle runs, which is the failure this
+    // assertion exists to prevent — it would still pass the test above.
+    assert.ok(
+      has(html, '<div id="root"></div>'),
+      `${slug}: #root is not empty, so prerendered body markup would be discarded`
+    );
+    assert.ok(html.indexOf('<noscript>') < html.indexOf('<div id="root">'),
+      `${slug}: the noscript block is not before #root`);
+  }
+});
+
