@@ -26,6 +26,7 @@
  * prerendered body markup anyway.
  */
 import { createClient } from '@sanity/client';
+import { toHtml } from './portable-to-html.mjs';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -72,7 +73,8 @@ const posts = await client.fetch(
      excerpt,
      publishedAt,
      "image": mainImage.asset->url,
-     "plainBody": pt::text(body)
+     "plainBody": pt::text(body),
+       body[]{..., _type == "image" => { ..., "asset": asset->{url} }}
    }`
 );
 
@@ -146,14 +148,66 @@ for (const post of posts) {
 
   // The shell hardcodes <html lang="en">. Only the head was ever rewritten, so
   // every Spanish post shipped as English to anything that does not run JS.
+  // The body a consumer without JavaScript reads.
+  //
+  // Every page of this site served 46 characters — "You need to enable
+  // JavaScript to run this app." — and zero links, to anything that does not
+  // execute the bundle. That is the whole page for such a reader: one sentence,
+  // and it is an error message. Google's own list of AdSense rejection reasons
+  // names exactly that shape twice, under insufficient content and under site
+  // navigation.
+  //
+  // This is not cloaking. Cloaking serves DIFFERENT content depending on who
+  // asks. This serves the same content to a client that cannot run the
+  // interactive version, and React never sees it: createRoot mounts into #root
+  // and leaves everything outside it alone.
+  const others = posts
+    .filter((p) => p.slug !== post.slug)
+    .slice(0, 8)
+    .map((p) => `<li><a href="/${esc(p.slug)}">${esc(p.title)}</a></li>`)
+    .join('');
+
+  const noscript = `<noscript>
+  <article>
+    <h1>${esc(post.title)}</h1>
+    <p><em>${esc(desc)}</em></p>
+    ${toHtml(post.body)}
+  </article>
+  <nav>
+    <h2>More posts</h2>
+    <ul>${others}</ul>
+    <p><a href="/">Home</a> · <a href="/allpost">All posts</a></p>
+  </nav>
+</noscript>`;
+
   const out = shell
     .replace(/<head([^>]*)>[\s\S]*?<\/head>/i, `<head$1>${head}${kept}</head>`)
-    .replace(/<html([^>]*)\slang="[^"]*"/i, `<html$1 lang="${lang}"`);
+    .replace(/<html([^>]*)\slang="[^"]*"/i, `<html$1 lang="${lang}"`)
+    .replace(/<noscript>[\s\S]*?<\/noscript>/i, noscript);
 
   const dir = join(BUILD, post.slug);
   mkdirSync(dir, { recursive: true });
   writeFileSync(join(dir, 'index.html'), out);
   written++;
 }
+
+// The shell answers "/" and, through the catch-all rewrite, every route with no
+// prerendered file of its own — /allpost among them. Without this it is the one
+// page with no way out for a reader who cannot run the bundle.
+const shellNoscript = `<noscript>
+  <h1>Code With Gabo</h1>
+  <p>Gabriel Abreu — full-stack developer in Santo Domingo, Dominican Republic.
+  React and TypeScript on the front, C# and .NET on the back. Notes on what I
+  build and what breaks, in English and Spanish.</p>
+  <h2>Posts</h2>
+  <ul>${posts
+    .map((p) => `<li><a href="/${esc(p.slug)}">${esc(p.title)}</a></li>`)
+    .join('')}</ul>
+</noscript>`;
+
+writeFileSync(
+  join(BUILD, 'index.html'),
+  shell.replace(/<noscript>[\s\S]*?<\/noscript>/i, shellNoscript)
+);
 
 console.log(`[prerender] ${written}/${posts.length} post heads written`);
