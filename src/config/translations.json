@@ -4,7 +4,9 @@
     "3-prompts-gemini-nano-banana-resultados",
     "auditoria-portfolio-20-problemas",
     "como-programo-con-claude-code-flujo-real",
-    "editor-propio-vs-sanity-studio"
+    "editor-propio-vs-sanity-studio",
+    "el-punto-ciego-de-la-auditoria",
+    "verde-y-ciego"
   ],
   "pairs": [
     {
@@ -14,6 +16,14 @@
     {
       "es": "como-programo-con-claude-code-flujo-real",
       "en": "how-i-actually-code-with-claude-code"
+    },
+    {
+      "es": "verde-y-ciego",
+      "en": "green-and-blind"
+    },
+    {
+      "es": "el-punto-ciego-de-la-auditoria",
+      "en": "the-audits-blind-spot"
     }
   ]
 }

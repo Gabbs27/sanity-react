@@ -31,28 +31,29 @@ const SCRATCH =
 
 const POSTS = [
   {
-    slug: "green-and-blind",
-    title: "Green and Blind: When a Passing Check Means Nothing",
+    slug: "verde-y-ciego",
+    title: "Verde y ciego: cuando un check que pasa no significa nada",
     excerpt:
-      "A commit message that was accurate and a site serving the opposite. Two " +
-      "failures from this site in one week: one check watching the wrong surface, " +
-      "and one slot nothing was watching at all.",
-    tags: ["Testing", "Verification", "SEO", "React", "AdSense"],
-    markdown: `${SCRATCH}/post-green-and-blind.md`,
-    cover: "scripts/covers/out/green-and-blind.png",
+      "Un mensaje de commit que era exacto y un sitio sirviendo lo contrario. " +
+      "Dos fallos de esta semana: un check mirando la superficie equivocada, y " +
+      "un slot que nadie estaba mirando.",
+    tags: ["Testing", "Verificación", "SEO", "React", "AdSense"],
+    markdown: `${SCRATCH}/es-verde-y-ciego.md`,
+    cover: "scripts/covers/out/verde-y-ciego.png",
   },
   {
-    slug: "the-audits-blind-spot",
-    title: "The Audit's Blind Spot: I Weighed the Build, Not the Page",
+    slug: "el-punto-ciego-de-la-auditoria",
+    title: "El punto ciego de la auditoría: pesé el build, no la página",
     excerpt:
-      "I audited my own portfolio and called weighing the build output the step " +
-      "most people skip. It was also the step that guaranteed I would never see " +
-      "the 9.88 MB the blog index was actually serving.",
-    tags: ["Audit", "Performance", "Images", "Sanity", "React"],
-    markdown: `${SCRATCH}/post-audit-blind-spot.md`,
-    cover: "scripts/covers/out/audit-blind-spot.png",
+      "Le hice una auditoría a mi portfolio y llamé al paso de pesar el build " +
+      "el que casi nadie hace. También era el paso que garantizaba que nunca " +
+      "vería los 9.88 MB que servía el índice del blog.",
+    tags: ["Auditoría", "Performance", "Imágenes", "Sanity", "React"],
+    markdown: `${SCRATCH}/es-punto-ciego-auditoria.md`,
+    cover: "scripts/covers/out/punto-ciego-auditoria.png",
   },
 ];
+
 
 function cliToken() {
   const path = resolve(homedir(), ".config/sanity/config.json");
