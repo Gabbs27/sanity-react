@@ -32,7 +32,12 @@ const MEASURE = process.argv.includes('--measure');
 // weighs today, so the check fails on a regression rather than nagging about an
 // ideal nobody is working toward. Lower them when a route gets lighter.
 const BUDGETS = {
-  '/': 900,
+  // The home page carries nine project screenshots the other routes do not, so
+  // its ratchet sits higher. It is a ratchet, not an endorsement: 1064 KB today,
+  // of which 493 is AdSense, Google Tag Manager and Google Fonts — third-party
+  // bytes I cannot cut without removing the thing that fetches them. The site's
+  // own share is 468 KB. It was 2944 KB before the screenshots were re-encoded.
+  '/': 1150,
   '/allpost': 900,
   '/green-and-blind': 900,
   '/the-audits-blind-spot': 900,
