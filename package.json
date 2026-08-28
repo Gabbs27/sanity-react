@@ -43,7 +43,8 @@
     "postbuild": "node scripts/prerender.mjs",
     "test": "node --test scripts/__tests__/",
     "comments": "node scripts/devto-comments.mjs",
-    "budget": "node scripts/byte-budget.mjs"
+    "budget": "node scripts/byte-budget.mjs",
+    "capture": "node scripts/capture-static.mjs"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.18",

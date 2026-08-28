@@ -11,7 +11,7 @@ export const data = [
   },
   {
     id: 9,
-    image: "/images/ginecologo-spa.png",
+    image: "/images/ginecologo-spa.webp",
     title: "Dr. Abreu Cornelio — Gynecology Clinic",
     description:
       "Landing page for a gynecology & obstetrics practice with a warm editorial design (Fraunces & Karla typography). Features WhatsApp appointment booking, services catalog, contact form, and a single-file content config that makes the template reusable for any medical practice. SEO-ready with sitemap and structured metadata.",
@@ -21,7 +21,7 @@ export const data = [
   },
   {
     id: 1,
-    image: "/images/negociord.png",
+    image: "/images/negociord.webp",
     title: "NegocioRD",
     description:
       "WhatsApp Order Management Platform for Dominican SMEs. Features an AI-powered chatbot (Claude) that takes orders via WhatsApp, real-time order tracking with status flow, product catalog management, Stripe subscription billing, analytics dashboard with Recharts, and real-time push notifications via SSE. Fully bilingual (ES/EN).",
@@ -31,7 +31,7 @@ export const data = [
   },
   {
     id: 8,
-    image: "/images/a2c.png",
+    image: "/images/a2c.webp",
     title: "A2C International",
     description:
       "Luxury and exotic vehicle dealership for A2C International (Santo Domingo, DR). Multi-section site covering buy/sell/financing/service flows with a Supabase-backed inventory, branded metallic visual identity, and integrated WhatsApp contact CTA. Built with React 18 + Vite and React Router 7.",
@@ -41,7 +41,7 @@ export const data = [
   },
   {
     id: 2,
-    image: "/images/HairSalon.png",
+    image: "/images/HairSalon.webp",
     title: "Hair Salon & Spa",
     description:
       "A modern, responsive website for a luxury salon and spa built with React and TypeScript. Features include service menu PDFs, location information, Instagram feed integration, and WhatsApp booking functionality.",
@@ -50,7 +50,7 @@ export const data = [
   },
   {
     id: 3,
-    image: "/images/invoice_generator.png",
+    image: "/images/invoice_generator.webp",
     url: "https://gabbs27.github.io/invoice-generator/",
     title: "Invoice Generator",
     description:
@@ -59,7 +59,7 @@ export const data = [
   },
   {
     id: 4,
-    image: "/images/calendar.png",
+    image: "/images/calendar.webp",
     url: "https://gabbs27.github.io/calendar-reminder/",
     title: "My React Calendar",
     description:
@@ -68,7 +68,7 @@ export const data = [
   },
   {
     id: 5,
-    image: "/images/movie.png",
+    image: "/images/movie.webp",
     url: "https://gabbs27.github.io/gmovie-app/",
     title: "G-Movie",
     description:
@@ -85,7 +85,7 @@ export const data = [
   },
   {
     id: 6,
-    image: "/images/todo.png",
+    image: "/images/todo.webp",
     title: "ToDo-matic",
     description:
       "A dynamic and user-friendly Todo List application, built using ReactJS, that helps users effortlessly manage and organize their tasks",
@@ -94,7 +94,7 @@ export const data = [
   },
   {
     id: 7,
-    image: "/images/memegenerator.png",
+    image: "/images/memegenerator.webp",
     title: "Memelogy",
     description: "A simple meme generator using ReactJs and ImgFlip API",
     url: "https://gabbs27.github.io/meme-generator/",

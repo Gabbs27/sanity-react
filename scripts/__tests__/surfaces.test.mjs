@@ -26,6 +26,7 @@
 import { test, before } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -299,6 +300,53 @@ test('the noscript content sits outside #root, so React never discards it', () =
     );
     assert.ok(html.indexOf('<noscript>') < html.indexOf('<div id="root">'),
       `${slug}: the noscript block is not before #root`);
+  }
+});
+
+// ── surface 7: the captured static routes ───────────────────────────────────
+// Their content is a browser capture committed to disk, because Vercel's build
+// image has no Chrome. That trade buys staleness: edit the component, forget to
+// re-run scripts/capture-static.mjs, and the committed copy becomes a rumour.
+// The hash is what turns that into a failure instead of a quiet wrong answer.
+const staticPages = JSON.parse(read(join(ROOT, 'src/config/static-pages.json')));
+
+test('every captured static page still matches its source component', () => {
+  for (const [route, page] of Object.entries(staticPages)) {
+    const source = read(join(ROOT, page.component));
+    const hash = createHash('sha256').update(source).digest('hex').slice(0, 16);
+    assert.equal(
+      hash,
+      page.sourceHash,
+      `${page.component} changed since ${route} was captured. ` +
+        `Run: npm run build && node scripts/capture-static.mjs`
+    );
+  }
+});
+
+test('every static route is prerendered with its own head', () => {
+  for (const [route, page] of Object.entries(staticPages)) {
+    const file = join(BUILD, route.replace(/^\//, ''), 'index.html');
+    assert.ok(existsSync(file), `${route}: not prerendered`);
+    const html = read(file);
+
+    const title = html.match(/<title>([^<]*)<\/title>/)?.[1];
+    assert.notEqual(title, SHELL_TITLE, `${route}: serving the shell title`);
+
+    const canonical = html.match(/<link rel="canonical" href="([^"]+)"/)?.[1];
+    assert.equal(canonical, `${ORIGIN}${route}`, `${route}: wrong canonical`);
+
+    // The failure this replaces: after the noscript fix, the catch-all answered
+    // /privacy with the home page's post list, so the policy page told a crawler
+    // it was the home page.
+    const noscript = html.match(/<noscript>([\s\S]*?)<\/noscript>/)?.[1] ?? '';
+    assert.ok(
+      noscript.length > 200,
+      `${route}: noscript is ${noscript.length} characters`
+    );
+    assert.ok(
+      !noscript.includes('full-stack developer in Santo Domingo'),
+      `${route}: serving the home page's noscript instead of its own`
+    );
   }
 });
 

@@ -35,6 +35,8 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const BUILD = join(root, 'build');
 const ORIGIN = 'https://codewithgabo.com';
 const FALLBACK_IMAGE = `${ORIGIN}/og-image.jpg`;
+const DESCRIPTION_FALLBACK =
+  'Portfolio, blog and open-source projects by Gabriel Abreu. React, TypeScript, C#.';
 
 // Same table src/config/translations.ts reads. This script cannot import the
 // TypeScript module, and duplicating the slugs here is how the two halves drift
@@ -191,6 +193,66 @@ for (const post of posts) {
   written++;
 }
 
+// The routes that are not posts. Their content comes from React components, so
+// prerender.mjs cannot query it the way it queries Sanity; scripts/capture-static.mjs
+// renders them in a browser and commits the result, because Vercel's build image
+// has no Chrome. See that file for why the capture carries a source hash.
+const staticPages = JSON.parse(
+  readFileSync(join(root, 'src/config/static-pages.json'), 'utf8')
+);
+
+for (const [route, page] of Object.entries(staticPages)) {
+  const url = `${ORIGIN}${route}`;
+  const desc = page.description || DESCRIPTION_FALLBACK;
+
+  // The blog index renders its cards from a Sanity fetch that had not resolved
+  // when the capture ran. The list is right here, so append it rather than
+  // waiting longer in a browser and hoping.
+  const extra =
+    route === '/allpost'
+      ? `<h2>Posts</h2><ul>${posts
+          .map((p) => `<li><a href="/${esc(p.slug)}">${esc(p.title)}</a></li>`)
+          .join('')}</ul>`
+      : '';
+
+  const head = `
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>${esc(page.title)}</title>
+    <meta name="description" content="${esc(desc)}" />
+    <meta name="author" content="Gabriel Abreu" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="${esc(url)}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="${esc(url)}" />
+    <meta property="og:title" content="${esc(page.title)}" />
+    <meta property="og:description" content="${esc(desc)}" />
+    <meta property="og:image" content="${esc(FALLBACK_IMAGE)}" />
+    <meta property="og:site_name" content="Code With Gabo" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="${esc(page.title)}" />
+    <meta name="twitter:description" content="${esc(desc)}" />
+    <meta name="twitter:image" content="${esc(FALLBACK_IMAGE)}" />
+`;
+
+  const shellHead = shell.match(/<head[^>]*>([\s\S]*?)<\/head>/i)[1];
+  const kept = shellHead
+    .replace(/<title>[\s\S]*?<\/title>/gi, '')
+    .replace(/<meta\s+(?:name|property)="(?:description|keywords|author|robots|og:[^"]*|twitter:[^"]*)"[^>]*>/gi, '')
+    .replace(/<link[^>]+rel="canonical"[^>]*>/gi, '')
+    .replace(/<meta\s+charset[^>]*>/gi, '')
+    .replace(/<meta\s+name="viewport"[^>]*>/gi, '');
+
+  const out = shell
+    .replace(/<head([^>]*)>[\s\S]*?<\/head>/i, `<head$1>${head}${kept}</head>`)
+    .replace(/<noscript>[\s\S]*?<\/noscript>/i, `<noscript>${page.html}${extra}</noscript>`);
+
+  const dir = join(BUILD, route.replace(/^\//, ''));
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, 'index.html'), out);
+  written++;
+}
+
 // The shell answers "/" and, through the catch-all rewrite, every route with no
 // prerendered file of its own — /allpost among them. Without this it is the one
 // page with no way out for a reader who cannot run the bundle.
@@ -210,4 +272,4 @@ writeFileSync(
   shell.replace(/<noscript>[\s\S]*?<\/noscript>/i, shellNoscript)
 );
 
-console.log(`[prerender] ${written}/${posts.length} post heads written`);
+console.log(`[prerender] ${written} pages written (${posts.length} posts + ${Object.keys(staticPages).length} static)`);
