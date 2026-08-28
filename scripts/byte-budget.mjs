@@ -22,6 +22,9 @@
  *   node scripts/byte-budget.mjs --measure  # print what routes weigh now
  */
 import { spawn } from 'node:child_process';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 
 const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const PORT = 9333;
@@ -32,16 +35,14 @@ const MEASURE = process.argv.includes('--measure');
 // weighs today, so the check fails on a regression rather than nagging about an
 // ideal nobody is working toward. Lower them when a route gets lighter.
 const BUDGETS = {
-  // The home page carries nine project screenshots the other routes do not, so
-  // its ratchet sits higher. It is a ratchet, not an endorsement: 1064 KB today,
-  // of which 493 is AdSense, Google Tag Manager and Google Fonts — third-party
-  // bytes I cannot cut without removing the thing that fetches them. The site's
-  // own share is 468 KB. It was 2944 KB before the screenshots were re-encoded.
-  '/': 1150,
-  '/allpost': 900,
-  '/green-and-blind': 900,
-  '/the-audits-blind-spot': 900,
-  '/3-prompts-gemini-nano-banana-resultados': 1200,
+  // First-party kilobytes only. Every route pays ~273 KB for the shared bundle;
+  // the home page adds the nine project screenshots, /allpost the post covers.
+  // Set just above today's figure so a regression fails and nothing nags.
+  '/': 550,
+  '/allpost': 380,
+  '/green-and-blind': 340,
+  '/the-audits-blind-spot': 340,
+  '/3-prompts-gemini-nano-banana-resultados': 360,
 };
 
 if (typeof WebSocket !== 'function') {
@@ -81,31 +82,53 @@ async function cdp(url) {
   };
 }
 
-const chrome = spawn(CHROME, [
-  '--headless',
-  '--disable-gpu',
-  '--no-first-run',
-  '--no-default-browser-check',
-  '--disable-background-networking',
-  `--remote-debugging-port=${PORT}`,
-  'about:blank',
-]);
-
-let version;
-for (let i = 0; i < 30; i++) {
+// A whole browser per route, each with its own profile directory.
+//
+// Sharing one browser and opening a tab per route looked equivalent and was not:
+// the HTTP cache is per profile, so the JS bundle was counted once, on whichever
+// route happened to be measured first, and every route after it reported 0 KB of
+// its own. The check was measuring measurement order. Target.createBrowserContext
+// would be lighter than a second Chrome; a second Chrome is impossible to get
+// subtly wrong, which is what this file is for.
+async function withChrome(fn) {
+  const port = PORT + Math.floor(Math.random() * 0); // stable; one at a time
+  const profile = mkdtempSync(join(tmpdir(), 'budget-'));
+  const proc = spawn(CHROME, [
+    '--headless',
+    '--disable-gpu',
+    '--no-first-run',
+    '--no-default-browser-check',
+    '--disable-background-networking',
+    `--user-data-dir=${profile}`,
+    `--remote-debugging-port=${port}`,
+    'about:blank',
+  ]);
   try {
-    version = await (await fetch(`http://127.0.0.1:${PORT}/json/version`)).json();
-    break;
-  } catch {
-    await sleep(300);
+    for (let i = 0; i < 40; i++) {
+      try {
+        await (await fetch(`http://127.0.0.1:${port}/json/version`)).json();
+        break;
+      } catch {
+        await sleep(300);
+      }
+    }
+    return await fn(port);
+  } finally {
+    // Wait for the process to actually exit. kill() only sends the signal, and
+    // Chrome keeps writing its profile for a moment afterwards — removing the
+    // directory under it fails with ENOTEMPTY.
+    const exited = new Promise((r) => proc.once('exit', r));
+    proc.kill();
+    await Promise.race([exited, sleep(3000)]);
+    rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
   }
 }
-if (!version) {
-  chrome.kill();
-  throw new Error('Chrome did not expose a debugging port');
-}
 
-async function weigh(route) {
+async function weigh(route, PORT) {
+  // A fresh browser context per route. Sharing one leaks the HTTP cache between
+  // them: the JS bundle was counted on the first route measured and on none of
+  // the others, so every route after the first under-reported its own weight by
+  // the size of everything it shares. The check was measuring measurement order.
   const target = await (
     await fetch(`http://127.0.0.1:${PORT}/json/new?about:blank`, { method: 'PUT' })
   ).json();
@@ -121,8 +144,8 @@ async function weigh(route) {
     } else if (method === 'Network.loadingFinished') {
       // encodedDataLength is what came over the wire, headers included, after
       // content-encoding. It is the number a person on a phone plan pays.
-      bytes += params.encodedDataLength;
       const url = inFlight.get(params.requestId) ?? '';
+      bytes += params.encodedDataLength;
       try {
         const host = new URL(url).host;
         byHost.set(host, (byHost.get(host) ?? 0) + params.encodedDataLength);
@@ -148,25 +171,42 @@ async function weigh(route) {
 
 const results = [];
 for (const route of Object.keys(BUDGETS)) {
-  const { bytes, byHost } = await weigh(route);
-  results.push({ route, kb: Math.round(bytes / 1024), byHost });
+  const { bytes, byHost } = await withChrome((port) => weigh(route, port));
+  // Budgets enforce FIRST-PARTY bytes only. AdSense measured between 247 KB and
+  // 644 KB across runs of the same route on the same afternoon — a budget over
+  // the total goes red or green depending on what Google decided to load that
+  // second, and a check that fails at random is one people learn to ignore.
+  // Third-party is still measured and printed, because not enforcing it is not
+  // a reason to stop looking at it.
+  let own = 0;
+  let third = 0;
+  for (const [host, b] of byHost) {
+    if (host.endsWith('codewithgabo.com')) own += b;
+    else third += b;
+  }
+  results.push({
+    route,
+    kb: Math.round(bytes / 1024),
+    own: Math.round(own / 1024),
+    third: Math.round(third / 1024),
+    byHost,
+  });
 }
-
-chrome.kill();
 
 const pad = (s, n) => String(s).padEnd(n);
 let failed = 0;
 
-console.log(`\n  ${pad('ROUTE', 44)} ${pad('MEASURED', 10)} ${pad('BUDGET', 9)}`);
-console.log('  ' + '─'.repeat(66));
+console.log(
+  `\n  ${pad('ROUTE', 44)} ${pad('OWN', 9)} ${pad('BUDGET', 9)} ${pad('3RD', 8)} TOTAL`
+);
+console.log('  ' + '─'.repeat(84));
 for (const r of results) {
   const budget = BUDGETS[r.route];
-  const over = r.kb > budget;
+  const over = r.own > budget;
   if (over && !MEASURE) failed++;
   console.log(
-    `  ${pad(r.route, 44)} ${pad(r.kb + ' KB', 10)} ${pad(budget + ' KB', 9)} ${
-      over ? '  OVER' : ''
-    }`
+    `  ${pad(r.route, 44)} ${pad(r.own + ' KB', 9)} ${pad(budget + ' KB', 9)} ` +
+      `${pad(r.third + ' KB', 8)} ${r.kb} KB${over ? '   OVER' : ''}`
   );
   if (MEASURE || over) {
     const top = [...r.byHost.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4);
