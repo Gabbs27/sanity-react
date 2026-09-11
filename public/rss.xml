@@ -9,6 +9,472 @@
     <language>es</language>
     <atom:link href="https://codewithgabo.com/rss.xml" rel="self" type="application/rss+xml" />
     <item>
+      <title><![CDATA[Four CSS workarounds you can delete]]></title>
+      <link>https://codewithgabo.com/four-css-workarounds-you-can-delete</link>
+      <guid isPermaLink="true">https://codewithgabo.com/four-css-workarounds-you-can-delete</guid>
+      <pubDate>Fri, 11 Sep 2026 22:32:35 GMT</pubDate>
+      <description><![CDATA[contrast-color(), @scope, style queries and :open all reached Baseline this year. Each one removes a workaround that is probably still alive in your codebase because you believed CSS could not do it.]]></description>
+      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/5ab93b91986d79b06c5e9d7c39df745a55e4d8cf-1200x630.png" alt="Four CSS workarounds you can delete" />
+<p>There's a category of code nobody ever revisits: the workaround you wrote three years ago because CSS couldn't do something, still sitting there because you still believe CSS can't do it.</p>
+<p>That belief has an expiry date, and nothing tells you when it passes.</p>
+<p>Four of those workarounds expired this year. All four are Baseline <em>newly available</em>, which means they work in the current versions of Chrome, Edge, Firefox and Safari, on desktop and mobile. It does not mean they work on your aunt's old phone — that's still your call — but it does mean you now have a date to look at instead of a hunch.</p>
+<h2>1. <code>contrast-color()</code> deletes your luminance function</h2>
+<p>If you've ever let a user pick a color, you wrote this or something near it:</p>
+<pre><code>function contrastColor(hex) {
+  const [r, g, b] = [1, 3, 5].map((i) =&gt; parseInt(hex.slice(i, i + 2), 16) / 255);
+  const lum = (c) =&gt; (c &lt;= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+  const L = 0.2126 * lum(r) + 0.7152 * lum(g) + 0.0722 * lum(b);
+  return L &gt; 0.179 ? '#000' : '#fff';
+}</code></pre>
+<p>Then you had to push the result into a CSS variable from JavaScript, which means your button's text color now depends on a script having run. All of that to choose between white and black.</p>
+<p>Now it's one line of CSS:</p>
+<pre><code>.button {
+  background: var(--user-color);
+  color: contrast-color(var(--user-color));
+}</code></pre>
+<p><code>contrast-color()</code> takes any color and returns white or black, whichever contrasts most against it. If the two tie, it returns white. It targets the WCAG AA minimum of 4.5:1, and browsers are free to use better algorithms.</p>
+<p>Available since April 2026.</p>
+<p>Watch what it <strong>doesn't</strong> do: it returns white or black, nothing else. If your brand demands a specific gray or a dark navy, this won't help. It solves the common case, which is precisely the case where people get tired and hardcode white.</p>
+<h2>2. <code>@scope</code> deletes the naming discipline</h2>
+<p>The eternal problem: you want to style the images inside a block, but not the ones inside a <code>figure</code> inside that block. The historical answer was to never nest and to baptize everything with a convention the whole team had to remember.</p>
+<pre><code>@scope (.feature) to (figure) {
+  img {
+    border: 5px solid black;
+    background-color: goldenrod;
+  }
+}</code></pre>
+<p>That's a <em>donut scope</em>: the root <code>.feature</code> sets the upper bound, inclusive; the limit <code>figure</code> sets the lower one, exclusive. Everything between them gets the style, and everything inside the <code>figure</code> doesn't.</p>
+<p>The interesting part isn't the syntax, it's what it removes. BEM and its relatives exist because a selector's scope couldn't be declared, so it had to be encoded into the name. Now it can be declared.</p>
+<p>Baseline since March 2026.</p>
+<h2>3. Style queries delete the class that only existed to announce something</h2>
+<p>This is the newest of the four — Baseline in May 2026 — and the one fewest people know about.</p>
+<p>The container queries everyone uses ask about size. Style queries ask about the value of a custom property on the container:</p>
+<pre><code>@property --theme {
+  syntax: &quot;&lt;color&gt;&quot;;
+  inherits: true;
+  initial-value: red;
+}
+
+@container style(--theme: red) {
+  output { font-weight: bold; }
+}
+
+@container style(--theme: green) or style(--theme: blue) {
+  output { color: var(--theme); }
+}</code></pre>
+<p>It takes <code>not</code>, <code>and</code> and <code>or</code>, so conditions compose.</p>
+<p>The detail that makes it worth the trouble: <strong>you don't need `container-type`.</strong> Any element can be a style container. The default, <code>container-type: normal</code>, stops it from being a size container but leaves it working as a style container.</p>
+<p>What it deletes: that <code>.theme-dark</code> class you put on the parent purely so the children could tell which mode they were in, duplicating information that already lived in a CSS variable two lines above.</p>
+<h2>4. <code>:open</code> deletes the listener</h2>
+<pre><code>details:open summary {
+  border-bottom: 1px solid currentColor;
+}</code></pre>
+<p>That used to be an <code>addEventListener('toggle')</code> adding and removing a class. One listener, one class, and a bug waiting for the day somebody opened the <code>details</code> through some other path.</p>
+<p><code>:open</code> matches elements that have an open state, while they're open. Baseline since May 2026.</p>
+<p>The same batch brought <code>ToggleEvent.source</code>, which hands you the control element that triggered a popover's toggle — the question people usually end up answering with a global variable.</p>
+<h2>What else moved, while you're here</h2>
+<ul>
+<li><code>lh</code> and <code>rlh</code> as length units: <code>lh</code> is the element's computed line-height, <code>rlh</code> the root element's. Both now <em>widely available</em>.</li>
+<li><code>:user-invalid</code>, which only matches an invalid field <strong>after</strong> the user has interacted with it. The end of forms that shout red at you before you've typed a character.</li>
+<li><code>clip-path</code> and <code>Navigator.userActivation</code>, both widely available now.</li>
+<li><code>text-decoration-skip-ink: all</code>, to force the underline to skip every glyph.</li>
+<li><code>SharedWorker</code>, reachable from several tabs or iframes at once.</li>
+</ul>
+<h2>The honest part</h2>
+<p><em>Newly available</em> does not mean &quot;safe for all of your traffic.&quot; It means it works in the current versions of the four major browsers, and it might not work on older devices or browsers. Who actually uses your site is a question for your analytics, not for an article.</p>
+<p>But that wasn't the question. The question was whether the workaround you're still carrying is still necessary, and that one does have an answer: a line on MDN, with a month and a year on it.</p>
+<p>Worth reading that line before you write the next luminance function. You already wrote it once.</p>
+<p><strong>Sources:</strong> <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/contrast-color">contrast-color() — MDN</a> · <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@scope">@scope — MDN</a> · <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Containment/Container_size_and_style_queries">Container size and style queries — MDN</a> · <a href="https://web.dev/blog/baseline-digest-may-2026">Baseline monthly digest, May 2026 — web.dev</a></p>]]></content:encoded>
+    </item>
+    <item>
+      <title><![CDATA[Cuatro trucos de CSS que ya puedes borrar]]></title>
+      <link>https://codewithgabo.com/cuatro-trucos-de-css-que-ya-puedes-borrar</link>
+      <guid isPermaLink="true">https://codewithgabo.com/cuatro-trucos-de-css-que-ya-puedes-borrar</guid>
+      <pubDate>Fri, 11 Sep 2026 22:32:33 GMT</pubDate>
+      <description><![CDATA[contrast-color(), @scope, las style queries y :open llegaron a Baseline este año. Cada uno elimina un truco que probablemente sigue vivo en tu código porque creías que CSS no podía hacerlo.]]></description>
+      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/7ef7781c091bdd580334df0a8fac644aefb3f42b-1200x630.png" alt="Cuatro trucos de CSS que ya puedes borrar" />
+<p>Hay una categoría de código que nadie revisa nunca: el truco que escribiste hace tres años porque CSS no podía hacer algo, y que sigue ahí porque tú sigues creyendo que CSS no puede hacerlo.</p>
+<p>Esa creencia tiene fecha de caducidad y nadie te avisa cuando se vence.</p>
+<p>Cuatro de esos trucos se vencieron este año. Los cuatro son Baseline <em>newly available</em>, que quiere decir que funcionan en las versiones actuales de Chrome, Edge, Firefox y Safari, en escritorio y en móvil. No quiere decir que funcionen en el celular viejo de tu tía — eso sigue siendo decisión tuya — pero sí quiere decir que ya es una fecha que puedes mirar, en vez de una corazonada.</p>
+<h2>1. <code>contrast-color()</code> borra tu función de luminancia</h2>
+<p>Si alguna vez dejaste que el usuario escogiera un color, escribiste esto o algo parecido:</p>
+<pre><code>function contrastColor(hex) {
+  const [r, g, b] = [1, 3, 5].map((i) =&gt; parseInt(hex.slice(i, i + 2), 16) / 255);
+  const lum = (c) =&gt; (c &lt;= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+  const L = 0.2126 * lum(r) + 0.7152 * lum(g) + 0.0722 * lum(b);
+  return L &gt; 0.179 ? '#000' : '#fff';
+}</code></pre>
+<p>Y después tuviste que meter el resultado en una variable CSS desde JavaScript, lo que significa que el color del texto de tu botón ahora depende de que un script haya corrido. Todo eso para decidir entre blanco y negro.</p>
+<p>Ahora es una línea de CSS:</p>
+<pre><code>.boton {
+  background: var(--color-usuario);
+  color: contrast-color(var(--color-usuario));
+}</code></pre>
+<p><code>contrast-color()</code> recibe cualquier color y devuelve blanco o negro, el que más contraste haga contra él. Si los dos empatan, devuelve blanco. La función apunta al mínimo AA de WCAG, que son 4.5:1, y los navegadores pueden usar algoritmos mejores.</p>
+<p>Está disponible desde abril de 2026.</p>
+<p>Ojo con lo que <strong>no</strong> hace: devuelve blanco o negro, nada más. Si tu marca exige un gris específico o un azul oscuro, esto no te sirve. Resuelve el caso común, que es exactamente el caso donde uno se cansa y pone blanco fijo.</p>
+<h2>2. <code>@scope</code> borra la disciplina de nombrar clases</h2>
+<p>El problema de siempre: quieres estilar las imágenes de un bloque, pero no las que están dentro de un <code>figure</code> adentro de ese bloque. La solución histórica fue no anidar nunca y bautizar cada cosa con una convención que todo el equipo tenía que recordar.</p>
+<pre><code>@scope (.feature) to (figure) {
+  img {
+    border: 5px solid black;
+    background-color: goldenrod;
+  }
+}</code></pre>
+<p>Eso se llama <em>donut scope</em>: la raíz <code>.feature</code> marca el borde de arriba, incluido; el límite <code>figure</code> marca el de abajo, excluido. Todo lo que quede entre los dos recibe el estilo, y lo de adentro del <code>figure</code> no.</p>
+<p>Lo interesante no es la sintaxis, es qué elimina. BEM y compañía existen porque el alcance de un selector no se podía declarar, así que había que codificarlo en el nombre. Ahora se declara.</p>
+<p>Baseline desde marzo de 2026.</p>
+<h2>3. Las style queries borran la clase que solo existía para avisar</h2>
+<p>Esta es la más nueva de las cuatro — Baseline en mayo de 2026 — y es la que menos gente conoce.</p>
+<p>Las container queries que todo el mundo usa preguntan por tamaño. Las style queries preguntan por el valor de una propiedad personalizada del contenedor:</p>
+<pre><code>@property --theme {
+  syntax: &quot;&lt;color&gt;&quot;;
+  inherits: true;
+  initial-value: red;
+}
+
+@container style(--theme: red) {
+  output { font-weight: bold; }
+}
+
+@container style(--theme: green) or style(--theme: blue) {
+  output { color: var(--theme); }
+}</code></pre>
+<p>Acepta <code>not</code>, <code>and</code> y <code>or</code>, así que puedes combinar condiciones.</p>
+<p>El detalle que hace que valga la pena: <strong>no hace falta poner `container-type`.</strong> Cualquier elemento sirve de contenedor de estilo. El valor por defecto, <code>container-type: normal</code>, evita que sea contenedor de tamaño pero lo deja funcionar como contenedor de estilo.</p>
+<p>Lo que borra: esa clase <code>.tema-oscuro</code> que ponías en el padre únicamente para que los hijos supieran en qué modo estaban, duplicando una información que ya vivía en una variable CSS dos líneas más arriba.</p>
+<h2>4. <code>:open</code> borra el listener</h2>
+<pre><code>details:open summary {
+  border-bottom: 1px solid currentColor;
+}</code></pre>
+<p>Antes eso era un <code>addEventListener('toggle')</code> que ponía o quitaba una clase. Un listener, una clase, y un bug esperando el día que alguien abriera el <code>details</code> por otro camino.</p>
+<p><code>:open</code> empata con los elementos que tienen estado abierto mientras están abiertos. Baseline desde mayo de 2026.</p>
+<p>En el mismo lote llegó <code>ToggleEvent.source</code>, que te devuelve el elemento de control que disparó el toggle de un popover — que es la pregunta que uno siempre termina respondiendo con una variable global.</p>
+<h2>Lo que también se movió, por si acaso</h2>
+<ul>
+<li><code>lh</code> y <code>rlh</code> como unidades de longitud: <code>lh</code> es el line-height calculado del elemento, <code>rlh</code> el del elemento raíz. Ya son <em>widely available</em>.</li>
+<li><code>:user-invalid</code>, que solo empata con un campo inválido <strong>después</strong> de que el usuario lo tocó. El fin de los formularios que te gritan en rojo antes de que escribas la primera letra.</li>
+<li><code>clip-path</code> y <code>Navigator.userActivation</code>, ambos ya widely available.</li>
+<li><code>text-decoration-skip-ink: all</code>, para forzar que el subrayado esquive todos los glifos.</li>
+<li><code>SharedWorker</code>, accesible desde varias pestañas o iframes a la vez.</li>
+</ul>
+<h2>La parte honesta</h2>
+<p><em>Newly available</em> no significa &quot;seguro para todo tu tráfico&quot;. Significa que funciona en las versiones actuales de los cuatro navegadores grandes, y que puede no funcionar en dispositivos o navegadores viejos. Quién usa tu sitio lo dicen tus analíticas, no un artículo.</p>
+<p>Pero esa no era la pregunta. La pregunta era si el truco que llevas cargando todavía hace falta, y esa sí tiene respuesta: una línea en MDN, con mes y año.</p>
+<p>Vale la pena leer esa línea antes de escribir la próxima función de luminancia. Ya la escribiste una vez.</p>
+<p><strong>Fuentes:</strong> <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/contrast-color">contrast-color() — MDN</a> · <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@scope">@scope — MDN</a> · <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Containment/Container_size_and_style_queries">Container size and style queries — MDN</a> · <a href="https://web.dev/blog/baseline-digest-may-2026">Baseline monthly digest, mayo 2026 — web.dev</a></p>]]></content:encoded>
+    </item>
+    <item>
+      <title><![CDATA[Chrome already ships a model. It isn't the one being announced]]></title>
+      <link>https://codewithgabo.com/chrome-already-ships-a-model</link>
+      <guid isPermaLink="true">https://codewithgabo.com/chrome-already-ships-a-model</guid>
+      <pubDate>Fri, 11 Sep 2026 22:32:30 GMT</pubDate>
+      <description><![CDATA[The Prompt API isn't stable on the web — it's an origin trial. But three built-in AI APIs have been stable since Chrome 138, and you can ship them today with no server and no user text leaving the device.]]></description>
+      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/76e38d5d7ef26738b71efefc9b65bee3a32e5719-1200x630.png" alt="Chrome already ships a model. It isn't the one being announced" />
+<p>I almost wrote a different post.</p>
+<p>It was going to be about the Prompt API: Gemini Nano running inside Chrome, no server, no API key, no per-token cost. I read it in several places and they all said the same thing, that Chrome 148 made it stable. Chrome 148 hit stable on May 5, 2026, so the date lined up.</p>
+<p>I opened the official status table before writing. It says something else.</p>
+<ul>
+<li><strong>Translator</strong> — stable, since Chrome 138</li>
+<li><strong>Language Detector</strong> — stable, since Chrome 138</li>
+<li><strong>Summarizer</strong> — stable, since Chrome 138</li>
+<li><strong>Prompt API in extensions</strong> — stable, since Chrome 138</li>
+<li><strong>Prompt API on the web</strong> — origin trial, Chrome 148</li>
+<li><strong>Writer, Rewriter and Proofreader</strong> — developer trial, not shipped</li>
+</ul>
+<p>There's the line the headlines lost. The Prompt API is stable <strong>for extensions</strong>. For a web page it's an origin trial, which is a different thing: you register, you get a token for your domain, and it expires.</p>
+<p>What turned out to be interesting is what I found while checking: there are three AI APIs that have been stable since Chrome 138, that you can use today on an ordinary page, and that almost nobody is writing about.</p>
+<h2>What you can actually ship today</h2>
+<p>Translation, no server:</p>
+<pre><code>if ('Translator' in self) {
+  // The API exists in this browser.
+}
+
+const availability = await Translator.availability({
+  sourceLanguage: 'es',
+  targetLanguage: 'fr',
+});
+
+const translator = await Translator.create({
+  sourceLanguage: 'es',
+  targetLanguage: 'fr',
+});
+
+await translator.translate('Where is the next bus stop, please?');</code></pre>
+<p>Summarization, also no server:</p>
+<pre><code>const summarizer = await Summarizer.create({
+  type: 'key-points',   // or 'tldr', 'teaser', 'headline'
+  format: 'markdown',   // or 'plain-text'
+  length: 'short',      // or 'medium', 'long'
+});
+
+await summarizer.summarize(longText, { context: 'For a reader in a hurry' });</code></pre>
+<p>And there's a streaming version, which on a long summary is the difference between a frozen screen and text appearing:</p>
+<pre><code>for await (const chunk of summarizer.summarizeStreaming(longText)) {
+  output.textContent += chunk;
+}</code></pre>
+<p>The third is Language Detector, which does exactly what the name says and is the thing missing from nearly every multilingual contact form.</p>
+<p>None of these three send anything to any server. The user's text never leaves their machine.</p>
+<h2><code>availability()</code> has four states, not two</h2>
+<p>Here's the part that makes this unlike calling a normal API. The model doesn't ship with the browser: it downloads onto your visitor's machine. So &quot;is it available?&quot; has four possible answers, not two:</p>
+<ul>
+<li><code>&quot;unavailable&quot;</code> — this machine can't</li>
+<li><code>&quot;downloadable&quot;</code> — it can, but hasn't yet</li>
+<li><code>&quot;downloading&quot;</code> — it's coming down right now</li>
+<li><code>&quot;available&quot;</code> — ready</li>
+</ul>
+<p>Treat that return value as a boolean and the <code>downloadable</code> case turns into a permanent spinner. You have to trigger the download and show its progress:</p>
+<pre><code>const translator = await Translator.create({
+  sourceLanguage: 'en',
+  targetLanguage: 'fr',
+  monitor(m) {
+    m.addEventListener('downloadprogress', (e) =&gt; {
+      console.log(`Downloaded ${e.loaded * 100}%`);
+    });
+  },
+});</code></pre>
+<p>That <code>downloadprogress</code> isn't a nicety. It's the only way you get to tell someone why their browser has been quiet for two minutes.</p>
+<h2>The cost that doesn't make the headlines</h2>
+<p>This is what to know before getting excited, and it comes from the same documentation:</p>
+<ul>
+<li><strong>Operating systems:</strong> Windows 10 or 11, macOS 13 and up, Linux, or ChromeOS on Chromebook Plus.</li>
+<li><strong>Free space:</strong> at least 22 GB.</li>
+<li><strong>Hardware:</strong> strictly more than 4 GB of VRAM on the GPU, or 16 GB of RAM and 4 CPU cores.</li>
+<li><strong>Connection:</strong> unlimited data or an unmetered one.</li>
+<li><strong>Mobile:</strong> no. The Translator docs say it outright — these APIs don't work on mobile devices.</li>
+</ul>
+<p>Add it up: an 8 GB laptop without a decent GPU is out. A phone is out, and phones are half your traffic or more.</p>
+<p>There are finer details too. The Summarizer requires user activation before it initializes — you can't fire it just because the page loaded — and supports English, Japanese, Spanish, German and French. The Translator covers 40-plus languages. Outside Chrome, the Translator works in Edge 148; Firefox and Safari don't have it.</p>
+<h2>So is it useful?</h2>
+<p>It is, with one condition: <strong>it can never be the only path.</strong></p>
+<p>The right shape is progressive enhancement. Your summary happens on the server, or it simply doesn't happen and you show the full text. If the browser turns out to carry the model, it happens there instead: free, instant, and without the user's text leaving their machine. If not, nobody finds out that branch existed.</p>
+<p>That flips the economics of certain features. A summary per article costs tokens on a server and zero on the client. Translating your interface costs one call per language, or zero. And the privacy argument is real and verifiable: there's no network request to intercept because there's no network request.</p>
+<h2>And the Prompt API</h2>
+<p>When it lands, it's the big one. It takes text, image and audio as input, and — this is what makes it genuinely usable — it lets you constrain the output to a regular expression or a JSON schema. That's the thing that makes wiring a model into code painful: not that it gets things wrong, but that it returns something your parser didn't expect. Chrome 148 also added the sampling parameters <code>temperature</code> and <code>topK</code>, in origin trial as well.</p>
+<p>The session looks like this:</p>
+<pre><code>const session = await LanguageModel.create();
+const text = await session.prompt('Write me a poem!');
+
+const stream = session.promptStreaming('Write me an extra-long poem!');
+for await (const chunk of stream) { console.log(chunk); }
+
+session.destroy();</code></pre>
+<p>It has a context window you can inspect with <code>session.contextUsage</code> against <code>session.contextWindow</code>. When it fills, the oldest exchanges get dropped, except the system prompt. If a prompt flat out doesn't fit, it throws a <code>QuotaExceededError</code> carrying <code>requested</code> and <code>contextWindow</code>, so you know by how much you overshot.</p>
+<p>All of that is real and documented. What it isn't, yet, is stable on the web.</p>
+<h2>What I'm taking from this</h2>
+<p>The fact that changed this post wasn't technical. It was that the word &quot;stable&quot; has a scope, and the scope doesn't travel attached to the word.</p>
+<p>&quot;The Prompt API is stable in Chrome 138&quot; is true. It's true for extensions. For a web page it's an origin trial, and the difference between those two is whether you can build a product on it.</p>
+<p>The table that clears this up is one click from every article I read. Finding out wasn't the cheap option. Repeating it was.</p>
+<p><strong>Sources:</strong> <a href="https://developer.chrome.com/docs/ai/built-in-apis">Built-in AI APIs — Chrome for Developers</a> · <a href="https://developer.chrome.com/docs/ai/translator-api">Translator API</a> · <a href="https://developer.chrome.com/docs/ai/summarizer-api">Summarizer API</a> · <a href="https://developer.chrome.com/docs/ai/prompt-api">Prompt API</a> · <a href="https://developer.chrome.com/release-notes/148">Chrome 148 release notes</a></p>]]></content:encoded>
+    </item>
+    <item>
+      <title><![CDATA[Chrome ya trae un modelo adentro. No es el que están anunciando]]></title>
+      <link>https://codewithgabo.com/chrome-ya-trae-un-modelo-adentro</link>
+      <guid isPermaLink="true">https://codewithgabo.com/chrome-ya-trae-un-modelo-adentro</guid>
+      <pubDate>Fri, 11 Sep 2026 22:32:27 GMT</pubDate>
+      <description><![CDATA[El Prompt API no está estable en la web: es origin trial. Pero hay tres APIs de IA estables desde Chrome 138 que puedes usar hoy, sin servidor y sin que el texto del usuario salga de su máquina.]]></description>
+      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/718397a11ea50fae6998e6c7ec89ce7c4ac1184d-1200x630.png" alt="Chrome ya trae un modelo adentro. No es el que están anunciando" />
+<p>Casi escribo otro post.</p>
+<p>Iba a ser sobre el Prompt API: Gemini Nano corriendo dentro de Chrome, sin servidor, sin llave de API, sin costo por token. Lo leí en varios sitios y todos decían lo mismo, que Chrome 148 lo dejó estable. Chrome 148 salió estable el 5 de mayo de 2026, así que la fecha cuadraba.</p>
+<p>Fui a la tabla de estado de la documentación oficial antes de escribir. Dice otra cosa.</p>
+<ul>
+<li><strong>Translator</strong> — estable, desde Chrome 138</li>
+<li><strong>Language Detector</strong> — estable, desde Chrome 138</li>
+<li><strong>Summarizer</strong> — estable, desde Chrome 138</li>
+<li><strong>Prompt API en extensiones</strong> — estable, desde Chrome 138</li>
+<li><strong>Prompt API en la web</strong> — origin trial, Chrome 148</li>
+<li><strong>Writer, Rewriter y Proofreader</strong> — developer trial, sin publicar</li>
+</ul>
+<p>Ahí está la línea que se les perdió a los titulares. El Prompt API está estable <strong>para extensiones</strong>. Para una página web es un origin trial, que es otra cosa: te registras, te dan un token para tu dominio, y se vence.</p>
+<p>Lo interesante es lo que apareció cuando fui a comprobar eso: hay tres APIs de IA que llevan estables desde Chrome 138, que sí puedes usar hoy en una página normal, y de las que casi nadie está escribiendo.</p>
+<h2>Lo que sí puedes mandar a producción hoy</h2>
+<p>Traducción, sin servidor:</p>
+<pre><code>if ('Translator' in self) {
+  // El API existe en este navegador.
+}
+
+const disponible = await Translator.availability({
+  sourceLanguage: 'es',
+  targetLanguage: 'fr',
+});
+
+const translator = await Translator.create({
+  sourceLanguage: 'es',
+  targetLanguage: 'fr',
+});
+
+await translator.translate('¿Dónde queda la próxima parada, por favor?');</code></pre>
+<p>Resumen, también sin servidor:</p>
+<pre><code>const summarizer = await Summarizer.create({
+  type: 'key-points',   // o 'tldr', 'teaser', 'headline'
+  format: 'markdown',   // o 'plain-text'
+  length: 'short',      // o 'medium', 'long'
+});
+
+await summarizer.summarize(textoLargo, { context: 'Para un lector apurado' });</code></pre>
+<p>Y hay versión en streaming, que para un resumen largo es la diferencia entre una pantalla congelada y texto apareciendo:</p>
+<pre><code>for await (const chunk of summarizer.summarizeStreaming(textoLargo)) {
+  salida.textContent += chunk;
+}</code></pre>
+<p>El tercero es Language Detector, que hace exactamente lo que dice el nombre y es el que le falta a casi todo formulario de contacto multilingüe.</p>
+<p>Ninguno de estos tres manda nada a ningún servidor. El texto del usuario no sale de su computadora.</p>
+<h2><code>availability()</code> tiene cuatro estados, no dos</h2>
+<p>Acá está la parte que hace que esto no se parezca a llamar una API normal. El modelo no viene con el navegador: se descarga a la máquina de quien te visita. Así que la pregunta &quot;¿está disponible?&quot; tiene cuatro respuestas posibles, no dos:</p>
+<ul>
+<li><code>&quot;unavailable&quot;</code> — este equipo no puede</li>
+<li><code>&quot;downloadable&quot;</code> — puede, pero todavía no lo bajó</li>
+<li><code>&quot;downloading&quot;</code> — lo está bajando ahora mismo</li>
+<li><code>&quot;available&quot;</code> — listo</li>
+</ul>
+<p>Si tratas ese resultado como un booleano, el caso <code>downloadable</code> se te convierte en un spinner eterno. Hay que pedir la descarga y mostrar su progreso:</p>
+<pre><code>const translator = await Translator.create({
+  sourceLanguage: 'en',
+  targetLanguage: 'fr',
+  monitor(m) {
+    m.addEventListener('downloadprogress', (e) =&gt; {
+      console.log(`Descargado ${e.loaded * 100}%`);
+    });
+  },
+});</code></pre>
+<p>Ese <code>downloadprogress</code> no es un detalle de lujo. Es la única forma que tienes de decirle a alguien por qué su navegador lleva dos minutos sin responderte.</p>
+<h2>El costo que no sale en los titulares</h2>
+<p>Esto es lo que hay que saber antes de emocionarse, y sale de la misma documentación:</p>
+<ul>
+<li><strong>Sistemas:</strong> Windows 10 u 11, macOS 13 o superior, Linux, o ChromeOS en Chromebook Plus.</li>
+<li><strong>Espacio libre:</strong> 22 GB como mínimo.</li>
+<li><strong>Hardware:</strong> más de 4 GB de VRAM en la GPU, o 16 GB de RAM y 4 núcleos de CPU.</li>
+<li><strong>Conexión:</strong> sin límite de datos o no medida.</li>
+<li><strong>Móvil:</strong> no. La documentación del Translator lo dice directo — estas APIs no funcionan en dispositivos móviles.</li>
+</ul>
+<p>Súmalo: una laptop de 8 GB de RAM sin GPU decente queda fuera. Un celular queda fuera, y el celular es la mitad de tu tráfico o más.</p>
+<p>También hay detalles finos. El Summarizer exige activación del usuario antes de inicializarse — no lo puedes arrancar solo porque cargó la página — y soporta inglés, japonés, español, alemán y francés. El Translator cubre más de 40 idiomas. Y fuera de Chrome, el Translator funciona en Edge 148; Firefox y Safari no lo tienen.</p>
+<h2>Entonces, ¿sirve o no?</h2>
+<p>Sirve, con una condición: <strong>nunca puede ser el único camino.</strong></p>
+<p>La forma correcta es mejora progresiva. Tu resumen se hace en el servidor, o sencillamente no se hace y muestras el texto completo. Si el navegador resulta traer el modelo, se hace ahí: gratis, instantáneo y sin que el texto de tu usuario salga de su máquina. Si no, nadie se entera de que existía esa rama.</p>
+<p>Eso da vuelta la economía de ciertas funciones. Un resumen por artículo cuesta tokens en un servidor y cero en el cliente. Una traducción de la interfaz cuesta una llamada por idioma, o cero. Y el argumento de privacidad es real y verificable: no hay petición de red que interceptar porque no hay petición de red.</p>
+<h2>Y el Prompt API</h2>
+<p>Cuando llegue, es el grande. Acepta texto, imagen y audio de entrada, y —esto es lo que lo hace utilizable de verdad— permite restringir la salida a una expresión regular o a un esquema JSON. Ese es el problema que hace que integrar un modelo en código sea doloroso: no que se equivoque, sino que devuelva algo que tu parser no espera. Chrome 148 además agregó, también en origin trial, los parámetros de muestreo <code>temperature</code> y <code>topK</code>.</p>
+<p>La sesión se maneja así:</p>
+<pre><code>const session = await LanguageModel.create();
+const texto = await session.prompt('Escríbeme un poema');
+
+const stream = session.promptStreaming('Escríbeme un poema largo');
+for await (const chunk of stream) { console.log(chunk); }
+
+session.destroy();</code></pre>
+<p>Y tiene ventana de contexto, que se consulta con <code>session.contextUsage</code> contra <code>session.contextWindow</code>. Cuando se llena, se van botando los intercambios más viejos, menos el prompt de sistema. Si de plano no cabe, tira un <code>QuotaExceededError</code> que trae <code>requested</code> y <code>contextWindow</code>, para que sepas por cuánto te pasaste.</p>
+<p>Todo eso es real y está documentado. Lo que no es, todavía, es estable en la web.</p>
+<h2>Lo que me llevo</h2>
+<p>El dato que cambió este post no fue técnico. Fue que la palabra &quot;estable&quot; tiene un alcance, y el alcance no viene pegado a la palabra.</p>
+<p>&quot;El Prompt API está estable en Chrome 138&quot; es cierto. Es cierto para extensiones. Para una página web es un origin trial, y la diferencia entre las dos cosas es si puedes construir un producto encima o no.</p>
+<p>La tabla que aclara eso está a un clic de todos los artículos que leí. Lo barato no era averiguarlo. Lo barato era repetirlo.</p>
+<p><strong>Fuentes:</strong> <a href="https://developer.chrome.com/docs/ai/built-in-apis">Built-in AI APIs — Chrome for Developers</a> · <a href="https://developer.chrome.com/docs/ai/translator-api">Translator API</a> · <a href="https://developer.chrome.com/docs/ai/summarizer-api">Summarizer API</a> · <a href="https://developer.chrome.com/docs/ai/prompt-api">Prompt API</a> · <a href="https://developer.chrome.com/release-notes/148">Chrome 148 release notes</a></p>]]></content:encoded>
+    </item>
+    <item>
+      <title><![CDATA[The email you send is not the email they read]]></title>
+      <link>https://codewithgabo.com/the-email-you-send-is-not-the-email-they-read</link>
+      <guid isPermaLink="true">https://codewithgabo.com/the-email-you-send-is-not-the-email-they-read</guid>
+      <pubDate>Fri, 11 Sep 2026 22:32:24 GMT</pubDate>
+      <description><![CDATA[Three groups of mail clients do three different things to your HTML, and one of them inverts even the backgrounds you made dark on purpose. Plus what NN/g's research says about how newsletters actually get read.]]></description>
+      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/89da166168004876d488a13a737d9f5937c3cebe-1200x630.png" alt="The email you send is not the email they read" />
+<p>You write the HTML. You open it in your mail client. It looks exactly the way you designed it. You hit send.</p>
+<p>That is where the part you didn't see begins. Between your send button and your reader's eyes sits a program that may repaint your colors, invert your background, swallow your logo, or touch nothing at all. Which of those four happens has nothing to do with your code. It depends on which app that person opened the mail in.</p>
+<p>&quot;It looks fine in my client&quot; is a true statement. The problem is how closely it resembles a different statement you never made: &quot;it looks fine.&quot;</p>
+<h2>There is no dark mode behavior. There are three</h2>
+<p>Litmus groups mail clients into three buckets, and the distance between those buckets is wider than you'd guess:</p>
+<p><strong>No color changes.</strong> Apple Mail, Gmail on desktop, AOL and Yahoo Mail leave your HTML exactly as it arrived, no matter what the client's own interface is set to.</p>
+<p><strong>Partial inversion.</strong> Outlook.com and some Outlook mobile apps flip light backgrounds to dark and leave the already-dark ones alone.</p>
+<p><strong>Full inversion.</strong> The Gmail app on iOS, Outlook 2021 on Windows and Office 365 on Windows invert every color, light and dark alike.</p>
+<p>Read that last group again. <strong>They invert dark backgrounds too.</strong> If you deliberately designed a dark card, those clients hand it back to you light. A design decision becomes a design bug without anyone touching the code.</p>
+<h2>The two tags that say you handled it</h2>
+<pre><code>&lt;meta name=&quot;color-scheme&quot; content=&quot;light dark&quot;&gt;
+&lt;meta name=&quot;supported-color-schemes&quot; content=&quot;light dark&quot;&gt;</code></pre>
+<p>They go in the email's <code>&lt;head&gt;</code>, and what they do is tell the client that you took care of dark mode yourself, so it doesn't apply its automatic inversion on top of you. Then the CSS:</p>
+<pre><code>@media (prefers-color-scheme: dark) {
+  body { background-color: #272623 !important; }
+  h1, h2, p { color: #ffffff !important; }
+}</code></pre>
+<p>That <code>!important</code> isn't sloppiness. In email you aren't competing with your own styles, you're competing with the ones the client injects over yours.</p>
+<h2>The pure white trap</h2>
+<p>Here's the detail that feels unfair and is real: once you add the tags above, <strong>avoid pure white</strong> (<code>#ffffff</code>) as a background. Apple Mail will invert it anyway. An off-white — barely off — stays where you put it.</p>
+<p>Then there's the logo. If your logo is a PNG with a transparent background and dark lettering, on a dark background it doesn't look bad, it looks like nothing. The fix is a translucent outline so it stays legible either way, or midtones with enough contrast against both.</p>
+<p>If you want to swap the image entirely, <code>@media (prefers-color-scheme: dark)</code> covers most clients, and Outlook on Android needs the <code>[data-ogsc]</code> prefix.</p>
+<h2>But dark mode is not your biggest problem</h2>
+<p>Everything above is about how the email looks. Nielsen Norman Group's research is about something less comfortable: how it gets read.</p>
+<p>Their newsletter usability report comes out of six rounds of studies over sixteen years, starting in 2002, with real users in the United States, Australia, England, Hong Kong, Japan and Sweden, testing more than 500 newsletters. It produced 199 design guidelines across 537 pages.</p>
+<p>The findings that actually change how you write:</p>
+<p><strong>People scan, they don't read.</strong> We know this about web pages and forget it about email, which is where it hurts most, because your email is competing with forty others.</p>
+<p><strong>Reading on a phone is still uncomfortable.</strong> Users rated the ease of reading newsletters on their phones a 3.3 out of 7. That isn't a disaster; it's mediocre, which is worse, because nobody files a complaint about mediocre.</p>
+<p><strong>&quot;Mobile newsletter&quot; is a misnomer.</strong> Only 7% of newsletters would have been read on a phone only. The normal pattern is the same person reading on a computer sometimes and a phone other times. You aren't designing for a device, you're designing for a person who switches devices.</p>
+<p><strong>The subject line and the from field carry almost all the weight.</strong> And there, clarity beats cleverness every time. The study cites a real one from InterContinental Hotels: <em>&quot;Open Your (I)s to the Wonders of the Sea.&quot;</em> A pun somebody celebrated in a meeting. The study's conclusion is that people simply don't have time for word plays.</p>
+<p><strong>The valuable part goes first.</strong> Fewer and fewer readers get past the opening, so burying the good stuff in the middle is equivalent to not writing it.</p>
+<h2>The list you can actually check before sending</h2>
+<ul>
+<li><strong>Descriptive alt text on every image.</strong> When a client blocks images — and many do by default — the alt text <em>is</em> the email.</li>
+<li><strong>Absolute URLs.</strong> Mail clients don't resolve relative paths. A <code>/images/logo.png</code> simply doesn't exist there.</li>
+<li><strong>Images on a publicly reachable host.</strong> Behind a login or an internal network, nobody sees them.</li>
+<li><strong>Buttons at least 44 pixels.</strong> That's the size of a finger, not an aesthetic preference.</li>
+<li><strong>Contrast and typography.</strong> Most accessibility failures in email reduce to these two, and they're the two easiest to check before you send.</li>
+</ul>
+<h2>What looking at it won't fix</h2>
+<p>Everything above is checkable. What isn't is looking at your email in your client and concluding something about the email.</p>
+<p>It's the same trap wearing a different costume: you verified the surface that was within reach, not the one your reader looks at. On a website that means reading the DOM instead of the HTML the server actually serves. In an email it means reading the one inbox you happen to have open and calling that a test.</p>
+<p>The honest version of &quot;it looks fine&quot; is &quot;it looks fine in Apple Mail, in light mode, on a laptop screen.&quot; Written out, it stops sounding like a conclusion. It sounds like what it is: one data point, from one client, out of the three groups that exist.</p>
+<p><strong>Sources:</strong> <a href="https://www.litmus.com/blog/the-ultimate-guide-to-dark-mode-for-email-marketers">The Ultimate Guide to Dark Mode — Litmus</a> · <a href="https://www.nngroup.com/articles/e-mail-newsletters-usability/">E-Mail Newsletters: Increasing Usability — Nielsen Norman Group</a> · <a href="https://www.nngroup.com/reports/email-newsletter-design/">Marketing Email and Newsletter Usability (report) — NN/g</a></p>]]></content:encoded>
+    </item>
+    <item>
+      <title><![CDATA[El email que envías no es el que leen]]></title>
+      <link>https://codewithgabo.com/el-email-que-envias-no-es-el-que-leen</link>
+      <guid isPermaLink="true">https://codewithgabo.com/el-email-que-envias-no-es-el-que-leen</guid>
+      <pubDate>Fri, 11 Sep 2026 22:32:21 GMT</pubDate>
+      <description><![CDATA[Tres grupos de clientes de correo hacen tres cosas distintas con tu HTML, y uno de ellos invierte hasta los fondos que pusiste oscuros a propósito. Más lo que dice la investigación de NN/g sobre cómo se lee de verdad.]]></description>
+      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/92d28ba2e0f115f932804fd4c2d0cadf70993788-1200x630.png" alt="El email que envías no es el que leen" />
+<p>Escribes el HTML. Lo abres en tu cliente de correo. Se ve exactamente como lo diseñaste. Le das enviar.</p>
+<p>Ahí empieza la parte que no viste. Entre tu botón de enviar y los ojos de quien lo recibe hay un programa que puede repintarte los colores, invertirte el fondo, tragarse tu logo, o no tocar absolutamente nada. Cuál de esas cuatro cosas pasa no depende de tu código. Depende de en qué aplicación abrió el correo esa persona.</p>
+<p>&quot;Se ve bien en mi cliente&quot; es una afirmación verdadera. El problema es que se parece muchísimo a otra afirmación que no hiciste: &quot;se ve bien&quot;.</p>
+<h2>No hay un comportamiento de modo oscuro. Hay tres</h2>
+<p>La guía de Litmus sobre modo oscuro los agrupa así, y la diferencia entre los tres grupos es más grande de lo que uno se imagina:</p>
+<p><strong>No cambian nada.</strong> Apple Mail, Gmail en escritorio, AOL y Yahoo Mail dejan el HTML como llegó, sin importar si la interfaz del cliente está en oscuro.</p>
+<p><strong>Invierten parcialmente.</strong> Outlook.com y algunas apps de Outlook en celular convierten los fondos claros en oscuros y dejan tranquilos los que ya eran oscuros.</p>
+<p><strong>Invierten todo.</strong> La app de Gmail en iOS, Outlook 2021 en Windows y Office 365 en Windows invierten todos los colores, claros y oscuros por igual.</p>
+<p>Lee ese último grupo otra vez. <strong>Invierten también los fondos oscuros.</strong> Si diseñaste una tarjeta oscura a propósito, en esos clientes sale clara. Tu decisión de diseño se convierte en un error de diseño sin que nadie tocara el código.</p>
+<h2>Las dos etiquetas que declaran que te hiciste cargo</h2>
+<pre><code>&lt;meta name=&quot;color-scheme&quot; content=&quot;light dark&quot;&gt;
+&lt;meta name=&quot;supported-color-schemes&quot; content=&quot;light dark&quot;&gt;</code></pre>
+<p>Van en el <code>&lt;head&gt;</code> del correo y lo que hacen es avisarle al cliente que tú te ocupaste del modo oscuro, para que no te aplique su inversión automática por encima. Y el CSS:</p>
+<pre><code>@media (prefers-color-scheme: dark) {
+  body { background-color: #272623 !important; }
+  h1, h2, p { color: #ffffff !important; }
+}</code></pre>
+<p>Ese <code>!important</code> no es descuido. En email no compites contra tus propios estilos, compites contra los que el cliente inyecta encima de los tuyos.</p>
+<h2>La trampa del blanco puro</h2>
+<p>Acá viene el detalle que se siente injusto y es real: si pones las etiquetas de arriba, <strong>evita el blanco puro</strong> (<code>#ffffff</code>) como fondo. Apple Mail lo invierte de todas formas. Un blanco roto, apenas fuera del blanco puro, se queda donde lo pusiste.</p>
+<p>Y el logo. Si tu logo es un PNG con fondo transparente y letras oscuras, sobre un fondo oscuro desaparece — no se ve mal, se ve nada. La recomendación es darle un contorno translúcido para que siga siendo legible, o trabajar con tonos medios que tengan contraste suficiente contra los dos fondos.</p>
+<p>Si quieres cambiar la imagen completa según el modo, <code>@media (prefers-color-scheme: dark)</code> te cubre la mayoría de los clientes, y para Outlook en Android hace falta el prefijo <code>[data-ogsc]</code>.</p>
+<h2>Pero el modo oscuro no es tu problema más grande</h2>
+<p>Todo lo anterior es sobre cómo se ve. La investigación de Nielsen Norman Group es sobre algo más incómodo: cómo se lee.</p>
+<p>Su reporte de usabilidad en newsletters viene de seis rondas de estudios a lo largo de dieciséis años, empezando en 2002, con usuarios reales en Estados Unidos, Australia, Inglaterra, Hong Kong, Japón y Suecia, probando más de 500 newsletters. De ahí salieron 199 guías de diseño en un documento de 537 páginas.</p>
+<p>Los hallazgos que más cambian cómo escribes un correo:</p>
+<p><strong>La gente escanea, no lee.</strong> Esto lo sabemos para páginas web y se nos olvida para correos, que es donde más duele porque el correo compite contra otros cuarenta.</p>
+<p><strong>Leer en el celular sigue siendo incómodo.</strong> Los usuarios calificaron la facilidad de leer newsletters en el teléfono con un 3.3 sobre 7. No es un desastre; es mediocre, que es peor, porque nadie se queja.</p>
+<p><strong>&quot;Newsletter para móvil&quot; es un nombre equivocado.</strong> Solo el 7% de los newsletters se habrían leído únicamente en el teléfono. Lo normal es que la misma persona lo lea a veces en la computadora y a veces en el celular. No estás diseñando para un dispositivo, estás diseñando para una persona que cambia de dispositivo.</p>
+<p><strong>El asunto y el remitente cargan casi todo el peso.</strong> Y ahí la claridad le gana al ingenio siempre. El estudio cita un caso real de InterContinental Hotels: <em>&quot;Open Your (I)s to the Wonders of the Sea&quot;</em>. Un juego de palabras que alguien celebró en una reunión. La conclusión del estudio es que la gente sencillamente no tiene tiempo para descifrarlo.</p>
+<p><strong>Lo valioso va al principio.</strong> Cada vez menos gente pasa del primer bloque, así que enterrar lo bueno en el medio equivale a no haberlo escrito.</p>
+<h2>La lista que sí se puede revisar antes de enviar</h2>
+<ul>
+<li><strong>Texto alternativo descriptivo en cada imagen.</strong> Cuando el cliente bloquea imágenes —y muchos lo hacen por defecto— el alt es el correo.</li>
+<li><strong>URLs absolutas.</strong> Los clientes de correo no resuelven rutas relativas. Un <code>/imagenes/logo.png</code> sencillamente no existe ahí.</li>
+<li><strong>Imágenes en un host público.</strong> Si están detrás de un login o de una red interna, nadie las va a ver.</li>
+<li><strong>Botones de 44 píxeles como mínimo.</strong> Es el tamaño de un dedo, no una preferencia estética.</li>
+<li><strong>Contraste y tipografía.</strong> La mayoría de los fallos de accesibilidad en correo se reducen a estas dos cosas, y son las dos que más fácil se revisan antes de enviar.</li>
+</ul>
+<h2>Lo que no se arregla mirando</h2>
+<p>Todo lo de arriba se puede verificar. Lo que no se puede es mirar tu correo en tu cliente y concluir algo sobre el correo.</p>
+<p>Es la misma trampa de siempre, con otro disfraz: comprobaste la superficie que tenías a mano, no la que lee tu destinatario. En un sitio web eso significa mirar el DOM en vez del HTML que sirve el servidor. En un correo significa mirar la única bandeja de entrada que tienes abierta y llamarle a eso una prueba.</p>
+<p>La versión honesta de &quot;se ve bien&quot; es &quot;se ve bien en Apple Mail, en modo claro, en una pantalla de laptop&quot;. Escrito así ya no se parece a una conclusión. Se parece a lo que es: un dato, de un cliente, de los tres grupos que existen.</p>
+<p><strong>Fuentes:</strong> <a href="https://www.litmus.com/blog/the-ultimate-guide-to-dark-mode-for-email-marketers">The Ultimate Guide to Dark Mode — Litmus</a> · <a href="https://www.nngroup.com/articles/e-mail-newsletters-usability/">E-Mail Newsletters: Increasing Usability — Nielsen Norman Group</a> · <a href="https://www.nngroup.com/reports/email-newsletter-design/">Marketing Email and Newsletter Usability (reporte) — NN/g</a></p>]]></content:encoded>
+    </item>
+    <item>
       <title><![CDATA[El punto ciego de la auditoría: pesé el build, no la página]]></title>
       <link>https://codewithgabo.com/el-punto-ciego-de-la-auditoria</link>
       <guid isPermaLink="true">https://codewithgabo.com/el-punto-ciego-de-la-auditoria</guid>
@@ -1365,656 +1831,6 @@ if __name__ == &quot;__main__&quot;:
 <p>For small-scale projects with a simple component hierarchy, using props may be more suitable. However, as the scale of your project grows and the component tree becomes deeper, the Context API can provide a more scalable and maintainable solution. But remember to use Context sparingly, as overusing it can lead to unnecessary re-renders and lower reusability of components.</p>
 <h2>Conclusion</h2>
 <p>State management is a core concept in React and essential for building dynamic and interactive applications. Both props and the Context API are powerful tools for managing state in React, each with their own advantages and suitable scenarios. Whether you choose to use props or the Context API, understanding their implications will help you make the best choice for your application.</p>]]></content:encoded>
-    </item>
-    <item>
-      <title><![CDATA[Embracing Fluent UI: The Future of Interface Design]]></title>
-      <link>https://codewithgabo.com/embracing-fluent-ui-the-future-of-interface-design</link>
-      <guid isPermaLink="true">https://codewithgabo.com/embracing-fluent-ui-the-future-of-interface-design</guid>
-      <pubDate>Fri, 21 Apr 2023 23:17:00 GMT</pubDate>
-      <description><![CDATA[The Fluent UI Revolution: A Comprehensive Guide to the Future of Interface Design Introduction As technology continues to permeate every aspect of our lives, the importance of creating user-friendly a]]></description>
-      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/103df4acff20e06fee5a327140ee08ec9a17df06-1080x1080.png" alt="Embracing Fluent UI: The Future of Interface Design" />
-<h1>The Fluent UI Revolution: A Comprehensive Guide to the Future of Interface Design</h1>
-<h2>Introduction</h2>
-<p>As technology continues to permeate every aspect of our lives, the importance of creating user-friendly and accessible interfaces cannot be overstated. Fluent UI, developed by Microsoft, is a game-changing design system that has emerged as a powerful tool for designers and developers alike. In this comprehensive guide, we'll delve into the core principles of Fluent UI, its benefits, and how it's shaping the future of interface design. We'll also explore how to implement Fluent UI in your projects and examine some real-world applications of this innovative design system.</p>
-<h2>Part 1: The Core Principles of Fluent UI</h2>
-<p><strong>1.1</strong> Clarity Fluent UI aims to provide clear and straightforward user experiences by minimizing visual clutter and unnecessary elements. This helps reduce the learning curve for new users, ensuring that interfaces remain intuitive and easy to navigate. Clarity is achieved by using clear typography, meaningful icons, and a consistent visual hierarchy.</p>
-<p><strong>1.2</strong> Efficiency The design system offers a range of versatile components and tools that enable designers and developers to create efficient and streamlined interfaces. By focusing on common design patterns and reusable components, Fluent UI ensures minimal effort from users while maximizing productivity.</p>
-<p><strong>1.3</strong> Consistency One of the main goals of Fluent UI is to maintain consistency across platforms and devices. By using a consistent design language, users can quickly adapt to different environments without confusion. This consistency is achieved through a shared set of design principles, components, and styles that can be applied to various platforms and products.</p>
-<p><strong>1.4</strong> Flexibility Fluent UI acknowledges the diverse needs of users and offers adaptable components that can be customized to cater to different preferences and use cases. By providing a flexible foundation, Fluent UI enables designers and developers to build interfaces that can accommodate a wide range of user requirements and scenarios.</p>
-<h2>Part 2: The Benefits of Fluent UI</h2>
-<p><strong>2.1</strong> Enhanced User Experience Focusing on clarity, efficiency, and consistency, Fluent UI helps deliver a seamless and enjoyable user experience. By reducing the likelihood of user frustration and disengagement, Fluent UI enables products to better retain and satisfy users.</p>
-<p><strong>2.2</strong> Faster Development Fluent UI's comprehensive set of tools and components allows developers to create interfaces more quickly and efficiently. This results in faster project completion, reduced development costs, and the ability to rapidly prototype and iterate on designs.</p>
-<p><strong>2.3</strong> Improved Accessibility Fluent UI is designed with accessibility in mind, ensuring that interfaces are usable and comprehensible for users of all abilities. This focus on accessibility not only complies with legal requirements but also creates more inclusive products that cater to a wider audience.</p>
-<p><strong>2.4</strong> Cross-Platform Compatibility Fluent UI's consistent design language enables seamless adaptation across various platforms, devices, and screen sizes. This provides a cohesive experience for users, regardless of their preferred device or platform.</p>
-<h2>Part 3: Implementing Fluent UI in Your Projects</h2>
-<p><strong>3.1 </strong>Getting Started with Fluent UI To begin using Fluent UI, you'll first need to install the necessary packages and dependencies for your chosen platform (e.g., React, Web, or Xamarin). Microsoft provides extensive documentation and resources to help you get started, including sample code, tutorials, and a library of pre-built components.</p>
-<p><strong>3.2</strong> Customizing Fluent UI Components One of the strengths of Fluent UI is its flexibility, allowing you to customize components to fit your specific needs. You can modify the appearance, behavior, and layout of components by adjusting their properties or applying custom styles.</p>
-<p><strong>3.3</strong> Building Custom Components While Fluent UI offers an extensive library of pre-built components, you may encounter situations where you need to create a custom component from scratch. Fluent UI provides guidance and best practices for building custom components that adhere to the design system's principles and are compatible with existing Fluent UI components.</p>
-<p><strong>3.4</strong> Design Tokens and Theming Fluent UI utilizes design tokens to maintain consistency across different platforms and devices. Design tokens are a set of predefined variables that store design-related values, such as colors, typography, and spacing. By leveraging design tokens, you can easily create and apply themes to your application, ensuring a consistent look and feel throughout.</p>
-<p><strong>3.5</strong> Responsive Design with Fluent UI Creating responsive interfaces is essential for catering to various screen sizes and devices. Fluent UI provides tools and guidance for implementing responsive design, such as using CSS Grid, Flexbox, and media queries. This ensures that your interface can adapt to different screen sizes while maintaining a consistent user experience.</p>
-<h2>Part 4: Real-World Applications of Fluent UI</h2>
-<p><strong>4.1</strong> Microsoft Office Suite One of the most prominent implementations of Fluent UI can be found in the Microsoft Office Suite, which includes applications like Word, Excel, PowerPoint, and Outlook. Fluent UI has helped create a consistent and cohesive experience across these applications, making it easier for users to navigate and use the software.</p>
-<p><strong>4.2</strong> Microsoft Teams, a popular collaboration and communication platform, also utilizes Fluent UI to deliver a consistent and intuitive user experience. The platform's interface is designed to facilitate seamless communication, file sharing, and project management among team members.</p>
-<p><strong>4.3</strong> Third-Party Applications Many third-party developers have adopted Fluent UI to build their applications, taking advantage of the design system's flexibility, consistency, and efficiency. By using Fluent UI, these developers can ensure their applications are accessible, user-friendly, and compatible with Microsoft products and services.</p>
-<h2>Conclusion</h2>
-<p><strong>Fluent UI</strong> has emerged as a powerful design system that is shaping the future of interface design. Its focus on clarity, efficiency, consistency, and flexibility makes it an ideal choice for creating intuitive, efficient, and enjoyable experiences that cater to diverse user needs. By harnessing the power of Fluent UI, designers, and developers can build user interfaces that not only provide a seamless experience across platforms and devices but also promote inclusivity and accessibility. As the adoption of Fluent UI continues to grow, its influence on the world of interface design is poised to revolutionize the way we interact with technology.</p>]]></content:encoded>
-    </item>
-    <item>
-      <title><![CDATA[Creating a Weather App using JavaScript, HTML, CSS]]></title>
-      <link>https://codewithgabo.com/creating-a-weather-app-using-javascript-html-css</link>
-      <guid isPermaLink="true">https://codewithgabo.com/creating-a-weather-app-using-javascript-html-css</guid>
-      <pubDate>Fri, 24 Mar 2023 22:56:00 GMT</pubDate>
-      <description><![CDATA[Build a simple but genuinely useful weather app that displays real-time weather data for any city using JavaScript, HTML, CSS, and WeatherAPI. It is a good project to pick up after your first few tuto]]></description>
-      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/471e0255b7cd53bd780fd12fcee9de43e8f84867-1080x1080.png" alt="Creating a Weather App using JavaScript, HTML, CSS" />
-<p>Build a simple but genuinely useful weather app that displays real-time weather data for any city using JavaScript, HTML, CSS, and WeatherAPI. It is a good project to pick up after your first few tutorials, because it makes you deal with three things at once: talking to an API, writing asynchronous code, and handling the moment when the request comes back wrong.</p>
-<p>No framework, no build step, no dependencies. Three files and a free API key.</p>
-<h2>Step 1: Set up the project structure</h2>
-<p>Create a new folder for the project and add three files:</p>
-<ul>
-<li><code>index.html</code></li>
-<li><code>style.css</code></li>
-<li><code>script.js</code></li>
-</ul>
-<p>You can open <code>index.html</code> directly in the browser. That is all the tooling this needs.</p>
-<h2>Step 2: index.html</h2>
-<p>The markup is small. What matters is the IDs, because the JavaScript looks each element up by ID: <code>city-input</code>, <code>weather-info</code>, <code>city-name</code>, <code>temperature</code>, and <code>description</code>.</p>
-<pre><code>&lt;!DOCTYPE html&gt;
-&lt;html lang=&quot;en&quot;&gt;
-  &lt;head&gt;
-    &lt;meta charset=&quot;UTF-8&quot; /&gt;
-    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot; /&gt;
-    &lt;title&gt;Weather App&lt;/title&gt;
-    &lt;link rel=&quot;stylesheet&quot; href=&quot;style.css&quot; /&gt;
-  &lt;/head&gt;
-  &lt;body&gt;
-    &lt;header&gt;
-      &lt;h1&gt;Weather App&lt;/h1&gt;
-    &lt;/header&gt;
-
-    &lt;main&gt;
-      &lt;label for=&quot;city-input&quot;&gt;Type a city and press Enter&lt;/label&gt;
-      &lt;input
-        type=&quot;text&quot;
-        id=&quot;city-input&quot;
-        name=&quot;city&quot;
-        autocomplete=&quot;off&quot;
-        placeholder=&quot;Santo Domingo&quot;
-      /&gt;
-
-      &lt;section id=&quot;weather-info&quot; class=&quot;hidden&quot; aria-live=&quot;polite&quot;&gt;
-        &lt;h2 id=&quot;city-name&quot;&gt;&lt;/h2&gt;
-        &lt;p id=&quot;temperature&quot;&gt;&lt;/p&gt;
-        &lt;p id=&quot;description&quot;&gt;&lt;/p&gt;
-      &lt;/section&gt;
-    &lt;/main&gt;
-
-    &lt;script src=&quot;script.js&quot;&gt;&lt;/script&gt;
-  &lt;/body&gt;
-&lt;/html&gt;</code></pre>
-<p>Two details worth noticing. The <code>&lt;label&gt;</code> is tied to the input with <code>for=&quot;city-input&quot;</code>, so clicking the text focuses the field and screen readers announce it. And <code>aria-live=&quot;polite&quot;</code> on the results container means the new weather is read out when it appears, instead of changing silently.</p>
-<p>The <code>&lt;script&gt;</code> tag goes at the end of <code>&lt;body&gt;</code> on purpose. The JavaScript calls <code>getElementById</code> as soon as it runs, so the elements have to exist already.</p>
-<h2>Step 3: style.css</h2>
-<pre><code>body {
-  font-family: Arial, sans-serif;
-  text-align: center;
-  background-color: #f0f0f0;
-}
-
-header {
-  background-color: #3b3b3b;
-  padding: 20px;
-}
-
-header h1 {
-  color: #ffffff;
-  margin: 0;
-  font-size: 24px;
-}
-
-input[type=&quot;text&quot;] {
-  font-size: 18px;
-  padding: 10px;
-  width: 80%;
-  max-width: 300px;
-  margin-top: 40px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-}
-
-#weather-info {
-  margin-top: 40px;
-}
-
-.hidden {
-  display: none;
-}</code></pre>
-<p>Add these two rules at the bottom of the same file so the label sits on its own line above the input. They come later in the stylesheet, so the smaller <code>margin-top</code> wins over the earlier one:</p>
-<pre><code>label {
-  display: block;
-  margin-top: 40px;
-  color: #3b3b3b;
-}
-
-input[type=&quot;text&quot;] {
-  margin-top: 10px;
-}</code></pre>
-<p><code>.hidden</code> is the whole show/hide mechanism. The results block starts hidden and the JavaScript removes the class once there is something to show.</p>
-<h2>Step 4: Register for WeatherAPI</h2>
-<p>Go to <a href="https://www.weatherapi.com/">weatherapi.com</a> and sign up for a free account, then generate an API key from your dashboard. Keep the key somewhere handy, you need it in the next step.</p>
-<h2>Step 5: script.js</h2>
-<pre><code>const cityInput = document.getElementById(&quot;city-input&quot;);
-const weatherInfo = document.getElementById(&quot;weather-info&quot;);
-const cityName = document.getElementById(&quot;city-name&quot;);
-const temperature = document.getElementById(&quot;temperature&quot;);
-const description = document.getElementById(&quot;description&quot;);
-
-cityInput.addEventListener(&quot;keyup&quot;, (event) =&gt; {
-  if (event.key === &quot;Enter&quot;) {
-    fetchWeatherData(cityInput.value);
-  }
-});
-
-async function fetchWeatherData(city) {
-  const API_KEY = &quot;your_weatherapi_key_here&quot;;
-  try {
-    const response = await fetch(
-      `https://api.weatherapi.com/v1/current.json?key=${API_KEY}&amp;q=${city}&amp;aqi=no`
-    );
-    if (!response.ok) {
-      throw new Error(&quot;Failed to fetch weather data&quot;);
-    }
-    const data = await response.json();
-    displayWeatherData(data);
-  } catch (error) {
-    console.error(&quot;Error:&quot;, error);
-  }
-}
-
-function displayWeatherData(data) {
-  cityName.textContent = data.location.name;
-  temperature.textContent = `${data.current.temp_c}°C`;
-  description.textContent = data.current.condition.text;
-  weatherInfo.classList.remove(&quot;hidden&quot;);
-}</code></pre>
-<p>Replace <code>your_weatherapi_key_here</code> with your actual WeatherAPI key. Save all three files, open <code>index.html</code>, type a city, press Enter.</p>
-<h2>What the async function is actually doing</h2>
-<p>This is the real lesson of the project, so it is worth slowing down on the three pieces.</p>
-<h3>await</h3>
-<p><code>fetch</code> does not return the response. It returns a promise, an object that stands in for a result that has not arrived yet. <code>await</code> pauses the function until that promise settles, then hands you the value. The rest of the page keeps running while it waits, which is why nothing freezes.</p>
-<p>You need two <code>await</code>s here because there are two waits: one for the response headers to arrive, and a second one for <code>response.json()</code> to finish reading and parsing the body.</p>
-<h3>response.ok</h3>
-<p><code>fetch</code> only rejects when the request itself fails, for example when the network is down. A 400 or a 401 from the server is still a successful round trip as far as <code>fetch</code> is concerned, so it resolves normally. If you skip the <code>response.ok</code> check, a bad API key or a misspelled city gives you a <code>data</code> object with no <code>location</code> in it, and the error you eventually see is a confusing <code>Cannot read properties of undefined</code>.</p>
-<p><code>response.ok</code> is simply <code>true</code> for any status in the 200 range. Checking it turns a silent wrong answer into a clear one.</p>
-<h3>try/catch</h3>
-<p><code>throw</code> inside an <code>async</code> function jumps straight to <code>catch</code>, and so does any rejected promise you awaited. That means one <code>catch</code> block covers the network failing, the JSON being unparseable, and the error you threw yourself.</p>
-<h2>Handling a city that doesn't exist</h2>
-<p>This is the first thing a beginner hits, and right now the app does nothing visible: it logs to the console and the old weather stays on screen. When you send an unknown city, WeatherAPI responds with a non-OK status and a JSON body containing an <code>error</code> object with a <code>message</code> field explaining what went wrong. You can read that and put it in front of the user.</p>
-<p>Add a place to show it, right after the <code>&lt;/section&gt;</code> in <code>index.html</code>:</p>
-<pre><code>&lt;p id=&quot;error-message&quot; class=&quot;hidden&quot; role=&quot;alert&quot;&gt;&lt;/p&gt;</code></pre>
-<p>Then replace <code>fetchWeatherData</code> in <code>script.js</code> with this version, and add the two helpers below it:</p>
-<pre><code>const errorMessage = document.getElementById(&quot;error-message&quot;);
-
-async function fetchWeatherData(city) {
-  const API_KEY = &quot;your_weatherapi_key_here&quot;;
-  if (!city.trim()) return;
-
-  hideError();
-  try {
-    const response = await fetch(
-      `https://api.weatherapi.com/v1/current.json?key=${API_KEY}&amp;q=${encodeURIComponent(
-        city
-      )}&amp;aqi=no`
-    );
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error?.message || &quot;Failed to fetch weather data&quot;);
-    }
-
-    displayWeatherData(data);
-  } catch (error) {
-    console.error(&quot;Error:&quot;, error);
-    showError(error.message);
-  }
-}
-
-function showError(message) {
-  errorMessage.textContent = message;
-  errorMessage.classList.remove(&quot;hidden&quot;);
-  weatherInfo.classList.add(&quot;hidden&quot;);
-}
-
-function hideError() {
-  errorMessage.classList.add(&quot;hidden&quot;);
-}</code></pre>
-<p>Three changes matter here. The body is parsed <em>before</em> the <code>ok</code> check, so the error message is available to throw. <code>encodeURIComponent</code> means city names with spaces or accents survive the trip. And <code>showError</code> hides the stale weather, so the user is never looking at yesterday's city next to today's error.</p>
-<p>A network failure lands in the same <code>catch</code>, but with a browser message like &quot;Failed to fetch&quot;. If that bothers you, check <code>error instanceof TypeError</code> and show your own wording.</p>
-<h2>About that API key</h2>
-<p>Your key is sitting in <code>script.js</code>, which the browser downloads in full. Anyone who opens DevTools can read it, copy it, and spend your quota. Minifying does not help, and neither does moving it to another file.</p>
-<p>For learning, this is fine. Use a free key, and rotate it if you ever paste the file publicly. For anything real, the request belongs behind a small server endpoint of your own: your page calls <code>/api/weather?city=London</code>, the server holds the key, adds it, calls WeatherAPI, and returns the result. The key never reaches the browser. That is one short serverless function, and it is the right moment to learn one.</p>
-<h2>Make it yours</h2>
-<p><strong>Show the weather icon.</strong> <code>data.current.condition.icon</code> comes back as a URL with no protocol, like <code>//cdn.weatherapi.com/...</code>, so prefix it: <code>iconEl.src = &quot;https:&quot; + data.current.condition.icon;</code>. Give the <code>&lt;img&gt;</code> an <code>alt</code> of <code>data.current.condition.text</code>.</p>
-<p><strong>Add a three day forecast.</strong> Swap the endpoint to <code>https://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&amp;q=${encodeURIComponent(city)}&amp;days=3&amp;aqi=no&amp;alerts=no</code>. The response still has <code>location</code> and <code>current</code>, plus <code>data.forecast.forecastday</code>, an array you can loop over.</p>
-<p><strong>Remember the last city.</strong> Call <code>localStorage.setItem(&quot;lastCity&quot;, data.location.name)</code> inside <code>displayWeatherData</code>, then on load read it back and fetch it if it exists. Two lines, and the app feels like it knows you.</p>
-<h2>Where this stops</h2>
-<p>The Enter key is the only way to trigger a search, which means no mouse and no comfortable path on mobile. Add a button that calls the same function before you show this to anyone. There is no loading state either, so on a slow connection the page looks broken for a second.</p>
-<p>Beyond that, this is a learning project and it should stay one until the key moves to a server. If you want to build a weather feature people actually use, you will also want caching, since free tiers have request limits and hitting the API on every keystroke will burn through them fast. Get this version working first, then move the key, then worry about the rest.</p>]]></content:encoded>
-    </item>
-    <item>
-      <title><![CDATA[A Brief Full Stack Engineer Guide]]></title>
-      <link>https://codewithgabo.com/what-is-a-full-stack-developer-2023-full-stack-engineer-guide</link>
-      <guid isPermaLink="true">https://codewithgabo.com/what-is-a-full-stack-developer-2023-full-stack-engineer-guide</guid>
-      <pubDate>Sat, 11 Mar 2023 14:05:00 GMT</pubDate>
-      <description><![CDATA[A Brief Full Stack Engineer Guide What is a Full Stack Developer? A full-stack developer is a software engineer who can develop both the front-end and back-end of a web application. This means a full-]]></description>
-      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/533ccb16b6863843e5a32a0983ba35ec81895b8d-1080x1080.png" alt="A Brief Full Stack Engineer Guide" />
-<h1>A Brief Full Stack Engineer Guide</h1>
-<h3>What is a Full Stack Developer?</h3>
-<p>A full-stack developer is a software engineer who can develop both the front-end and back-end of a web application. This means a full-stack developer has knowledge and experience with multiple programming languages, databases, servers, and frameworks.</p>
-<p>Front-end development involves creating the user interface and experience of a web application, while back-end development involves writing code that runs on the server and communicates with databases and other resources.</p>
-<p>Full-stack developers need to be proficient in both areas to create a complete, functional web application. They are also responsible for integrating different components of a web application and making sure everything works together smoothly.</p>
-<h4>Skills Required for Full Stack Development</h4>
-<p>To become a full-stack developer, you need to have a solid foundation in a variety of technical skills. Here are some of the most important skills you should focus on:</p>
-<ol>
-<li>HTML, CSS, and JavaScript: These are the fundamental building blocks of front-end development. You need to understand how to use these technologies to create user interfaces and make web applications interactive.</li>
-<li>Server-side languages: Popular server-side languages include Java, Python, Ruby, and PHP. You need to have a solid understanding of at least one of these languages to develop the back end of a web application.</li>
-<li>Databases: You need to understand how to store and retrieve data from databases, as well as how to optimize queries and manage data efficiently. Some popular databases include MySQL, MongoDB, and PostgreSQL.</li>
-<li>Web frameworks: Frameworks like React, Angular, and Vue.js can help you create complex front-end applications quickly and efficiently. You also need to be familiar with server-side frameworks like Node.js, Django, or Flask.</li>
-<li>DevOps: DevOps refers to the set of practices that combine software development and IT operations to improve the delivery of software. You need to understand how to use tools like Git, Docker, and Kubernetes to deploy and manage web applications.</li>
-</ol>
-<h4></h4>
-<h4>Steps to Becoming a Full-Stack Developer</h4>
-<p>Here are some steps you can take to become a full-stack developer:</p>
-<ol>
-<li>Learn the fundamentals of programming: Start by learning a programming language like Python, Java, or JavaScript. You need to have a strong foundation in programming concepts before you can start developing web applications.</li>
-<li>Learn front-end technologies: HTML, CSS, and JavaScript are essential front-end technologies. You can start learning these technologies by taking online courses or watching tutorial videos.</li>
-<li>Learn a server-side language: Once you have a solid understanding of front-end technologies, you can start learning a server-side language like Java, Python, or Ruby.</li>
-<li>Learn databases: You need to understand how to work with databases to create dynamic web applications. Take online courses or read documentation to learn how to work with databases like MySQL or MongoDB.</li>
-<li>Learn web frameworks: Web frameworks can help you develop web applications more efficiently. Start by learning front-end frameworks like React or Angular, then move on to server-side frameworks like Node.js, Django, or Flask.</li>
-<li>Learn DevOps: DevOps skills are essential for deploying and managing web applications. Start by learning how to use version control systems like Git, and then move on to containerization technologies like Docker.</li>
-<li>Practice building projects: Building projects is the best way to solidify your skills and gain practical experience. Start by building simple applications and gradually move on to more complex projects.</li>
-<li>Get involved in the developer community: Join developer communities online or in person to network and learn from other developers. Attend meetups, hackathons, and conferences to stay up-to-date with the latest technologies and trends.</li>
-</ol>
-<h3>Conclusion</h3>
-<p>Becoming a full-stack developer requires a lot of hard work and dedication, but it can be a rewarding career path for those who enjoy working with both front-end and back-end technologies. To become a successful full-stack developer, you need to have a solid foundation in programming fundamentals, front-end technologies, server-side languages, databases, web frameworks, and DevOps.</p>
-<p>Remember to focus on building practical experience by working on projects and collaborating with other developers. By continually learning and growing your skills, you can become a valuable asset to any team and develop innovative web applications that meet the needs of users.</p>
-<p>In 2023, full-stack development is a fast-growing and constantly evolving field, with new tools and technologies always emerging. By staying up-to-date with the latest trends and best practices, you can remain competitive and continue to grow your skills and career as a full-stack developer.</p>
-<p>Thank you for reading, and remember &quot;Success is not linear.&quot;</p>]]></content:encoded>
-    </item>
-    <item>
-      <title><![CDATA[The Six Most Common HTTP Errors]]></title>
-      <link>https://codewithgabo.com/commons-http-errors</link>
-      <guid isPermaLink="true">https://codewithgabo.com/commons-http-errors</guid>
-      <pubDate>Fri, 03 Mar 2023 14:02:00 GMT</pubDate>
-      <description><![CDATA[HTTP errors are response status codes that indicate that something has gone wrong with a website or web application. These errors can be caused by a variety of factors, such as invalid input, server i]]></description>
-      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/cb4b51846dd8cc741f44d51242c87034d378e362-1080x1080.png" alt="The Six Most Common HTTP Errors" />
-<p>HTTP errors are response status codes that indicate that something has gone wrong with a website or web application. These errors can be caused by a variety of factors, such as invalid input, server issues, or user authentication problems. In this blog post, we'll cover some of the most common HTTP errors and how to handle them.</p>
-<h2>404 (Not Found) Error</h2>
-<p>The 404 error occurs when a user tries to access a web page that doesn't exist on the server. This can happen for a variety of reasons, such as a mistyped URL or a broken link.</p>
-<p>To handle a 404 error, you should provide a custom error page that explains to the user what has happened and provides suggestions for what they can do next. The error page should have a clear message and a search bar to help users find what they're looking for.</p>
-<p>You can also customize the error page with your own branding and design, but make sure that it's still easy to use and navigate. Additionally, you should include a link to your homepage or other relevant pages to help users get back on track.</p>
-<h2>403 (Forbidden) Error</h2>
-<p>The 403 error occurs when a user tries to access a resource that they don't have permission to access. This can happen when a user tries to access a page or file that is restricted to certain users or groups.</p>
-<p>To handle a 403 error, you should display a message to the user explaining that they don't have permission to access the resource. Additionally, you can provide a link to the login page or a button to retry the request once the user has been granted the necessary permissions.</p>
-<h2>401 (Unauthorized) Error</h2>
-<p>The 401 error occurs when a user tries to access a protected resource without proper authentication. This can happen when a user tries to access a page that requires a login, but they haven't logged in yet or their session has expired.</p>
-<p>To handle a 401 error, you should redirect the user to the login page and display a message explaining that they need to log in to access the resource. If the user is already logged in, you can display a message telling them that they don't have permission to access the resource.</p>
-<p>Additionally, you can provide a link to the login page or a button to retry the request once the user has logged in.</p>
-<h2>400 (Bad Request) Error</h2>
-<p>The 400 error occurs when the server cannot process a request due to invalid input or a malformed request. This can happen when a user submits a form with missing or incorrect data, or when a request is made with invalid parameters.</p>
-<p>To handle a 400 error, you should display a message to the user explaining that the request could not be processed due to invalid input. Additionally, you can provide guidance on how to correct the input and resubmit the request.</p>
-<h2>500 (Internal Server Error) Error</h2>
-<p>The 500 error occurs when the server encounters an unexpected error that prevents it from fulfilling the user's request. This can happen for a variety of reasons, such as database errors, server configuration issues, or application bugs.</p>
-<p>To handle a 500 error, you should display a message to the user explaining that there was an error and that the problem is being investigated. Additionally, you should log the error on the server and provide information to the development team so that they can fix the problem.</p>
-<h2>503 (Service Unavailable) Error</h2>
-<p>The 503 error occurs when the server is temporarily unavailable due to maintenance or overload. This can happen when a website experiences a sudden surge in traffic or when the server is being updated.</p>
-<p>To handle a 503 error, you should display a message to the user explaining that the server is temporarily unavailable and provide an estimated time when it will be available again. Additionally, you can provide links to related resources or a button to retry the request once the server is back online.</p>
-<p>In conclusion, HTTP errors can be frustrating for users and can negatively impact the performance and reputation of your web application. By being prepared to handle these errors, you can provide a more positive user experience and minimize the impact of errors on your application.</p>
-<p>Remember to always provide clear and informative error messages, along with relevant links and suggestions for what users can do next. It's also important to log errors on the server and provide information to your development team so that they can identify and fix any underlying issues.</p>
-<p>By taking these steps, you can help ensure that your web application runs smoothly and that your users have a positive experience, even in the face of errors and other unexpected events.</p>
-<p>In the next post i will be showing how to fix or handle those errors, stay tuned!!!</p>]]></content:encoded>
-    </item>
-    <item>
-      <title><![CDATA[Axios Or Fetch]]></title>
-      <link>https://codewithgabo.com/axios-or-fetch</link>
-      <guid isPermaLink="true">https://codewithgabo.com/axios-or-fetch</guid>
-      <pubDate>Sun, 19 Feb 2023 01:30:00 GMT</pubDate>
-      <description><![CDATA[Consuming REST APIs is a fundamental part of building modern web applications. In React, several libraries are available to handle this task, including Fetch and Axios. They look almost identical in a]]></description>
-      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/abb06f27487e874f8563763076f344e2afa28155-1080x1080.png" alt="Axios Or Fetch" />
-<p>Consuming REST APIs is a fundamental part of building modern web applications. In React, several libraries are available to handle this task, including Fetch and Axios. They look almost identical in a simple example, which is why the choice feels arbitrary at first — but they behave differently in the exact places where beginners get stuck. Let's go through both, and then through the differences that actually matter.</p>
-<h2>Fetch</h2>
-<p>Fetch is a built-in browser API for making HTTP requests. It is a promise-based API, which means it returns a promise that resolves to a Response object when the request is complete.</p>
-<pre><code>import React, { useEffect, useState } from 'react';
-
-// eslint-disable-next-line no-unused-vars
-function TodoList() {
-  const [todos, setTodos] = useState([]);
-
-  useEffect(() =&gt; {
-    fetch('https://jsonplaceholder.typicode.com/todos')
-      .then(response =&gt; response.json())
-      .then(data =&gt; setTodos(data));
-  }, []);
-
-  return (
-    &lt;ul&gt;
-      {todos.map(todo =&gt; (
-        &lt;li key={todo.id}&gt;{todo.title}&lt;/li&gt;
-      ))}
-    &lt;/ul&gt;
-  );
-}</code></pre>
-<p>In the example above, we're using the useEffect hook to make the API call when the component mounts. We then use the <code>json()</code> method to convert the response to a JSON object, which we then set as the state of our component using the <code>setTodos</code> function.</p>
-<h2>Axios</h2>
-<p>Axios is a popular third-party library for making HTTP requests in JavaScript. It is also promise-based, and it provides a simple API for making requests and handling responses. You install it first with <code>npm install axios</code>.</p>
-<pre><code>import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-
-// eslint-disable-next-line no-unused-vars
-function TodoList() {
-  const [todos, setTodos] = useState([]);
-
-  useEffect(() =&gt; {
-    axios.get('https://jsonplaceholder.typicode.com/todos')
-      .then(response =&gt; setTodos(response.data));
-  }, []);
-
-  return (
-    &lt;ul&gt;
-      {todos.map(todo =&gt; (
-        &lt;li key={todo.id}&gt;{todo.title}&lt;/li&gt;
-      ))}
-    &lt;/ul&gt;
-  );
-}</code></pre>
-<p>In the example above, we're using the <code>get()</code> method of the Axios library to make the API call. We then use the <code>data</code> property of the response object to set the state of our component. Notice there is no <code>json()</code> step — Axios already parsed the body for you.</p>
-<h2>The difference that actually bites you: errors</h2>
-<p>This is the one I wish someone had told me on day one. <strong>Fetch does not reject on a 404 or a 500.</strong> As far as fetch is concerned, the server answered, so the promise resolves. Only a network failure (no connection, DNS error, CORS block) rejects it. That means a broken endpoint quietly flows into your success path, <code>response.json()</code> tries to parse an error page, and you end up debugging the wrong thing.</p>
-<p>You have to check <code>response.ok</code> yourself. The two snippets below are just the <code>useEffect</code> from the components above, with one extra piece of state alongside <code>todos</code> to hold the message:</p>
-<pre><code>const [error, setError] = useState(null);</code></pre>
-<pre><code>useEffect(() =&gt; {
-  fetch('https://jsonplaceholder.typicode.com/todos/999999')
-    .then(response =&gt; {
-      if (!response.ok) {
-        throw new Error(`Request failed with status ${response.status}`);
-      }
-      return response.json();
-    })
-    .then(data =&gt; setTodos(data))
-    .catch(error =&gt; setError(error.message));
-}, []);</code></pre>
-<p>Axios rejects on any non-2xx status by default, so the failure lands in <code>catch</code> where you expect it. The error object carries a <code>response</code> when the server replied, and doesn't when the request never got there:</p>
-<pre><code>useEffect(() =&gt; {
-  axios.get('https://jsonplaceholder.typicode.com/todos/999999')
-    .then(response =&gt; setTodos(response.data))
-    .catch(error =&gt; {
-      if (error.response) {
-        setError(`Request failed with status ${error.response.status}`);
-      } else {
-        setError(error.message);
-      }
-    });
-}, []);</code></pre>
-<p>Both are fine. Fetch just makes you opt in to the behaviour most people assumed they already had.</p>
-<h2>Cleaning up when the component unmounts</h2>
-<p>If the user navigates away before your request finishes, your <code>.then</code> still runs and calls <code>setTodos</code> on a component that no longer exists. The fix is an <code>AbortController</code> and a cleanup function returned from <code>useEffect</code>:</p>
-<pre><code>useEffect(() =&gt; {
-  const controller = new AbortController();
-
-  fetch('https://jsonplaceholder.typicode.com/todos', { signal: controller.signal })
-    .then(response =&gt; response.json())
-    .then(data =&gt; setTodos(data))
-    .catch(error =&gt; {
-      if (error.name === 'AbortError') return;
-      console.error(error);
-    });
-
-  return () =&gt; controller.abort();
-}, []);</code></pre>
-<p>Axios accepts the same <code>AbortController</code> signal in current versions:</p>
-<pre><code>useEffect(() =&gt; {
-  const controller = new AbortController();
-
-  axios.get('https://jsonplaceholder.typicode.com/todos', { signal: controller.signal })
-    .then(response =&gt; setTodos(response.data))
-    .catch(error =&gt; {
-      if (axios.isCancel(error)) return;
-      console.error(error);
-    });
-
-  return () =&gt; controller.abort();
-}, []);</code></pre>
-<p>The aborted request throws, so remember to swallow that specific error instead of showing it to the user.</p>
-<h2>Timeouts</h2>
-<p>Neither one waits forever by default in a useful way. Axios has a <code>timeout</code> option in milliseconds:</p>
-<pre><code>axios.get('https://jsonplaceholder.typicode.com/todos', { timeout: 5000 })
-  .then(response =&gt; console.log(response.data))
-  .catch(error =&gt; {
-    if (error.code === 'ECONNABORTED') {
-      console.log('The request timed out');
-    }
-  });</code></pre>
-<p>Fetch has no option, but you can pass <code>AbortSignal.timeout()</code> as the signal:</p>
-<pre><code>fetch('https://jsonplaceholder.typicode.com/todos', { signal: AbortSignal.timeout(5000) })
-  .then(response =&gt; response.json())
-  .then(data =&gt; console.log(data))
-  .catch(error =&gt; {
-    if (error.name === 'TimeoutError') {
-      console.log('The request timed out');
-    }
-  });</code></pre>
-<h2>Sending data</h2>
-<p>With fetch you serialise the body and set the header yourself. Forget the <code>Content-Type</code> and many APIs will reject the request:</p>
-<pre><code>fetch('https://jsonplaceholder.typicode.com/todos', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ title: 'Write a blog post', completed: false })
-})
-  .then(response =&gt; response.json())
-  .then(data =&gt; console.log(data));</code></pre>
-<p>Axios does both for you when you hand it a plain object:</p>
-<pre><code>axios.post('https://jsonplaceholder.typicode.com/todos', {
-  title: 'Write a blog post',
-  completed: false
-}).then(response =&gt; console.log(response.data));</code></pre>
-<h2>Instances and interceptors</h2>
-<p>This is the real reason teams reach for Axios once an app grows. You create one configured client and every call inherits the base URL, the timeout, and the auth header — and you write the &quot;token expired, log the user out&quot; logic once instead of in every component.</p>
-<pre><code>// src/api/client.js
-import axios from 'axios';
-
-const client = axios.create({
-  baseURL: 'https://jsonplaceholder.typicode.com',
-  timeout: 5000,
-  headers: { 'Content-Type': 'application/json' }
-});
-
-client.interceptors.request.use(config =&gt; {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
-client.interceptors.response.use(
-  response =&gt; response,
-  error =&gt; {
-    if (error.response &amp;&amp; error.response.status === 401) {
-      localStorage.removeItem('token');
-      window.location.href = '/login';
-    }
-    return Promise.reject(error);
-  }
-);
-
-export default client;</code></pre>
-<p>Your components then import that file instead of Axios directly:</p>
-<pre><code>import client from '../api/client';
-
-// inside useEffect
-client.get('/todos').then(response =&gt; setTodos(response.data));</code></pre>
-<p>You can build the same thing on top of fetch — it's just a wrapper function you write and maintain yourself.</p>
-<h2>So which one should you pick</h2>
-<p>For a small app with a handful of requests, use fetch. It's built into every modern browser and into recent versions of Node, it's zero bytes of dependency, and the only tax is remembering to check <code>response.ok</code>.</p>
-<p>Reach for Axios once you have auth headers on every call, refresh-token logic, a dozen endpoints, or a team that will otherwise each invent their own wrapper. Paying for a dependency to delete that duplication is a good trade.</p>
-<p>Two honest limits. First, Axios is a dependency you have to keep updated, and if you only ever make two GET requests it's weight you don't need. Second — and more important — neither of these solves caching, request deduplication, refetching on focus, or loading and error state. If you find yourself writing the same <code>useState</code> trio in every component, the answer isn't switching HTTP clients; it's a data-fetching library like React Query or SWR, which sits on top of either one.</p>]]></content:encoded>
-    </item>
-    <item>
-      <title><![CDATA[Tailwind CSS]]></title>
-      <link>https://codewithgabo.com/tailwind-css</link>
-      <guid isPermaLink="true">https://codewithgabo.com/tailwind-css</guid>
-      <pubDate>Fri, 10 Feb 2023 20:05:00 GMT</pubDate>
-      <description><![CDATA[Having trouble with CSS? Try Tailwind. Are you tired of writing countless lines of CSS to style your web pages, only to end up with messy, hard-to-maintain code? Or perhaps you're just starting out wi]]></description>
-      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/915392f6454e0d8235f6e62064722238633927a4-1080x1080.png" alt="Tailwind CSS" />
-<p>Having trouble with CSS? Try Tailwind.</p>
-<p>Are you tired of writing countless lines of CSS to style your web pages, only to end up with messy, hard-to-maintain code? Or perhaps you're just starting out with web development and feeling overwhelmed by the complexity of CSS? If so, you might want to consider giving Tailwind CSS a try.</p>
-<p>Tailwind is a utility-first CSS framework. Instead of giving you components like <code>.btn</code> or <code>.card</code>, it gives you hundreds of tiny single-purpose classes — <code>p-4</code>, <code>text-sm</code>, <code>flex</code>, <code>rounded-xl</code> — and you compose them directly in your markup. That sentence is easy to say and hard to picture, so the rest of this post is one small component built both ways.</p>
-<h2>The same card, twice</h2>
-<p>Here's a card: an image, a title, a paragraph, a link. First the way most of us learned to write it.</p>
-<pre><code>&lt;article class=&quot;card&quot;&gt;
-  &lt;img class=&quot;card__image&quot; src=&quot;/coffee.jpg&quot; alt=&quot;A cup of cold brew on a wooden table&quot;&gt;
-  &lt;div class=&quot;card__body&quot;&gt;
-    &lt;h2 class=&quot;card__title&quot;&gt;Cold brew, at home&lt;/h2&gt;
-    &lt;p class=&quot;card__text&quot;&gt;Twelve hours, a jar, and coarse ground coffee. That's the whole recipe.&lt;/p&gt;
-    &lt;a class=&quot;card__link&quot; href=&quot;/recipes/cold-brew&quot;&gt;Read the recipe&lt;/a&gt;
-  &lt;/div&gt;
-&lt;/article&gt;</code></pre>
-<p>And the stylesheet that makes it real:</p>
-<pre><code>.card {
-  max-width: 20rem;
-  background-color: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.75rem;
-  overflow: hidden;
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-}
-
-.card__image {
-  display: block;
-  width: 100%;
-  height: 10rem;
-  object-fit: cover;
-}
-
-.card__body { padding: 1rem; }
-
-.card__title {
-  margin: 0 0 0.5rem;
-  font-size: 1.125rem;
-  line-height: 1.75rem;
-  font-weight: 600;
-  color: #111827;
-}
-
-.card__text {
-  margin: 0 0 1rem;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  color: #4b5563;
-}
-
-.card__link {
-  display: inline-block;
-  padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
-  background-color: #2563eb;
-  color: #ffffff;
-  font-size: 0.875rem;
-  text-decoration: none;
-}
-
-.card__link:hover { background-color: #1d4ed8; }</code></pre>
-<p>Nothing is wrong with that code. But notice what it costs: six class names you had to invent, a naming convention you have to remember, a second file you have to keep in sync with the first, and — the part that actually hurts six months later — no way to tell from the HTML what any of it looks like.</p>
-<p>Now the same card in Tailwind:</p>
-<pre><code>&lt;article class=&quot;max-w-xs overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm&quot;&gt;
-  &lt;img class=&quot;block h-40 w-full object-cover&quot; src=&quot;/coffee.jpg&quot; alt=&quot;A cup of cold brew on a wooden table&quot;&gt;
-  &lt;div class=&quot;p-4&quot;&gt;
-    &lt;h2 class=&quot;mb-2 text-lg font-semibold text-gray-900&quot;&gt;Cold brew, at home&lt;/h2&gt;
-    &lt;p class=&quot;mb-4 text-sm text-gray-600&quot;&gt;Twelve hours, a jar, and coarse ground coffee. That's the whole recipe.&lt;/p&gt;
-    &lt;a href=&quot;/recipes/cold-brew&quot;
-       class=&quot;inline-block rounded-md bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700&quot;&gt;
-      Read the recipe
-    &lt;/a&gt;
-  &lt;/div&gt;
-&lt;/article&gt;</code></pre>
-<p>Same card — near enough. The hex values above are v3-era approximations of v4's palette, which is defined in <code>oklch</code> and renders a slightly different blue. No stylesheet, no invented names, nothing to keep in sync.</p>
-<p>To run it you need the build step wired up, not just the import. On a Vite project — which is how this site is set up — that means installing <code>tailwindcss</code> and <code>@tailwindcss/vite</code>, adding <code>tailwindcss()</code> to the <code>plugins</code> array in <code>vite.config.ts</code>, and then putting one line at the top of your CSS file:</p>
-<pre><code>@import &quot;tailwindcss&quot;;</code></pre>
-<h2>So what does &quot;utility-first&quot; actually mean</h2>
-<p>Look at <code>p-4</code>. It is a class whose entire definition is <code>padding: 1rem</code>. That's it. <code>text-sm</code> sets a font size and a line height. <code>rounded-md</code> sets a border radius. Every class does one thing and its name tells you which thing.</p>
-<p>Because each class is a fixed, self-contained rule, three things follow:</p>
-<ul>
-<li><strong>The styles live in the markup, which is where you're already looking.</strong> You read <code>mb-4 text-sm text-gray-600</code> and you know exactly what that paragraph looks like without opening another file.</li>
-<li><strong>You stop naming things.</strong> Naming is genuinely one of the hardest parts of CSS, and utilities delete the problem. There is no <code>.card__body--compact</code> to argue about.</li>
-<li><strong>Deleting an element deletes its styles.</strong> No orphaned rules accumulating in a stylesheet nobody dares to clean up.</li>
-</ul>
-<p>The values aren't arbitrary either. <code>p-1</code> through <code>p-8</code> walk a consistent spacing scale, so a page built out of utilities tends to look coherent almost by accident.</p>
-<h2>Responsive, hover, focus, dark mode</h2>
-<p>This is the part I would miss most if I stopped using it. Any utility takes a prefix, and the prefix is the condition:</p>
-<pre><code>&lt;article class=&quot;max-w-xs overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm
-                md:flex md:max-w-2xl
-                dark:border-gray-800 dark:bg-gray-900&quot;&gt;
-  &lt;img class=&quot;block h-40 w-full object-cover md:h-auto md:w-48&quot;
-       src=&quot;/coffee.jpg&quot; alt=&quot;A cup of cold brew on a wooden table&quot;&gt;
-  &lt;div class=&quot;p-4&quot;&gt;
-    &lt;h2 class=&quot;mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100&quot;&gt;Cold brew, at home&lt;/h2&gt;
-    &lt;p class=&quot;mb-4 text-sm text-gray-600 dark:text-gray-400&quot;&gt;Twelve hours, a jar, and coarse ground coffee.&lt;/p&gt;
-    &lt;a href=&quot;/recipes/cold-brew&quot;
-       class=&quot;inline-block rounded-md bg-blue-600 px-4 py-2 text-sm text-white
-              hover:bg-blue-700
-              focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900
-              dark:bg-blue-500 dark:hover:bg-blue-400&quot;&gt;
-      Read the recipe
-    &lt;/a&gt;
-  &lt;/div&gt;
-&lt;/article&gt;</code></pre>
-<p><code>md:flex</code> means &quot;flex, from the medium breakpoint up&quot;. <code>hover:bg-blue-700</code> means &quot;this background, on hover&quot;. <code>dark:bg-gray-900</code> follows the reader's system theme by default. No media queries, no pseudo-class selectors, no jumping between files to check which breakpoint you used.</p>
-<h2>Customising the design tokens</h2>
-<p>You are not stuck with Tailwind's defaults. In Tailwind v4, configuration moved into your CSS file as an <code>@theme</code> block:</p>
-<pre><code>@import &quot;tailwindcss&quot;;
-
-@theme {
-  --color-brand: oklch(58% 0.11 180);
-  --color-brand-dark: oklch(48% 0.10 180);
-  --font-display: &quot;Inter&quot;, ui-sans-serif, system-ui, sans-serif;
-  --radius-card: 0.75rem;
-}</code></pre>
-<p>Those variables generate classes. <code>--color-brand</code> gives you <code>bg-brand</code>, <code>text-brand</code>, <code>border-brand</code>; <code>--font-display</code> gives you <code>font-display</code>; <code>--radius-card</code> gives you <code>rounded-card</code>. So the link becomes:</p>
-<pre><code>&lt;a href=&quot;/recipes/cold-brew&quot;
-   class=&quot;inline-block rounded-card bg-brand px-4 py-2 font-display text-sm text-white hover:bg-brand-dark&quot;&gt;
-  Read the recipe
-&lt;/a&gt;</code></pre>
-<p>One note if you're reading older tutorials: projects still on Tailwind v3 configure all of this in a <code>tailwind.config.js</code> file instead, and that file is not how v4 works.</p>
-<h2>&quot;But now my markup is ugly&quot;</h2>
-<p>This is the honest complaint about Tailwind and it deserves an honest answer: yes, a long class list is ugly, and the fix is not a shorter class list — it's fewer copies of it.</p>
-<p>If you're writing that card once, leave it inline. If you're writing it twenty times, extract a component. In React:</p>
-<pre><code>export function Card({ image, alt, title, href, children }) {
-  return (
-    &lt;article className=&quot;max-w-xs overflow-hidden rounded-card border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900&quot;&gt;
-      &lt;img className=&quot;block h-40 w-full object-cover&quot; src={image} alt={alt} /&gt;
-      &lt;div className=&quot;p-4&quot;&gt;
-        &lt;h2 className=&quot;mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100&quot;&gt;{title}&lt;/h2&gt;
-        &lt;p className=&quot;mb-4 text-sm text-gray-600 dark:text-gray-400&quot;&gt;{children}&lt;/p&gt;
-        &lt;a
-          href={href}
-          className=&quot;inline-block rounded-md bg-brand px-4 py-2 text-sm text-white hover:bg-brand-dark&quot;
-        &gt;
-          Read the recipe
-        &lt;/a&gt;
-      &lt;/div&gt;
-    &lt;/article&gt;
-  );
-}</code></pre>
-<p>Now the ugly class list exists in exactly one place, and every usage reads <code>&lt;Card title=&quot;Cold brew, at home&quot; ... /&gt;</code>. That's better than a CSS class would have been, because the structure is reused too, not just the styles.</p>
-<p>Tailwind also has an <code>@apply</code> directive that folds utilities into a regular CSS class. It works, and it's the right tool when you can't create a component — but reach for a component first. <code>@apply</code> quietly reintroduces the naming problem and the second file you were trying to escape.</p>
-<h2>When Tailwind is the wrong choice</h2>
-<p>I use Tailwind on most things I build, but &quot;most&quot; is not &quot;all&quot;.</p>
-<ul>
-<li><strong>A tiny static page.</strong> If you're styling one landing page with forty lines of CSS, a build step and a new vocabulary are more overhead than the CSS you're avoiding. Just write the CSS.</li>
-<li><strong>A team that already has a working design system.</strong> If your company ships a component library people are happy with, replacing it with utilities is a large migration in exchange for a smaller win than you think.</li>
-<li><strong>Markup you can't easily edit.</strong> Utility-first assumes you control the HTML. If your output comes from a CMS's rich text, a third-party widget, or an email template, you can't sprinkle classes onto elements you never see — that's a job for regular CSS selectors.</li>
-<li><strong>A project where nobody will learn the class names.</strong> Tailwind has a real learning curve, and its payoff is fluency. If you're handing the project to someone who'll fight the vocabulary for the rest of its life, you've made their job harder, not easier.</li>
-</ul>
-<p>If you're new to Tailwind, its syntax will feel overwhelming at first — I found the same thing. But once you get the hang of it, it's a much more direct way to write CSS, and the card above is the reason why: everything that card looks like is right there in the file you're already reading.</p>]]></content:encoded>
     </item>
   </channel>
 </rss>

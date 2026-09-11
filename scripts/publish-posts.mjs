@@ -25,32 +25,73 @@ import { mdToPortable } from "./md-to-portable.mjs";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
 const PUBLISH = process.argv.includes("--publish");
-const SCRATCH =
-  "/private/tmp/claude-501/-Users-gabriel-Desktop-Proyectos-sanity-react/" +
-  "b1730875-d52c-4e03-a3d3-f954e1624d1a/scratchpad";
 
 const POSTS = [
   {
-    slug: "verde-y-ciego",
-    title: "Verde y ciego: cuando un check que pasa no significa nada",
+    slug: "el-email-que-envias-no-es-el-que-leen",
+    title: "El email que envías no es el que leen",
     excerpt:
-      "Un mensaje de commit que era exacto y un sitio sirviendo lo contrario. " +
-      "Dos fallos de esta semana: un check mirando la superficie equivocada, y " +
-      "un slot que nadie estaba mirando.",
-    tags: ["Testing", "Verificación", "SEO", "React", "AdSense"],
-    markdown: `${SCRATCH}/es-verde-y-ciego.md`,
-    cover: "scripts/covers/out/verde-y-ciego.png",
+      "Tres grupos de clientes de correo hacen tres cosas distintas con tu HTML, " +
+      "y uno de ellos invierte hasta los fondos que pusiste oscuros a propósito. " +
+      "Más lo que dice la investigación de NN/g sobre cómo se lee de verdad.",
+    tags: ["Email", "Usabilidad", "Accesibilidad", "CSS", "Dark mode"],
+    markdown: resolve(ROOT, "docs/drafts/el-email-que-envias-no-es-el-que-leen.md"),
+    cover: "scripts/covers/out/email-es.png",
   },
   {
-    slug: "el-punto-ciego-de-la-auditoria",
-    title: "El punto ciego de la auditoría: pesé el build, no la página",
+    slug: "the-email-you-send-is-not-the-email-they-read",
+    title: "The email you send is not the email they read",
     excerpt:
-      "Le hice una auditoría a mi portfolio y llamé al paso de pesar el build " +
-      "el que casi nadie hace. También era el paso que garantizaba que nunca " +
-      "vería los 9.88 MB que servía el índice del blog.",
-    tags: ["Auditoría", "Performance", "Imágenes", "Sanity", "React"],
-    markdown: `${SCRATCH}/es-punto-ciego-auditoria.md`,
-    cover: "scripts/covers/out/punto-ciego-auditoria.png",
+      "Three groups of mail clients do three different things to your HTML, and " +
+      "one of them inverts even the backgrounds you made dark on purpose. Plus " +
+      "what NN/g's research says about how newsletters actually get read.",
+    tags: ["Email", "Usability", "Accessibility", "CSS", "Dark mode"],
+    markdown: resolve(ROOT, "docs/drafts/the-email-you-send-is-not-the-email-they-read.md"),
+    cover: "scripts/covers/out/email-en.png",
+  },
+  {
+    slug: "chrome-ya-trae-un-modelo-adentro",
+    title: "Chrome ya trae un modelo adentro. No es el que están anunciando",
+    excerpt:
+      "El Prompt API no está estable en la web: es origin trial. Pero hay tres " +
+      "APIs de IA estables desde Chrome 138 que puedes usar hoy, sin servidor y " +
+      "sin que el texto del usuario salga de su máquina.",
+    tags: ["IA", "Chrome", "JavaScript", "Gemini Nano", "Privacidad"],
+    markdown: resolve(ROOT, "docs/drafts/chrome-ya-trae-un-modelo-adentro.md"),
+    cover: "scripts/covers/out/chrome-ai-es.png",
+  },
+  {
+    slug: "chrome-already-ships-a-model",
+    title: "Chrome already ships a model. It isn't the one being announced",
+    excerpt:
+      "The Prompt API isn't stable on the web — it's an origin trial. But three " +
+      "built-in AI APIs have been stable since Chrome 138, and you can ship them " +
+      "today with no server and no user text leaving the device.",
+    tags: ["AI", "Chrome", "JavaScript", "Gemini Nano", "Privacy"],
+    markdown: resolve(ROOT, "docs/drafts/chrome-already-ships-a-model.md"),
+    cover: "scripts/covers/out/chrome-ai-en.png",
+  },
+  {
+    slug: "cuatro-trucos-de-css-que-ya-puedes-borrar",
+    title: "Cuatro trucos de CSS que ya puedes borrar",
+    excerpt:
+      "contrast-color(), @scope, las style queries y :open llegaron a Baseline " +
+      "este año. Cada uno elimina un truco que probablemente sigue vivo en tu " +
+      "código porque creías que CSS no podía hacerlo.",
+    tags: ["CSS", "Baseline", "Frontend", "Accesibilidad"],
+    markdown: resolve(ROOT, "docs/drafts/cuatro-trucos-de-css-que-ya-puedes-borrar.md"),
+    cover: "scripts/covers/out/css-2026-es.png",
+  },
+  {
+    slug: "four-css-workarounds-you-can-delete",
+    title: "Four CSS workarounds you can delete",
+    excerpt:
+      "contrast-color(), @scope, style queries and :open all reached Baseline " +
+      "this year. Each one removes a workaround that is probably still alive in " +
+      "your codebase because you believed CSS could not do it.",
+    tags: ["CSS", "Baseline", "Frontend", "Accessibility"],
+    markdown: resolve(ROOT, "docs/drafts/four-css-workarounds-you-can-delete.md"),
+    cover: "scripts/covers/out/css-2026-en.png",
   },
 ];
 

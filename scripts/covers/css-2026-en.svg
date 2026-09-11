@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1E293B"/>
+      <stop offset="1" stop-color="#0F172A"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#g1)"/>
+  <rect x="0" y="0" width="10" height="630" fill="#6366F1"/>
+
+  <!-- Cuatro líneas tachadas: el truco que ya no hace falta. -->
+  <g transform="translate(798,150)">
+    <rect x="0" y="0" width="250" height="14" rx="7" fill="#334155"/>
+    <line x1="-8" y1="7" x2="258" y2="7" stroke="#EF4444" stroke-width="4" stroke-linecap="round"/>
+    <rect x="0" y="52" width="290" height="14" rx="7" fill="#334155"/>
+    <line x1="-8" y1="59" x2="298" y2="59" stroke="#EF4444" stroke-width="4" stroke-linecap="round"/>
+    <rect x="0" y="104" width="215" height="14" rx="7" fill="#334155"/>
+    <line x1="-8" y1="111" x2="223" y2="111" stroke="#EF4444" stroke-width="4" stroke-linecap="round"/>
+    <rect x="0" y="156" width="270" height="14" rx="7" fill="#334155"/>
+    <line x1="-8" y1="163" x2="278" y2="163" stroke="#EF4444" stroke-width="4" stroke-linecap="round"/>
+    <rect x="0" y="212" width="180" height="14" rx="7" fill="#22C55E"/>
+  </g>
+
+  <text x="72" y="150" font-family="Helvetica,Arial,sans-serif" font-size="24" font-weight="700" letter-spacing="4" fill="#38BDF8">CSS 2026</text>
+  <text x="72" y="262" font-family="Helvetica,Arial,sans-serif" font-size="58" font-weight="700" fill="#F8FAFC">Four CSS workarounds</text>
+  <text x="72" y="334" font-family="Helvetica,Arial,sans-serif" font-size="58" font-weight="700" fill="#F8FAFC">you can delete</text>
+  <text x="72" y="566" font-family="Helvetica,Arial,sans-serif" font-size="26" fill="#64748B">codewithgabo.com</text>
+</svg>

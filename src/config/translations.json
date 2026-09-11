@@ -3,8 +3,11 @@
   "spanishPosts": [
     "3-prompts-gemini-nano-banana-resultados",
     "auditoria-portfolio-20-problemas",
+    "chrome-ya-trae-un-modelo-adentro",
     "como-programo-con-claude-code-flujo-real",
+    "cuatro-trucos-de-css-que-ya-puedes-borrar",
     "editor-propio-vs-sanity-studio",
+    "el-email-que-envias-no-es-el-que-leen",
     "el-punto-ciego-de-la-auditoria",
     "verde-y-ciego"
   ],
@@ -24,6 +27,18 @@
     {
       "es": "el-punto-ciego-de-la-auditoria",
       "en": "the-audits-blind-spot"
+    },
+    {
+      "es": "el-email-que-envias-no-es-el-que-leen",
+      "en": "the-email-you-send-is-not-the-email-they-read"
+    },
+    {
+      "es": "chrome-ya-trae-un-modelo-adentro",
+      "en": "chrome-already-ships-a-model"
+    },
+    {
+      "es": "cuatro-trucos-de-css-que-ya-puedes-borrar",
+      "en": "four-css-workarounds-you-can-delete"
     }
   ]
 }
