@@ -5,6 +5,7 @@ import SEO from "./common/SEO";
 import ReposGreeting from "./Greeting/ReposGreeting";
 import usePageTracking from "../hooks/useAnalytics";
 import "./card/PostCard.css";
+import snapshot from "../config/repos.json";
 
 interface GithubRepo {
   id: number;
@@ -54,7 +55,17 @@ const Repos = () => {
         setallRepos(data);
       })
       .catch((error) => {
-        console.error("Failed to fetch repos:", error);
+        // Unauthenticated GitHub allows 60 requests an hour per IP, so this
+        // fails for real visitors, not just in theory, and the page used to go
+        // permanently empty when it did. Fall back to the committed snapshot —
+        // the same one scripts/prerender.mjs writes into this page's noscript.
+        //
+        // It is a fallback and not the initial state on purpose: seeding it
+        // would put six cards into the browser capture that feeds the noscript,
+        // and prerender.mjs already writes the full list of twenty there. The
+        // page would then list the first six twice.
+        console.warn("GitHub unavailable, using the committed snapshot:", error);
+        setallRepos(snapshot.repos as GithubRepo[]);
       });
   }, []);
 

@@ -327,6 +327,46 @@ test('the home page lists every project without JavaScript', () => {
   }
 });
 
+const repoSnapshot = JSON.parse(read(join(ROOT, 'src/config/repos.json')));
+
+test('the repositories page lists its repos without JavaScript', () => {
+  // This route's list comes from api.github.com at runtime, so the browser
+  // capture caught the page without it: 646 characters of chrome and not one
+  // repository name. It was the last route still serving nothing useful to a
+  // reader without the bundle, and it kept the hole longer than the others
+  // precisely because its data came from neither the CMS nor the components —
+  // the two places the earlier fixes knew to look.
+  const html = read(join(BUILD, 'repositorios', 'index.html'));
+  const noscript = html.match(/<noscript>([\s\S]*?)<\/noscript>/)?.[1] ?? '';
+
+  for (const repo of repoSnapshot.repos) {
+    assert.ok(
+      has(noscript, repo.name),
+      `/repositorios noscript is missing the repo "${repo.name}"`
+    );
+    assert.ok(
+      has(noscript, repo.html_url),
+      `/repositorios noscript is missing the link for "${repo.name}"`
+    );
+  }
+});
+
+test('the repo snapshot feeds both the page and the prerenderer', () => {
+  assert.ok(
+    has(read(join(ROOT, 'src/components/Repos.tsx')), 'config/repos.json'),
+    'Repos.tsx no longer seeds from the snapshot — it renders empty until GitHub answers'
+  );
+  assert.ok(
+    has(read(join(ROOT, 'scripts/prerender.mjs')), 'repos.json'),
+    'prerender.mjs no longer reads the snapshot'
+  );
+  // A snapshot with no date cannot be judged stale by anyone reading it.
+  assert.ok(
+    !Number.isNaN(Date.parse(repoSnapshot.takenAt)),
+    'the repo snapshot has no usable takenAt'
+  );
+});
+
 test('data.ts and the prerenderer read the same project list', () => {
   // The reason projects.json exists. If someone re-inlines the array into
   // data.ts, the browser and the build drift and only one of them is right.

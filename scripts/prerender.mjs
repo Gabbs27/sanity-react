@@ -50,6 +50,12 @@ const translations = JSON.parse(
 const projects = JSON.parse(
   readFileSync(join(root, 'src/config/projects.json'), 'utf8')
 );
+
+// The GitHub snapshot. /repositorios fetches this list from api.github.com in
+// the browser, so without it the page served its chrome and nothing else. See
+// scripts/fetch-repos.mjs for why the snapshot is committed instead of fetched
+// at build time.
+const { repos } = JSON.parse(readFileSync(join(root, 'src/config/repos.json'), 'utf8'));
 const SPANISH_POSTS = new Set(translations.spanishPosts);
 const PAIRS = translations.pairs;
 
@@ -214,12 +220,40 @@ for (const [route, page] of Object.entries(staticPages)) {
   // The blog index renders its cards from a Sanity fetch that had not resolved
   // when the capture ran. The list is right here, so append it rather than
   // waiting longer in a browser and hoping.
-  const extra =
-    route === '/allpost'
-      ? `<h2>Posts</h2><ul>${posts
+  // Two routes render a list fetched at runtime — /allpost from Sanity,
+  // /repositorios from api.github.com — so the capture may or may not include
+  // it depending on whether the request beat the timeout. That is the whole
+  // problem: the capture is timing-dependent, and both outcomes look fine.
+  // /allpost was captured with its fetch unresolved and /repositorios with six
+  // of its cards already painted, on the same run.
+  //
+  // So the list is appended here from data that is not timing-dependent, minus
+  // anything the capture already shows. Filtering on the link rather than
+  // trusting either side means a capture that catches nothing and a capture
+  // that catches everything both produce exactly one copy.
+  const listed = (href) => page.html.includes(`href="${href}"`);
+  let extra = '';
+  if (route === '/allpost') {
+    const missing = posts.filter((p) => !listed(`/${p.slug}`));
+    extra = missing.length
+      ? `<h2>Posts</h2><ul>${missing
           .map((p) => `<li><a href="/${esc(p.slug)}">${esc(p.title)}</a></li>`)
           .join('')}</ul>`
       : '';
+  } else if (route === '/repositorios') {
+    const missing = repos.filter((r) => !listed(r.html_url));
+    extra =
+      (missing.length
+        ? `<h2>Repositories</h2><ul>${missing
+            .map((r) => {
+              const meta = [r.language, r.description].filter(Boolean).map(esc).join(' — ');
+              return `<li><a href="${esc(r.html_url)}">${esc(r.name)}</a>${meta ? ` — ${meta}` : ''}</li>`;
+            })
+            .join('')}</ul>`
+        : '') +
+      `<p><a href="https://github.com/Gabbs27">All repositories on GitHub</a> · ` +
+      `<a href="/">Portfolio</a> · <a href="/allpost">Blog</a></p>`;
+  }
 
   const head = `
     <meta charset="utf-8" />
