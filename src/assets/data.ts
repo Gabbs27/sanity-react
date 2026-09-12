@@ -10,6 +10,26 @@ export const data = [
     badge: "New",
   },
   {
+    id: 10,
+    image: "/images/aparta-buscador-rd.webp",
+    title: "ApartaSearch",
+    description:
+      "Real estate aggregator for the Dominican Republic. It pulls apartment and commercial listings from several local portals into a single de-duplicated feed, then surfaces what the portals themselves don't: price drops, total decline since listing, US$/m² and days on market, with each listing credited to its source. Filters by zone, price, bedrooms and elevator access; sorts by recent drop, biggest decline or best price per square metre; switches between US dollars and Dominican pesos.",
+    url: "https://aparta-buscador-rd.netlify.app",
+    languages: ["Astro", "JavaScript", "CSS3", "Netlify"],
+    badge: "New",
+  },
+  {
+    id: 11,
+    image: "/images/peacer-rankers.webp",
+    title: "LoL Tracker",
+    description:
+      "Match analysis for League of Legends built on the Riot Games API. Profile search by name and tag across regions, minute-by-minute review of each game to surface what is actually costing you matches, plus guides, a planner and a side-by-side comparison view. Data comes from the Riot Games API and Data Dragon; the project is not endorsed by Riot Games.",
+    url: "https://peacer-rankers.vercel.app",
+    languages: ["Next.js", "React", "Riot Games API", "Data Dragon", "Vercel"],
+    badge: "New",
+  },
+  {
     id: 9,
     image: "/images/ginecologo-spa.webp",
     title: "Dr. Abreu Cornelio — Gynecology Clinic",
