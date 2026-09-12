@@ -1,123 +1,27 @@
-export const data = [
-  {
-    id: 0,
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=450&fit=crop",
-    title: "Analytics Dashboard",
-    description:
-      "Interactive analytics dashboard with real-time data visualization. Features Google Analytics 4 integration, custom charts with Recharts, and responsive design. Includes admin authentication and mock data demo mode.",
-    url: "/dashboard-demo",
-    languages: ["React", "GA4 API", "Recharts", "Motion", "Node.js", "Express"],
-    badge: "New",
-  },
-  {
-    id: 10,
-    image: "/images/aparta-buscador-rd.webp",
-    title: "ApartaSearch",
-    description:
-      "Real estate aggregator for the Dominican Republic. It pulls apartment and commercial listings from several local portals into a single de-duplicated feed, then surfaces what the portals themselves don't: price drops, total decline since listing, US$/m² and days on market, with each listing credited to its source. Filters by zone, price, bedrooms and elevator access; sorts by recent drop, biggest decline or best price per square metre; switches between US dollars and Dominican pesos.",
-    url: "https://aparta-buscador-rd.netlify.app",
-    languages: ["Astro", "JavaScript", "CSS3", "Netlify"],
-    badge: "New",
-  },
-  {
-    id: 11,
-    image: "/images/peacer-rankers.webp",
-    title: "LoL Tracker",
-    description:
-      "Match analysis for League of Legends built on the Riot Games API. Profile search by name and tag across regions, minute-by-minute review of each game to surface what is actually costing you matches, plus guides, a planner and a side-by-side comparison view. Data comes from the Riot Games API and Data Dragon; the project is not endorsed by Riot Games.",
-    url: "https://peacer-rankers.vercel.app",
-    languages: ["Next.js", "React", "Riot Games API", "Data Dragon", "Vercel"],
-    badge: "New",
-  },
-  {
-    id: 9,
-    image: "/images/ginecologo-spa.webp",
-    title: "Dr. Abreu Cornelio — Gynecology Clinic",
-    description:
-      "Landing page for a gynecology & obstetrics practice with a warm editorial design (Fraunces & Karla typography). Features WhatsApp appointment booking, services catalog, contact form, and a single-file content config that makes the template reusable for any medical practice. SEO-ready with sitemap and structured metadata.",
-    url: "https://gabbs27.github.io/ginecologo-spa/",
-    languages: ["Astro 5", "React 19", "JavaScript", "CSS3", "GitHub Pages"],
-    badge: "New",
-  },
-  {
-    id: 1,
-    image: "/images/negociord.webp",
-    title: "NegocioRD",
-    description:
-      "WhatsApp Order Management Platform for Dominican SMEs. Features an AI-powered chatbot (Claude) that takes orders via WhatsApp, real-time order tracking with status flow, product catalog management, Stripe subscription billing, analytics dashboard with Recharts, and real-time push notifications via SSE. Fully bilingual (ES/EN).",
-    url: "https://negocio-rd.vercel.app",
-    languages: ["Next.js", "React 19", "TypeScript", "Tailwind CSS", "Prisma", "PostgreSQL", "Stripe", "Claude AI"],
-    badge: "New",
-  },
-  {
-    id: 8,
-    image: "/images/a2c.webp",
-    title: "A2C International",
-    description:
-      "Luxury and exotic vehicle dealership for A2C International (Santo Domingo, DR). Multi-section site covering buy/sell/financing/service flows with a Supabase-backed inventory, branded metallic visual identity, and integrated WhatsApp contact CTA. Built with React 18 + Vite and React Router 7.",
-    url: "https://gabbs27.github.io/A2C/",
-    languages: ["React 18", "Vite", "React Router 7", "Supabase", "PostgreSQL", "CSS3"],
-    badge: "New",
-  },
-  {
-    id: 2,
-    image: "/images/HairSalon.webp",
-    title: "Hair Salon & Spa",
-    description:
-      "A modern, responsive website for a luxury salon and spa built with React and TypeScript. Features include service menu PDFs, location information, Instagram feed integration, and WhatsApp booking functionality.",
-    url: "https://gabbs27.github.io/hair-salon-spa/",
-    languages: ["React", "TypeScript", "Vite", "CSS3", "GitHub Actions"],
-  },
-  {
-    id: 3,
-    image: "/images/invoice_generator.webp",
-    url: "https://gabbs27.github.io/invoice-generator/",
-    title: "Invoice Generator",
-    description:
-      "This project is an invoice generator built using ReactJS, TypeScript and SASS. It simplifies invoicing process for businesses.",
-    languages: ["ReactJS", "typescript"],
-  },
-  {
-    id: 4,
-    image: "/images/calendar.webp",
-    url: "https://gabbs27.github.io/calendar-reminder/",
-    title: "My React Calendar",
-    description:
-      "This project is titled My React Calendar and features an image of a calendar on the website. The web application is built using ReactJS, Axios, HTML, and OpenWeather. The main purpose of the application is to help users stay organized by providing a platform to manage and schedule their events and reminders.",
-    languages: ["ReactJS", "Axios", "HTML", "OpenWeather"],
-  },
-  {
-    id: 5,
-    image: "/images/movie.webp",
-    url: "https://gabbs27.github.io/gmovie-app/",
-    title: "G-Movie",
-    description:
-      "Discover and explore movies with this user-friendly platform, featuring search functionality, ratings, and the ability to save your favorites for easy access.",
-    languages: [
-      "ReactJS",
-      "react-router-dom",
-      "Bootstrap",
-      "react-bootstrap",
-      "styled-components",
-      "Fetch API",
-      "The Movie Database (TMDB) API",
-    ],
-  },
-  {
-    id: 6,
-    image: "/images/todo.webp",
-    title: "ToDo-matic",
-    description:
-      "A dynamic and user-friendly Todo List application, built using ReactJS, that helps users effortlessly manage and organize their tasks",
-    url: "https://gabbs27.github.io/todolist/",
-    languages: ["ReactJS"],
-  },
-  {
-    id: 7,
-    image: "/images/memegenerator.webp",
-    title: "Memelogy",
-    description: "A simple meme generator using ReactJs and ImgFlip API",
-    url: "https://gabbs27.github.io/meme-generator/",
-    languages: ["ReactJS", "ImgFlip API", "React Hooks"],
-  },
-];
+/**
+ * The project cards.
+ *
+ * The list itself lives in src/config/projects.json, read by BOTH this module
+ * (the browser) and scripts/prerender.mjs (the build). It is JSON for the same
+ * reason src/config/translations.json is: a .mjs build script cannot import a
+ * .ts module, and a second copy of the list would drift the moment one side was
+ * edited alone.
+ *
+ * What made that matter: the home page's <noscript> listed the blog posts and
+ * nothing else, so twelve projects — the portfolio, on a portfolio site — were
+ * invisible to anything that does not execute the bundle. The posts had been
+ * fixed; the projects were never in the fix.
+ */
+import projects from "../config/projects.json";
+
+export interface Project {
+  id: number;
+  image: string;
+  title: string;
+  description: string;
+  url: string;
+  languages: string[];
+  badge?: string;
+}
+
+export const data: Project[] = projects;

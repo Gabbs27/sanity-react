@@ -44,6 +44,12 @@ const DESCRIPTION_FALLBACK =
 const translations = JSON.parse(
   readFileSync(join(root, 'src/config/translations.json'), 'utf8')
 );
+
+// The project cards, from the same file src/assets/data.ts reads. See that file
+// for why the list is JSON rather than a second copy living here.
+const projects = JSON.parse(
+  readFileSync(join(root, 'src/config/projects.json'), 'utf8')
+);
 const SPANISH_POSTS = new Set(translations.spanishPosts);
 const PAIRS = translations.pairs;
 
@@ -256,15 +262,32 @@ for (const [route, page] of Object.entries(staticPages)) {
 // The shell answers "/" and, through the catch-all rewrite, every route with no
 // prerendered file of its own — /allpost among them. Without this it is the one
 // page with no way out for a reader who cannot run the bundle.
+//
+// The projects belong here as much as the posts do. This is a portfolio site
+// whose portfolio was the one thing the noscript never mentioned: the fix that
+// gave every post its body left the home page listing posts only, so a reader
+// without JavaScript got the blog and no evidence that any of the work existed.
+const projectList = projects
+  .map(
+    (p) =>
+      `<li><a href="${esc(p.url)}">${esc(p.title)}</a> — ${esc(p.description)} ` +
+      `<em>${esc((p.languages || []).join(', '))}</em></li>`
+  )
+  .join('');
+
 const shellNoscript = `<noscript>
   <h1>Code With Gabo</h1>
   <p>Gabriel Abreu — full-stack developer in Santo Domingo, Dominican Republic.
   React and TypeScript on the front, C# and .NET on the back. Notes on what I
   build and what breaks, in English and Spanish.</p>
+  <h2>Projects</h2>
+  <ul>${projectList}</ul>
   <h2>Posts</h2>
   <ul>${posts
     .map((p) => `<li><a href="/${esc(p.slug)}">${esc(p.title)}</a></li>`)
     .join('')}</ul>
+  <p><a href="/allpost">All posts</a> · <a href="/about">About</a> ·
+  <a href="/services">Services</a> · <a href="/gabriel-abreu">Contact</a></p>
 </noscript>`;
 
 writeFileSync(

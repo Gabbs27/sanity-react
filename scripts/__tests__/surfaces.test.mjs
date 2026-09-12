@@ -293,6 +293,58 @@ test('every page carries real text and real links without JavaScript', () => {
   }
 });
 
+// The previous test proves the home page has SOME text. It passed for weeks
+// while the portfolio was missing from it entirely — the posts alone cleared
+// every threshold, so "enough content" was true and "the right content" was
+// never asked. This is a portfolio site; the projects are the reason it exists.
+const projects = JSON.parse(read(join(ROOT, 'src/config/projects.json')));
+
+test('the home page lists every project without JavaScript', () => {
+  const html = read(join(BUILD, 'index.html'));
+  const noscript = html.match(/<noscript>([\s\S]*?)<\/noscript>/)?.[1] ?? '';
+  assert.ok(noscript, 'the home page has no noscript block at all');
+
+  // Compare against what a reader sees, not against the source string: the
+  // prerenderer escapes, so "Hair Salon & Spa" ships as "Hair Salon &amp; Spa"
+  // and a raw substring match fails on a page that is perfectly correct. This
+  // assertion went red on its first run for exactly that reason.
+  const shown = noscript
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
+
+  for (const project of projects) {
+    assert.ok(
+      has(shown, project.title),
+      `home noscript is missing the project "${project.title}"`
+    );
+    assert.ok(
+      has(shown, project.url),
+      `home noscript is missing the link for "${project.title}"`
+    );
+  }
+});
+
+test('data.ts and the prerenderer read the same project list', () => {
+  // The reason projects.json exists. If someone re-inlines the array into
+  // data.ts, the browser and the build drift and only one of them is right.
+  const dataTs = read(join(ROOT, 'src/assets/data.ts'));
+  assert.ok(
+    has(dataTs, 'config/projects.json'),
+    'data.ts no longer reads projects.json — the build and the browser can now disagree'
+  );
+  assert.ok(
+    !/id:\s*\d+,\s*\n\s*image:/.test(dataTs),
+    'data.ts has an inlined project array again'
+  );
+  assert.ok(
+    has(read(join(ROOT, 'scripts/prerender.mjs')), 'projects.json'),
+    'prerender.mjs no longer reads projects.json'
+  );
+});
+
 test('the noscript content sits outside #root, so React never discards it', () => {
   for (const slug of slugs) {
     const html = read(join(BUILD, slug, 'index.html'));
