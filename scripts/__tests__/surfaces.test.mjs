@@ -31,9 +31,9 @@
 import { test, before } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
-import { createHash } from 'node:crypto';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { captureHash } from '../capture-hash.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const BUILD = join(ROOT, 'build');
@@ -369,14 +369,14 @@ const staticPages = JSON.parse(read(join(ROOT, 'src/config/static-pages.json')))
 
 test('every captured static page still matches its source component', () => {
   for (const [route, page] of Object.entries(staticPages)) {
-    const source = read(join(ROOT, page.component));
-    const hash = createHash('sha256').update(source).digest('hex').slice(0, 16);
-    assert.equal(
-      hash,
-      page.sourceHash,
-      `${page.component} changed since ${route} was captured. ` +
-        `Run: npm run build && node scripts/capture-static.mjs`
-    );
+      // Imported, not recomputed: the formula lives in one place so the alarm
+      // cannot drift away from what wrote the file.
+      assert.equal(
+        captureHash(ROOT, page.component),
+        page.sourceHash,
+        `${page.component} or the shared nav/footer changed since ${route} was ` +
+          `captured. Run: npm run build && node scripts/capture-static.mjs`
+      );
   }
 });
 

@@ -26,9 +26,9 @@
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:http';
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
-import { createHash } from 'node:crypto';
 import { resolve, dirname, join, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { captureHash } from './capture-hash.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const BUILD = join(ROOT, 'build');
@@ -153,13 +153,13 @@ function readable(html) {
 const captured = {};
 for (const [route, component] of Object.entries(ROUTES)) {
   const { title, description, html, text } = await capture(route);
-  const source = readFileSync(join(ROOT, component), 'utf8');
   captured[route] = {
     component,
-    // Not a cache key — a staleness alarm. surfaces.test.mjs compares this to
-    // the file on disk, so editing the component without re-running this script
-    // turns the committed capture red instead of leaving it quietly wrong.
-    sourceHash: createHash('sha256').update(source).digest('hex').slice(0, 16),
+    // Not a cache key — a staleness alarm. surfaces.test.mjs recomputes this
+    // from the files on disk, so editing the component or the shared chrome
+    // without re-running this script turns the committed capture red instead
+    // of leaving it quietly wrong.
+    sourceHash: captureHash(ROOT, component),
     title,
     description,
     html: readable(html),

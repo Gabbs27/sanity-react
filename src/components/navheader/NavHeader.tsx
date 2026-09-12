@@ -108,12 +108,16 @@ const NavBar = () => {
             role="menuitem">
             Contact
           </NavLink>
+          {/* "GitHub", not "Projects". This route lists repositories fetched
+              from the GitHub API; the actual built projects — the portfolio —
+              live on "/" under Portfolio. Labelling this one Projects sent
+              anyone looking for the work to a list of repo names instead. */}
           <NavLink
             to="/repositorios"
             className="nav-item"
             onClick={handleMenuItemClick}
             role="menuitem">
-            Projects
+            GitHub
           </NavLink>
           {/* Points at the public demo, not /dashboard: that route is behind
               an auth wall, so every visitor who clicked this hit a login
