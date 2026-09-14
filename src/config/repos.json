@@ -1,7 +1,64 @@
 {
-  "takenAt": "2026-09-12T18:04:36.218Z",
+  "takenAt": "2026-09-14T03:37:33.297Z",
   "user": "Gabbs27",
   "repos": [
+    {
+      "id": 1189862790,
+      "name": "Peacer-rankers",
+      "description": "LoL Tracker — League of Legends summoner profile, rank, champion mastery, filtered match history, per-match analysis, live game and player comparison. Next.js",
+      "html_url": "https://github.com/Gabbs27/Peacer-rankers",
+      "language": "TypeScript",
+      "stargazers_count": 0,
+      "forks_count": 0,
+      "updated_at": "2026-09-13T02:04:17Z",
+      "topics": []
+    },
+    {
+      "id": 1117816989,
+      "name": "A2C",
+      "description": "A2C International — premium vehicle dealership in the Dominican Republic. React 18 + Vite + Supabase",
+      "html_url": "https://github.com/Gabbs27/A2C",
+      "language": "JavaScript",
+      "stargazers_count": 0,
+      "forks_count": 0,
+      "updated_at": "2026-09-13T02:03:35Z",
+      "topics": []
+    },
+    {
+      "id": 922735696,
+      "name": "hair-salon-spa",
+      "description": "Reflections Salon & Spa — React + TypeScript + Vite, with service menu PDFs, Instagram feed and WhatsApp booking",
+      "html_url": "https://github.com/Gabbs27/hair-salon-spa",
+      "language": "TypeScript",
+      "stargazers_count": 0,
+      "forks_count": 0,
+      "updated_at": "2026-09-13T02:02:37Z",
+      "topics": []
+    },
+    {
+      "id": 594449367,
+      "name": "sanity-react",
+      "description": "codewithgabo.com — portfolio and bilingual blog in React 19 + Vite with Sanity CMS, build-time prerendering and an admin panel",
+      "html_url": "https://github.com/Gabbs27/sanity-react",
+      "language": "TypeScript",
+      "stargazers_count": 0,
+      "forks_count": 0,
+      "updated_at": "2026-09-13T01:55:00Z",
+      "topics": []
+    },
+    {
+      "id": 580580604,
+      "name": "invoice-generator",
+      "description": "Self-hosted issuer of Dominican electronic fiscal receipts (e-CF): builds, signs (XMLDSig) and validates the XML against DGII's XSD, and prints it with its QR. Does not transmit to DGII.",
+      "html_url": "https://github.com/Gabbs27/invoice-generator",
+      "language": "TypeScript",
+      "stargazers_count": 1,
+      "forks_count": 0,
+      "updated_at": "2026-09-13T01:27:02Z",
+      "topics": [
+        "react"
+      ]
+    },
     {
       "id": 864563868,
       "name": "StarWarsAPIChallenge",
@@ -135,50 +192,6 @@
       "topics": []
     },
     {
-      "id": 922735696,
-      "name": "hair-salon-spa",
-      "description": "Reflections Salon & Spa — React + TypeScript + Vite, with service menu PDFs, Instagram feed and WhatsApp booking",
-      "html_url": "https://github.com/Gabbs27/hair-salon-spa",
-      "language": "TypeScript",
-      "stargazers_count": 0,
-      "forks_count": 0,
-      "updated_at": "2026-09-12T18:04:22Z",
-      "topics": []
-    },
-    {
-      "id": 1117816989,
-      "name": "A2C",
-      "description": "A2C International — premium vehicle dealership in the Dominican Republic. React 18 + Vite + Supabase",
-      "html_url": "https://github.com/Gabbs27/A2C",
-      "language": "JavaScript",
-      "stargazers_count": 0,
-      "forks_count": 0,
-      "updated_at": "2026-09-12T18:04:21Z",
-      "topics": []
-    },
-    {
-      "id": 1189862790,
-      "name": "Peacer-rankers",
-      "description": "LoL Tracker — League of Legends summoner profile, rank, champion mastery, filtered match history, per-match analysis, live game and player comparison. Next.js",
-      "html_url": "https://github.com/Gabbs27/Peacer-rankers",
-      "language": "TypeScript",
-      "stargazers_count": 0,
-      "forks_count": 0,
-      "updated_at": "2026-09-12T18:04:21Z",
-      "topics": []
-    },
-    {
-      "id": 594449367,
-      "name": "sanity-react",
-      "description": "codewithgabo.com — portfolio and bilingual blog in React 19 + Vite with Sanity CMS, build-time prerendering and an admin panel",
-      "html_url": "https://github.com/Gabbs27/sanity-react",
-      "language": "TypeScript",
-      "stargazers_count": 0,
-      "forks_count": 0,
-      "updated_at": "2026-09-12T18:04:20Z",
-      "topics": []
-    },
-    {
       "id": 890172865,
       "name": "ChatBot",
       "description": "Simple Chatbot solution",
@@ -199,19 +212,6 @@
       "forks_count": 0,
       "updated_at": "2024-11-16T01:47:24Z",
       "topics": []
-    },
-    {
-      "id": 580580604,
-      "name": "invoice-generator",
-      "description": "This project is an invoice generator built using ReactJS, TypeScript and SASS. It simplifies invoicing process for businesses.",
-      "html_url": "https://github.com/Gabbs27/invoice-generator",
-      "language": "TypeScript",
-      "stargazers_count": 1,
-      "forks_count": 0,
-      "updated_at": "2024-10-15T19:09:48Z",
-      "topics": [
-        "react"
-      ]
     },
     {
       "id": 619214357,
