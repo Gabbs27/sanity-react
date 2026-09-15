@@ -28,70 +28,48 @@ const PUBLISH = process.argv.includes("--publish");
 
 const POSTS = [
   {
-    slug: "el-email-que-envias-no-es-el-que-leen",
-    title: "El email que envías no es el que leen",
+    slug: "lo-de-claro-que-se-sabe-y-que-no",
+    title: "Lo de Claro: qué se sabe, qué no, y qué hacer igual",
     excerpt:
-      "Tres grupos de clientes de correo hacen tres cosas distintas con tu HTML, " +
-      "y uno de ellos invierte hasta los fondos que pusiste oscuros a propósito. " +
-      "Más lo que dice la investigación de NN/g sobre cómo se lee de verdad.",
-    tags: ["Email", "Usabilidad", "Accesibilidad", "CSS", "Dark mode"],
-    markdown: resolve(ROOT, "docs/drafts/el-email-que-envias-no-es-el-que-leen.md"),
-    cover: "scripts/covers/out/email-es.png",
+      "Una afirmación sin verificar sobre 2.9 millones de registros, por qué la " +
+      "confirmación siempre llega tarde, y las cosas que conviene hacer esta " +
+      "semana aunque al final resulte falsa.",
+    tags: ["Seguridad", "República Dominicana", "Privacidad", "2FA", "Telecomunicaciones"],
+    markdown: resolve(ROOT, "docs/drafts/lo-de-claro-que-se-sabe-y-que-no.md"),
+    cover: "scripts/covers/out/claro-es.png",
   },
   {
-    slug: "the-email-you-send-is-not-the-email-they-read",
-    title: "The email you send is not the email they read",
+    slug: "the-claro-claim-what-is-known-and-what-is-not",
+    title: "The Claro claim: what is known, what is not, and what to do anyway",
     excerpt:
-      "Three groups of mail clients do three different things to your HTML, and " +
-      "one of them inverts even the backgrounds you made dark on purpose. Plus " +
-      "what NN/g's research says about how newsletters actually get read.",
-    tags: ["Email", "Usability", "Accessibility", "CSS", "Dark mode"],
-    markdown: resolve(ROOT, "docs/drafts/the-email-you-send-is-not-the-email-they-read.md"),
-    cover: "scripts/covers/out/email-en.png",
+      "An unverified claim about 2.9 million records, why confirmation always " +
+      "arrives late, and what is worth doing this week even if it turns out to " +
+      "be false.",
+    tags: ["Security", "Dominican Republic", "Privacy", "2FA", "Telecom"],
+    markdown: resolve(ROOT, "docs/drafts/the-claro-claim-what-is-known-and-what-is-not.md"),
+    cover: "scripts/covers/out/claro-en.png",
   },
   {
-    slug: "chrome-ya-trae-un-modelo-adentro",
-    title: "Chrome ya trae un modelo adentro. No es el que están anunciando",
+    slug: "react-19-3-el-compilador-y-un-cvss-10",
+    title: "React 19.3, el compilador y un CVSS 10: lo que cambió mientras no mirabas",
     excerpt:
-      "El Prompt API no está estable en la web: es origin trial. Pero hay tres " +
-      "APIs de IA estables desde Chrome 138 que puedes usar hoy, sin servidor y " +
-      "sin que el texto del usuario salga de su máquina.",
-    tags: ["IA", "Chrome", "JavaScript", "Gemini Nano", "Privacidad"],
-    markdown: resolve(ROOT, "docs/drafts/chrome-ya-trae-un-modelo-adentro.md"),
-    cover: "scripts/covers/out/chrome-ai-es.png",
+      "El compilador llegó a 1.0 y borra tus useMemo, Server Components tuvo una " +
+      "vulnerabilidad de puntuación máxima, y 19.3 trajo View Transitions, refs " +
+      "en Fragment y browser().",
+    tags: ["React", "React Compiler", "Server Components", "Seguridad", "Frontend"],
+    markdown: resolve(ROOT, "docs/drafts/react-19-3-el-compilador-y-un-cvss-10.md"),
+    cover: "scripts/covers/out/react-193-es.png",
   },
   {
-    slug: "chrome-already-ships-a-model",
-    title: "Chrome already ships a model. It isn't the one being announced",
+    slug: "react-19-3-the-compiler-and-a-cvss-10",
+    title: "React 19.3, the compiler, and a CVSS 10: what changed while you weren't looking",
     excerpt:
-      "The Prompt API isn't stable on the web — it's an origin trial. But three " +
-      "built-in AI APIs have been stable since Chrome 138, and you can ship them " +
-      "today with no server and no user text leaving the device.",
-    tags: ["AI", "Chrome", "JavaScript", "Gemini Nano", "Privacy"],
-    markdown: resolve(ROOT, "docs/drafts/chrome-already-ships-a-model.md"),
-    cover: "scripts/covers/out/chrome-ai-en.png",
-  },
-  {
-    slug: "cuatro-trucos-de-css-que-ya-puedes-borrar",
-    title: "Cuatro trucos de CSS que ya puedes borrar",
-    excerpt:
-      "contrast-color(), @scope, las style queries y :open llegaron a Baseline " +
-      "este año. Cada uno elimina un truco que probablemente sigue vivo en tu " +
-      "código porque creías que CSS no podía hacerlo.",
-    tags: ["CSS", "Baseline", "Frontend", "Accesibilidad"],
-    markdown: resolve(ROOT, "docs/drafts/cuatro-trucos-de-css-que-ya-puedes-borrar.md"),
-    cover: "scripts/covers/out/css-2026-es.png",
-  },
-  {
-    slug: "four-css-workarounds-you-can-delete",
-    title: "Four CSS workarounds you can delete",
-    excerpt:
-      "contrast-color(), @scope, style queries and :open all reached Baseline " +
-      "this year. Each one removes a workaround that is probably still alive in " +
-      "your codebase because you believed CSS could not do it.",
-    tags: ["CSS", "Baseline", "Frontend", "Accessibility"],
-    markdown: resolve(ROOT, "docs/drafts/four-css-workarounds-you-can-delete.md"),
-    cover: "scripts/covers/out/css-2026-en.png",
+      "The compiler hit 1.0 and deletes your useMemo, Server Components took a " +
+      "maximum-score vulnerability, and 19.3 brought View Transitions, Fragment " +
+      "refs and browser().",
+    tags: ["React", "React Compiler", "Server Components", "Security", "Frontend"],
+    markdown: resolve(ROOT, "docs/drafts/react-19-3-the-compiler-and-a-cvss-10.md"),
+    cover: "scripts/covers/out/react-193-en.png",
   },
 ];
 

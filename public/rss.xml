@@ -9,6 +9,418 @@
     <language>es</language>
     <atom:link href="https://codewithgabo.com/rss.xml" rel="self" type="application/rss+xml" />
     <item>
+      <title><![CDATA[React 19.3, the compiler, and a CVSS 10: what changed while you weren't looking]]></title>
+      <link>https://codewithgabo.com/react-19-3-the-compiler-and-a-cvss-10</link>
+      <guid isPermaLink="true">https://codewithgabo.com/react-19-3-the-compiler-and-a-cvss-10</guid>
+      <pubDate>Tue, 15 Sep 2026 23:58:06 GMT</pubDate>
+      <description><![CDATA[The compiler hit 1.0 and deletes your useMemo, Server Components took a maximum-score vulnerability, and 19.3 brought View Transitions, Fragment refs and browser().]]></description>
+      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/c16f623c85235aadf2a650bff375319904ed2852-1200x630.png" alt="React 19.3, the compiler, and a CVSS 10: what changed while you weren't looking" />
+<p>This week I pulled Create React App out of one project and wrote the plan to pull it out of another. Both were from 2022 and 2023, and both still worked. That is the deceptive part: still working and still being the right way to do it are different things, and between the two, four large changes happened in React that do not announce themselves.</p>
+<p>None of this is rumour. All four are on the official blog, with dates.</p>
+<h2>1. The compiler already deletes your <code>useMemo</code></h2>
+<p><strong>React Compiler reached 1.0 on October 7, 2025.</strong> Not beta, not an experiment: it automatically memoizes components and hooks, works in React and React Native, and installs through Babel, Vite or Rsbuild.</p>
+<p>What that means in practice is that most of your <code>useMemo</code> and <code>useCallback</code> stopped being your job. You wrote them to avoid re-renders; the compiler does that optimization at build time, without rewriting anything.</p>
+<p>There is one installation detail that catches people: <strong>if you had `eslint-plugin-react-compiler`, it is gone.</strong> You remove it and use <code>eslint-plugin-react-hooks@latest</code>, because the compiler's lint rules now ship inside its <code>recommended</code> and <code>recommended-latest</code> presets.</p>
+<p>The compiler leans on the Rules of React. If a component breaks them, the compiler detects it and skips that component rather than optimizing it wrongly. Which means linter warnings stopped being cosmetic: they now decide whether your code gets optimized at all.</p>
+<h2>2. If you serve Server Components, you now have a patch calendar</h2>
+<p>This is the change that gets discussed least and can cost you most.</p>
+<p>On <strong>December 3, 2025</strong>, React published a critical vulnerability in React Server Components: <strong>CVE-2025-55182, CVSS 10.0</strong>, the maximum score. An unauthenticated attacker could craft an HTTP request to any Server Function endpoint that, when deserialized by React, achieved <strong>remote code execution on the server</strong>.</p>
+<p>It affected <code>react-server-dom-webpack</code>, <code>react-server-dom-parcel</code> and <code>react-server-dom-turbopack</code> in versions 19.0, 19.1.0, 19.1.1 and 19.2.0. Fixed in <strong>19.0.1, 19.1.2 and 19.2.1</strong>.</p>
+<p>And the list of affected frameworks is the list of what people actually use: <code>next</code>, <code>react-router</code>, <code>waku</code>, <code>@parcel/rsc</code>, <code>@vitejs/plugin-rsc</code> and <code>rwsdk</code>.</p>
+<p><strong>Eight days later came the second batch.</strong> On December 11 two more were published:</p>
+<ul>
+<li><strong>Denial of service</strong> (CVE-2025-55184, CVE-2025-67779 and CVE-2026-23864, CVSS 7.5): malicious requests to Server Function endpoints caused infinite loops that hang the process, eat CPU, and end in crashes or out-of-memory.</li>
+<li><strong>Source code exposure</strong> (CVE-2025-55183, CVSS 5.3): a request could return the source of your Server Functions.</li>
+</ul>
+<p>The detail in that last one is worth reading carefully, because it decides whether it touches you:</p>
+<pre><code>'use server';
+
+export async function serverFunction(name) {
+  const conn = db.createConnection('SECRET KEY'); // exposed
+  const user = await conn.createUser(name);
+  return {
+    id: user.id,
+    message: `Hello, ${name}!` // exposed
+  }
+}</code></pre>
+<p>Only secrets <strong>hardcoded in the source</strong> are exposed. Ones coming from <code>process.env</code> are not. So: if you ever pasted a key straight into a file with <code>'use server'</code> to test something, that is the file.</p>
+<p>Fixed in <strong>19.0.4, 19.1.5 and 19.2.4</strong>.</p>
+<p>The operational conclusion is simple and it isn't about React: if your app serves Server Components, it stopped being a dependency you update when there's time. And if you use neither RSC nor a server, none of these reach you.</p>
+<h2>3. React 19.3 shipped things that used to be solved outside React</h2>
+<p><strong>It came out on September 9, 2026</strong>, days ago.</p>
+<p><strong>`&lt;ViewTransition&gt;`</strong> animates elements as they enter, exit, move or resize, using the browser's View Transition API:</p>
+<pre><code>import { ViewTransition } from 'react';
+
+{isShowing &amp;&amp; (
+  &lt;ViewTransition&gt;
+    &lt;Component /&gt;
+  &lt;/ViewTransition&gt;
+)}</code></pre>
+<p>React picks which animation to run based on how the tree changed: enter, exit, update or share. And when the same state update should animate differently depending on <strong>why</strong> it happened, <code>addTransitionType</code> marks the cause:</p>
+<pre><code>function nextSlide() {
+  startTransition(() =&gt; {
+    addTransitionType('next');
+    setCurrentSlide(c =&gt; c + 1);
+  });
+}</code></pre>
+<pre><code>&lt;ViewTransition
+  enter={{
+    'next': 'from-right',
+    'previous': 'from-left',
+  }}
+  exit={{
+    'next': 'to-left',
+    'previous': 'to-right',
+  }}
+&gt;
+  &lt;Page /&gt;
+&lt;/ViewTransition&gt;</code></pre>
+<p><strong>Fragment refs</strong> solve wanting to touch the DOM of a group of elements without wrapping it in a <code>div</code> you never needed:</p>
+<pre><code>&lt;Fragment ref={fragmentRef}&gt;
+  {posts.map(post =&gt; (
+    &lt;Heading key={post.id}&gt;{post.title}&lt;/Heading&gt;
+  ))}
+&lt;/Fragment&gt;</code></pre>
+<p>The <code>FragmentInstance</code> carries a deliberately small set of methods: <code>addEventListener</code>, <code>removeEventListener</code>, <code>dispatchEvent</code>, <code>focus</code>, <code>focusLast</code>, <code>blur</code>, <code>observeUsing</code>, <code>unobserveUsing</code>, <code>getClientRects</code>, <code>getRootNode</code>, <code>compareDocumentPosition</code> and <code>scrollIntoView</code>.</p>
+<p><code>observeUsing</code> is the one I care about: attaching an <code>IntersectionObserver</code> to a list without manufacturing a container just to have something to hold.</p>
+<p><strong>`browser()`</strong> tells a component not to render on the server:</p>
+<pre><code>import { use } from 'react';
+import { browser } from 'react-dom';
+
+function Component() {
+  use(browser());
+  // ...
+}</code></pre>
+<p>During server rendering the nearest <code>Suspense</code> fallback shows. Once the component hydrates on the client, <code>use(browser())</code> no longer suspends and rendering continues normally. It is the official version of the <code>useEffect</code> plus <code>isClient</code> trick everyone has written.</p>
+<p><strong>Trusted Types integration</strong> also landed, which helps against DOM-based XSS: React now passes those values through without coercing them to strings, so the browser can validate them.</p>
+<p>And one you don't see but feel: <strong>transitions now render independently</strong> instead of being entangled into a single render. A slow transition no longer holds up unrelated ones.</p>
+<h2>4. React no longer depends on Meta alone</h2>
+<p>The <strong>React Foundation</strong> was announced in October 2025, and on <strong>February 24, 2026</strong> its new home was published: the <strong>Linux Foundation</strong>.</p>
+<p>Eight platinum founding members: Amazon, Callstack, Expo, Huawei, Meta, Microsoft, Software Mansion and Vercel. A board with a representative from each, and Seth Webster as executive director.</p>
+<p>With a clarification worth reading in full: <strong>React's technical governance is independent from that board.</strong> Technical direction is still set by the people who contribute to and maintain React, not by the foundation's members.</p>
+<p>If you only write components, this changes nothing tomorrow. It changes the five-year risk, which is the one you actually take on when you pick a framework.</p>
+<h2>What to do with all of this</h2>
+<p>If I had to order it by urgency:</p>
+<ol>
+<li><strong>If you serve Server Components, check your version today.</strong> A CVSS 10.0 is not a negotiation.</li>
+<li><strong>If you write `useMemo` by reflex, try the compiler.</strong> And if you had the old ESLint plugin, remove it.</li>
+<li><strong>If you have a project on Create React App</strong>, React stopped recommending it on February 14, 2025. Migrating takes less than it looks.</li>
+<li><strong>19.3 can wait</strong>, but read it: there are things in there you are solving by hand right now.</li>
+</ol>
+<p><strong>Sources:</strong> <a href="https://react.dev/blog/2026/09/09/react-19-3">React 19.3</a> · <a href="https://react.dev/blog/2025/10/07/react-compiler-1">React Compiler v1.0</a> · <a href="https://react.dev/blog/2025/12/03/critical-security-vulnerability-in-react-server-components">Critical vulnerability in RSC</a> · <a href="https://react.dev/blog/2025/12/11/denial-of-service-and-source-code-exposure-in-react-server-components">DoS and source code exposure in RSC</a> · <a href="https://react.dev/blog/2026/02/24/the-react-foundation">The React Foundation</a></p>]]></content:encoded>
+    </item>
+    <item>
+      <title><![CDATA[React 19.3, el compilador y un CVSS 10: lo que cambió mientras no mirabas]]></title>
+      <link>https://codewithgabo.com/react-19-3-el-compilador-y-un-cvss-10</link>
+      <guid isPermaLink="true">https://codewithgabo.com/react-19-3-el-compilador-y-un-cvss-10</guid>
+      <pubDate>Tue, 15 Sep 2026 23:58:03 GMT</pubDate>
+      <description><![CDATA[El compilador llegó a 1.0 y borra tus useMemo, Server Components tuvo una vulnerabilidad de puntuación máxima, y 19.3 trajo View Transitions, refs en Fragment y browser().]]></description>
+      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/e0ea8b80f75416891f890fc2072ec81b851de4dc-1200x630.png" alt="React 19.3, el compilador y un CVSS 10: lo que cambió mientras no mirabas" />
+<p>Esta semana saqué Create React App de un proyecto y dejé escrito el plan para sacarlo de otro. Los dos eran de 2022 y 2023, y los dos seguían funcionando. Eso es lo engañoso: seguir funcionando y seguir siendo la forma correcta de hacerlo son cosas distintas, y entre una y otra pasaron cuatro cambios grandes en React que no se enteran solos.</p>
+<p>Ninguno es un rumor. Los cuatro están publicados en el blog oficial, con fecha.</p>
+<h2>1. El compilador ya borra tu <code>useMemo</code></h2>
+<p><strong>React Compiler llegó a la versión 1.0 el 7 de octubre de 2025.</strong> No es beta, no es experimento: memoriza automáticamente componentes y hooks, funciona en React y en React Native, y se instala con Babel, Vite o Rsbuild.</p>
+<p>Lo que eso significa en la práctica es que la mayoría de tus <code>useMemo</code> y <code>useCallback</code> dejaron de ser trabajo tuyo. Los escribías para evitar renders; el compilador hace esa optimización en tiempo de compilación, sin reescribir nada.</p>
+<p>Hay un detalle de instalación que se come a mucha gente: <strong>si tenías `eslint-plugin-react-compiler`, ya no va.</strong> Se elimina y se usa <code>eslint-plugin-react-hooks@latest</code>, porque las reglas del compilador ahora viajan dentro de sus presets <code>recommended</code> y <code>recommended-latest</code>.</p>
+<p>El compilador se apoya en las Reglas de React. Si tu componente las rompe, el compilador lo detecta y se salta ese componente en lugar de optimizarlo mal. Por eso las advertencias del linter dejaron de ser cosmética: ahora determinan si tu código se optimiza o no.</p>
+<h2>2. Si sirves Server Components, ahora tienes calendario de parches</h2>
+<p>Este es el cambio que menos se comenta y más te puede costar.</p>
+<p>El <strong>3 de diciembre de 2025</strong>, React publicó una vulnerabilidad crítica en React Server Components: <strong>CVE-2025-55182, con CVSS 10.0</strong>, la puntuación máxima. Un atacante sin autenticar podía mandar una petición HTTP a cualquier endpoint de Server Function que, al deserializarse, lograba <strong>ejecución remota de código en el servidor</strong>.</p>
+<p>Afectaba a <code>react-server-dom-webpack</code>, <code>react-server-dom-parcel</code> y <code>react-server-dom-turbopack</code> en las versiones 19.0, 19.1.0, 19.1.1 y 19.2.0. Se arregló en <strong>19.0.1, 19.1.2 y 19.2.1</strong>.</p>
+<p>Y la lista de frameworks afectados es la lista de lo que la gente usa: <code>next</code>, <code>react-router</code>, <code>waku</code>, <code>@parcel/rsc</code>, <code>@vitejs/plugin-rsc</code> y <code>rwsdk</code>.</p>
+<p><strong>Ocho días después llegó la segunda tanda.</strong> El 11 de diciembre se publicaron dos más:</p>
+<ul>
+<li><strong>Denegación de servicio</strong> (CVE-2025-55184, CVE-2025-67779 y CVE-2026-23864, CVSS 7.5): peticiones maliciosas a endpoints de Server Function provocaban bucles infinitos que cuelgan el proceso, se comen el CPU y terminan en caídas o en falta de memoria.</li>
+<li><strong>Exposición de código fuente</strong> (CVE-2025-55183, CVSS 5.3): una petición podía devolver el código de tus Server Functions.</li>
+</ul>
+<p>El detalle de esa última merece leerse con cuidado, porque decide si te afecta:</p>
+<pre><code>'use server';
+
+export async function serverFunction(name) {
+  const conn = db.createConnection('SECRET KEY'); // expuesto
+  const user = await conn.createUser(name);
+  return {
+    id: user.id,
+    message: `Hello, ${name}!` // expuesto
+  }
+}</code></pre>
+<p>Solo se exponen los secretos <strong>escritos a mano en el código</strong>. Los que vienen de <code>process.env</code> no. O sea: si alguna vez pegaste una llave directo en un archivo con <code>'use server'</code> para probar, ese es el archivo.</p>
+<p>Se arregló en <strong>19.0.4, 19.1.5 y 19.2.4</strong>.</p>
+<p>La conclusión operativa es sencilla y no es sobre React: si tu aplicación sirve Server Components, dejó de ser una dependencia que se actualiza cuando hay tiempo. Y si no usas RSC ni servidor, ninguna de estas te toca.</p>
+<h2>3. React 19.3 trajo cosas que antes se resolvían fuera de React</h2>
+<p><strong>Salió el 9 de septiembre de 2026</strong>, hace días.</p>
+<p><strong>`&lt;ViewTransition&gt;`</strong> te deja animar elementos cuando entran, salen, se mueven o cambian de tamaño, usando la View Transition API del navegador:</p>
+<pre><code>import { ViewTransition } from 'react';
+
+{isShowing &amp;&amp; (
+  &lt;ViewTransition&gt;
+    &lt;Component /&gt;
+  &lt;/ViewTransition&gt;
+)}</code></pre>
+<p>React decide qué animación correr según cómo cambió el árbol: entrada, salida, actualización o compartida. Y si necesitas que la misma actualización de estado se anime distinto según <strong>por qué</strong> ocurrió, <code>addTransitionType</code> marca la causa:</p>
+<pre><code>function nextSlide() {
+  startTransition(() =&gt; {
+    addTransitionType('next');
+    setCurrentSlide(c =&gt; c + 1);
+  });
+}</code></pre>
+<pre><code>&lt;ViewTransition
+  enter={{
+    'next': 'from-right',
+    'previous': 'from-left',
+  }}
+  exit={{
+    'next': 'to-left',
+    'previous': 'to-right',
+  }}
+&gt;
+  &lt;Page /&gt;
+&lt;/ViewTransition&gt;</code></pre>
+<p><strong>Los refs en `Fragment`</strong> resuelven el problema de querer tocar el DOM de un grupo de elementos sin envolverlo en un <code>div</code> que no necesitabas:</p>
+<pre><code>&lt;Fragment ref={fragmentRef}&gt;
+  {posts.map(post =&gt; (
+    &lt;Heading key={post.id}&gt;{post.title}&lt;/Heading&gt;
+  ))}
+&lt;/Fragment&gt;</code></pre>
+<p>El <code>FragmentInstance</code> trae un conjunto acotado de métodos: <code>addEventListener</code>, <code>removeEventListener</code>, <code>dispatchEvent</code>, <code>focus</code>, <code>focusLast</code>, <code>blur</code>, <code>observeUsing</code>, <code>unobserveUsing</code>, <code>getClientRects</code>, <code>getRootNode</code>, <code>compareDocumentPosition</code> y <code>scrollIntoView</code>.</p>
+<p>Ese <code>observeUsing</code> es el que a mí me importa: conectar un <code>IntersectionObserver</code> a una lista sin fabricar un contenedor solo para tener dónde agarrarse.</p>
+<p><strong>`browser()`</strong> le dice a un componente que no se renderice en el servidor:</p>
+<pre><code>import { use } from 'react';
+import { browser } from 'react-dom';
+
+function Component() {
+  use(browser());
+  // ...
+}</code></pre>
+<p>Durante el renderizado en servidor se muestra el <code>fallback</code> del <code>Suspense</code> más cercano. Cuando el componente hidrata en el cliente, <code>use(browser())</code> ya no suspende y todo sigue normal. Es la versión oficial del truco del <code>useEffect</code> con <code>isClient</code> que todos hemos escrito.</p>
+<p>También llegó <strong>integración con Trusted Types</strong>, que ayuda contra XSS basado en DOM: React ahora pasa esos valores sin convertirlos a texto, para que el navegador pueda validarlos.</p>
+<p>Y una que no se ve pero se siente: <strong>las transiciones ahora se renderizan de forma independiente</strong> en vez de enredarse en un solo render. Una transición lenta ya no retrasa a las otras.</p>
+<h2>4. React ya no depende solo de Meta</h2>
+<p>En octubre de 2025 se anunció la <strong>React Foundation</strong>, y el 24 de febrero de 2026 se publicó su nueva casa: la <strong>Linux Foundation</strong>.</p>
+<p>Ocho miembros fundadores platino: Amazon, Callstack, Expo, Huawei, Meta, Microsoft, Software Mansion y Vercel. Una junta directiva con representantes de cada uno y Seth Webster como director ejecutivo.</p>
+<p>Con una aclaración que conviene leer completa: <strong>la gobernanza técnica de React es independiente de la junta.</strong> La dirección técnica la siguen marcando quienes contribuyen y mantienen React, no los miembros de la fundación.</p>
+<p>Para el que solo escribe componentes, esto no cambia nada mañana. Cambia el riesgo a cinco años, que es el que uno realmente asume cuando escoge un framework.</p>
+<h2>Qué hacer con todo esto</h2>
+<p>Si tuviera que ordenarlo por urgencia:</p>
+<ol>
+<li><strong>Si sirves Server Components, revisa tu versión hoy.</strong> Un CVSS 10.0 no se negocia.</li>
+<li><strong>Si escribes `useMemo` por reflejo, prueba el compilador.</strong> Y si tenías el plugin viejo de ESLint, quítalo.</li>
+<li><strong>Si tienes un proyecto en Create React App</strong>, React dejó de recomendarlo el 14 de febrero de 2025. Migrar toma menos de lo que parece.</li>
+<li><strong>Lo de 19.3 puede esperar</strong>, pero léelo: hay cosas ahí que estás resolviendo a mano ahora mismo.</li>
+</ol>
+<p><strong>Fuentes:</strong> <a href="https://react.dev/blog/2026/09/09/react-19-3">React 19.3</a> · <a href="https://react.dev/blog/2025/10/07/react-compiler-1">React Compiler v1.0</a> · <a href="https://react.dev/blog/2025/12/03/critical-security-vulnerability-in-react-server-components">Vulnerabilidad crítica en RSC</a> · <a href="https://react.dev/blog/2025/12/11/denial-of-service-and-source-code-exposure-in-react-server-components">DoS y exposición de código en RSC</a> · <a href="https://react.dev/blog/2026/02/24/the-react-foundation">The React Foundation</a></p>]]></content:encoded>
+    </item>
+    <item>
+      <title><![CDATA[The Claro claim: what is known, what is not, and what to do anyway]]></title>
+      <link>https://codewithgabo.com/the-claro-claim-what-is-known-and-what-is-not</link>
+      <guid isPermaLink="true">https://codewithgabo.com/the-claro-claim-what-is-known-and-what-is-not</guid>
+      <pubDate>Tue, 15 Sep 2026 23:58:00 GMT</pubDate>
+      <description><![CDATA[An unverified claim about 2.9 million records, why confirmation always arrives late, and what is worth doing this week even if it turns out to be false.]]></description>
+      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/45662a9b45903ab761b272d74cd3553f7446a4db-1200x630.png" alt="The Claro claim: what is known, what is not, and what to do anyway" />
+<p>On September 13 a forum post claimed that someone had broken into Claro's systems in the Dominican Republic and taken a database of <strong>2,889,256 customer records</strong>. The number travelled fast, amplified from X, and within hours half the country was treating it as fact.</p>
+<p>Two things got merged immediately that are worth pulling apart: what was claimed, and what has been verified. They are not the same, and the difference changes what you should do.</p>
+<h2>What was claimed</h2>
+<p>According to the post, each record would include:</p>
+<ul>
+<li>National identification number</li>
+<li>Phone number</li>
+<li>Subscription information</li>
+<li>Account status</li>
+<li>Plan category</li>
+<li>Activation date</li>
+<li>Billing cycle</li>
+<li>Internal codes</li>
+<li><strong>ICCID</strong>, the unique identifier of each SIM card</li>
+</ul>
+<p>That last field is the one that says the most. An ICCID is not a marketing attribute: it identifies one specific SIM.</p>
+<h2>What has not been verified</h2>
+<p>Nearly everything else.</p>
+<p>The claim <strong>could not be verified independently</strong>. The circulated samples do not establish the origin of the data on their own, and they do not show the information is recent, complete, or taken from the company's systems.</p>
+<p>Claro Dominicana <strong>has not publicly confirmed</strong> any incident. At the time of writing, no Dominican authority has announced an investigation or a notification either.</p>
+<p>So the honest status is: an allegation circulating on social media, not a confirmed breach.</p>
+<h2>Why that does not let you relax</h2>
+<p>This is where most people draw the wrong conclusion, in one direction or the other.</p>
+<p>Some read &quot;unconfirmed&quot; and carry on. Others read the number and panic. Both reactions treat uncertainty as if it were information.</p>
+<p>Look at the cost instead:</p>
+<ul>
+<li><strong>If the leak is fake</strong> and you moved your two-factor authentication off SMS, you lost twenty minutes.</li>
+<li><strong>If it is real</strong> and you waited for official confirmation, you waited during exactly the window when that data is worth the most.</li>
+</ul>
+<p>That is not symmetric. And confirmation, when it arrives, usually arrives late: first someone has to verify, then decide what to say, and that takes days or weeks. Whatever was circulating has already circulated.</p>
+<p>Absence of confirmation is not confirmation of absence.</p>
+<h2>What someone could do with that data, if it were real</h2>
+<p>No need to imagine film plots. With an ID number, a phone, a plan and a billing cycle, two ordinary attacks get much easier.</p>
+<p><strong>The first is the call that knows things about you.</strong> The old script — &quot;we're calling from your phone company&quot; — fails because the caller knows nothing. With those fields they do: your name, your ID, which plan you have, when you get billed. Every security question your bank asks over the phone is on that list.</p>
+<p><strong>The second is the SIM swap.</strong> If someone convinces a service desk that they are you and moves your number to another SIM, they inherit your messages. And that is where it hurts: <strong>SMS is still the second factor for almost everything here.</strong> Your bank, your email, your accounts. Whoever controls your number can request the recovery code for everything else.</p>
+<p>That is why the ICCID is not a boring technical detail. It is what turns a customer list into a target list.</p>
+<h2>How a fraudulent SIM swap actually works</h2>
+<p>Worth understanding, because the defence becomes obvious once you see the order of the steps.</p>
+<ol>
+<li><strong>The attacker already knows who you are.</strong> Name, ID, number, plan. Nothing to guess.</li>
+<li><strong>They present as you</strong> and ask for a replacement SIM: lost phone, damaged card. They answer the verification questions because the answers are on the list.</li>
+<li><strong>Your phone loses signal.</strong> That is the only alarm you get, and it is easy to mistake for a network problem. That detail is why the attack works at night.</li>
+<li><strong>Your texts now arrive on another device.</strong> They open your email with &quot;forgot my password&quot;, receive the code, and from the email everything else falls.</li>
+</ol>
+<p>Notice where the weak point sits: not your password, not your phone, not even your data. It is the counter where a person decides whether the caller is you. Your security depends on the training of someone you have never met, serving a hundred customers a day.</p>
+<p>That is why moving your second factor off SMS is the only defence that does not depend on that person.</p>
+<h2>What to do this week</h2>
+<p>None of this depends on the leak being confirmed.</p>
+<p><strong>Move your second factor off SMS.</strong> Email, bank, social accounts: wherever it is offered, use an authenticator app. It is the highest-value change per minute spent, and the only one that protects you if your number stops being yours.</p>
+<p><strong>Ask your carrier what it takes to move your number to a new SIM.</strong> If the answer is &quot;a phone call&quot;, that is the problem. Ask whether they offer in-person verification or an extra passphrase.</p>
+<p><strong>Put a PIN on the SIM.</strong> It is in your phone's security menu, takes a minute, and blocks the simple case where someone steals the handset and pulls the card.</p>
+<p><strong>Change your mental rule about who calls you.</strong> Someone knowing your ID number proves nothing now. It was never good proof; today it is not even weak proof. If your bank calls, hang up and call the number on the card.</p>
+<p><strong>And never read a code out loud.</strong> No bank, no carrier and no app will ask you over the phone for the code that just arrived.</p>
+<h2>What this means for those of us who build software</h2>
+<p>If you build systems for Dominican customers, two assumptions changed.</p>
+<p><strong>First: ID numbers and phone numbers are not secrets.</strong> They never fully were, but any system verifying identity by asking for a national ID is performing theatre. If your account recovery rests on &quot;tell me your document number&quot;, your account recovery is public.</p>
+<p><strong>Second: SMS OTP is a borrowed factor.</strong> You do not control it — the carrier does, and its security is the security of their customer service desk. If your app protects money or sensitive data, at least offer an authenticator app.</p>
+<p>And a third, less comfortable one that applies even if this case turns out to be false: <strong>you are one export away too.</strong> Almost every customer database can be dumped whole from the inside. The useful questions are not about firewalls:</p>
+<ul>
+<li>How many fields do you store that you never use? Each one is surface.</li>
+<li>Who can export the full customer table, and is it logged?</li>
+<li>If a dump with your schema appeared tomorrow, could you say within hours whether it is yours and how old it is?</li>
+</ul>
+<p>That last one is what separates a credible response from two weeks of silence.</p>
+<h2>How to read the next leak claim</h2>
+<p>There will be another one. Better to have criteria beforehand than during.</p>
+<p><strong>Is there a verifiable sample?</strong> Not screenshots: records an independent party can cross-check against known real data. A screenshot proves nothing about origin; a thousand rows that line up does.</p>
+<p><strong>Are the fields internal or catalogue?</strong> A name and a phone number can come from anywhere. An ICCID, an internal code or a billing cycle do not appear on a public form. The fields that exist only inside the system are the hard part to fake.</p>
+<p><strong>Is the data fresh?</strong> The question that kills most claims. If not one line in the sample was activated this year, you are probably looking at old data from another breach, resold under a new label.</p>
+<p><strong>Has anyone cross-checked it against previous leaks?</strong> Repackaging old dumps and selling them as new is a business, not an exception. It is the most boring explanation and therefore the most common one.</p>
+<p><strong>And who is telling you?</strong> An account that aggregates leaks is not a source that verifies them. Amplifying and checking are two different jobs.</p>
+<p>With those five filters, most internet scares resolve themselves within a day.</p>
+<h2>What a company should publish to end it</h2>
+<p>There is an asymmetry almost nobody notices: <strong>the company is the only party that can close this cheaply.</strong></p>
+<p>Whoever claims to hold the data cannot prove its origin without exposing themselves. Anyone reviewing from outside can only say &quot;looks plausible&quot;. But the company has its own schema. It knows whether a field named the way the sample names it exists in its systems, whether that internal code format is theirs, and whether those activation dates match its own history.</p>
+<p>A useful statement is three sentences:</p>
+<ul>
+<li><strong>We reviewed the sample</strong>, and these fields do or do not match our schema.</li>
+<li><strong>If they match</strong>, this is the scope and these are the affected accounts.</li>
+<li><strong>Here is what you should do</strong>, with concrete instructions.</li>
+</ul>
+<p>A useless statement says customer security is a priority.</p>
+<p>Silence carries a cost that is invisible at the time: it leaves everyone managing the worst case alone. And it keeps the rumour alive, which is harder to kill in two weeks than in two days.</p>
+<h2>The legal frame, and its gap</h2>
+<p>In the Dominican Republic the reference is <strong>Ley 172-13</strong>, of December 13, 2013, on the protection of personal data. What it clearly establishes:</p>
+<ul>
+<li>Processing personal data requires the subject's prior, free, unambiguous and specific consent, save the exceptions the law itself sets out.</li>
+<li>Whoever processes data must adopt <strong>technical and organisational measures</strong> to prevent unauthorised access or alteration.</li>
+<li>You have the right to have your data rectified, updated or deleted, and the controller has a maximum of <strong>ten business days</strong> from your claim.</li>
+</ul>
+<p>What I did not find in the sources I checked is an explicit obligation to <strong>notify a breach</strong> to those affected. If a later regulation creates one, I did not come across it, and that seems worth saying plainly instead of asserting the opposite.</p>
+<p>That gap explains a lot. When no legal clock is running, &quot;no comment&quot; is a viable strategy. In Europe it would not be: the regulation there requires notification within 72 hours. Here the incentive points the other way.</p>
+<h2>How this probably ends</h2>
+<p>There are three possible endings. Someone verifies the samples and they turn out to be authentic. Someone shows they are old data, recombined from earlier leaks — which happens more than people think. Or nothing happens and the story fades in two weeks without anyone knowing.</p>
+<p>The third is the most likely. And it is the worst, because it leaves everyone with the same doubt and no reason to change anything.</p>
+<p>That is why the advice above does not depend on the ending. Moving your second factor off SMS is worth it if this turns out to be smoke, worth it if it turns out to be true, and worth it the next time a list with your name on it shows up.</p>
+<p><strong>Sources:</strong> <a href="https://n.com.do/2026/09/13/usuario-asegura-haber-accedido-a-datos-de-casi-2-9-millones-de-clientes-de-claro-en-rd/">N Digital</a> · <a href="https://eyr.com.do/presunta-filtracion-datos-clientes-claro-dominicana/">EyR</a> · <a href="https://www.one.gob.do/media/u5ohmfyp/ley-172-13.pdf">Ley 172-13, official text</a></p>]]></content:encoded>
+    </item>
+    <item>
+      <title><![CDATA[Lo de Claro: qué se sabe, qué no, y qué hacer igual]]></title>
+      <link>https://codewithgabo.com/lo-de-claro-que-se-sabe-y-que-no</link>
+      <guid isPermaLink="true">https://codewithgabo.com/lo-de-claro-que-se-sabe-y-que-no</guid>
+      <pubDate>Tue, 15 Sep 2026 23:57:56 GMT</pubDate>
+      <description><![CDATA[Una afirmación sin verificar sobre 2.9 millones de registros, por qué la confirmación siempre llega tarde, y las cosas que conviene hacer esta semana aunque al final resulte falsa.]]></description>
+      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/311b7eb4bd22f31e1dd307ee79bf3ace4649fba5-1200x630.png" alt="Lo de Claro: qué se sabe, qué no, y qué hacer igual" />
+<p>El 13 de septiembre apareció en un foro la afirmación de que alguien había accedido a los sistemas de Claro en República Dominicana y sacado una base con <strong>2,889,256 registros de clientes</strong>. La cifra se repitió rápido, amplificada desde X, y en cuestión de horas medio país la daba por hecha.</p>
+<p>Vale la pena separar dos cosas que se mezclaron enseguida: lo que se afirmó y lo que está comprobado. No son lo mismo, y la diferencia cambia qué deberías hacer tú.</p>
+<h2>Qué se afirmó</h2>
+<p>Según la publicación, cada registro incluiría:</p>
+<ul>
+<li>Número de identificación</li>
+<li>Número de teléfono</li>
+<li>Información de la suscripción</li>
+<li>Estado de la cuenta</li>
+<li>Categoría del plan</li>
+<li>Fecha de activación</li>
+<li>Ciclo de facturación</li>
+<li>Códigos internos</li>
+<li><strong>ICCID</strong>, el identificador único de cada tarjeta SIM</li>
+</ul>
+<p>Ese último campo es el que más dice. El ICCID no es un dato de mercadeo: identifica una SIM en concreto.</p>
+<h2>Qué no está comprobado</h2>
+<p>Prácticamente todo lo demás.</p>
+<p>La afirmación <strong>no se ha podido comprobar de forma independiente</strong>. Las muestras difundidas no permiten establecer por sí solas el origen de los datos, ni demuestran que la información sea reciente, completa, ni que salga de los sistemas de la empresa.</p>
+<p>Claro Dominicana <strong>no ha confirmado públicamente</strong> ningún incidente. Al momento de escribir esto tampoco aparecen investigaciones ni notificaciones anunciadas por autoridades dominicanas.</p>
+<p>Así que el estado real es: una alegación difundida en redes, no una filtración confirmada.</p>
+<h2>Por qué eso no te deja tranquilo</h2>
+<p>Aquí es donde casi todo el mundo saca la conclusión equivocada, en una dirección o en la otra.</p>
+<p>Unos leen &quot;no está confirmado&quot; y siguen igual. Otros leen la cifra y entran en pánico. Las dos reacciones tratan la incertidumbre como si fuera información.</p>
+<p>Míralo por el costo:</p>
+<ul>
+<li><strong>Si la filtración es falsa</strong> y tú moviste tu autenticación de dos pasos fuera del SMS, perdiste veinte minutos.</li>
+<li><strong>Si es real</strong> y esperaste la confirmación oficial, esperaste justo durante la ventana en que esos datos valen más.</li>
+</ul>
+<p>No es simétrico. Y la confirmación, cuando llega, suele llegar tarde: primero hay que verificar, luego decidir qué se comunica, y eso toma días o semanas. Mientras tanto, lo que estuviera circulando ya circuló.</p>
+<p>La ausencia de confirmación no es confirmación de ausencia.</p>
+<h2>Qué haría alguien con esos datos, si fueran reales</h2>
+<p>No hace falta imaginar escenarios de película. Con cédula, teléfono, plan y ciclo de facturación, dos ataques normales se vuelven mucho más fáciles.</p>
+<p><strong>El primero es la llamada que sabe cosas de ti.</strong> El esquema de siempre —&quot;le llamamos de su compañía telefónica&quot;— falla porque el que llama no sabe nada. Con esos campos sí sabe: tu nombre, tu cédula, qué plan tienes y cuándo te facturan. Toda la pregunta de seguridad que tu banco te hace por teléfono está en esa lista.</p>
+<p><strong>El segundo es el cambio de SIM.</strong> Si alguien convence a un punto de servicio de que es tú y se lleva tu número a otra SIM, hereda tus mensajes. Y ahí es donde duele: <strong>el SMS sigue siendo el segundo factor de casi todo en el país.</strong> Tu banco, tu correo, tus redes. Quien controla tu número puede pedir el código de recuperación de todo lo demás.</p>
+<p>Por eso el dato del ICCID no es un detalle técnico aburrido. Es el que convierte una lista de clientes en una lista de objetivos.</p>
+<h2>Qué hacer esta semana</h2>
+<p>Ninguna de estas cosas depende de que la filtración se confirme.</p>
+<p><strong>Saca tu segundo factor del SMS.</strong> Correo, banco, redes: donde se pueda, usa una app de autenticación. Es el cambio con más efecto por minuto invertido, y es el único que te protege si tu número deja de ser tuyo.</p>
+<p><strong>Pregunta en tu compañía qué hace falta para cambiar tu número de SIM.</strong> Si la respuesta es &quot;una llamada&quot;, eso es el problema. Pide que exija presencia física o una clave adicional, si lo ofrecen.</p>
+<p><strong>Ponle PIN a la SIM.</strong> Es el menú de seguridad del teléfono, toma un minuto, y bloquea el caso simple de que te roben el equipo y saquen la tarjeta.</p>
+<p><strong>Cambia tu regla mental sobre quién te llama.</strong> Que alguien sepa tu cédula ya no prueba nada. Nunca fue una buena prueba; ahora ni siquiera es una mala. Si te llaman de tu banco, cuelga y llama tú al número de la tarjeta.</p>
+<p><strong>Y nunca leas un código en voz alta.</strong> Ningún banco, ninguna telefónica y ninguna app te va a pedir por teléfono el código que te acaba de llegar.</p>
+<h2>Lo que nos toca a los que construimos software</h2>
+<p>Si tú haces sistemas para clientes dominicanos, esto cambia dos supuestos.</p>
+<p><strong>El primero: la cédula y el teléfono no son secretos.</strong> Nunca lo fueron del todo, pero cualquier sistema que verifique identidad preguntando la cédula está haciendo teatro. Si tu recuperación de cuenta se apoya en &quot;dime tu número de documento&quot;, tu recuperación de cuenta es pública.</p>
+<p><strong>El segundo: el OTP por SMS es un factor prestado.</strong> No lo controlas tú, lo controla la operadora, y su seguridad es la de su punto de atención al cliente. Si tu app protege dinero o datos sensibles, ofrece al menos la opción de una app de autenticación.</p>
+<p>Y hay un tercero, más incómodo, que aplica aunque este caso resulte falso: <strong>tú también estás a un export de distancia.</strong> Casi toda base de datos de clientes puede volcarse completa desde adentro. Las preguntas útiles no son de firewall:</p>
+<ul>
+<li>¿Cuántos campos guardas que nunca usas? Cada uno es superficie.</li>
+<li>¿Quién puede exportar la tabla de clientes completa, y queda registrado?</li>
+<li>Si mañana aparece un volcado con tu esquema, ¿podrías decir en horas si es tuyo y de cuándo?</li>
+</ul>
+<p>Esa última es la que separa una respuesta creíble de un silencio de dos semanas.</p>
+<h2>El marco legal, y su hueco</h2>
+<p>En República Dominicana la referencia es la <strong>Ley 172-13</strong>, del 13 de diciembre de 2013, sobre protección de datos de carácter personal. Lo que sí establece con claridad:</p>
+<ul>
+<li>El tratamiento de datos exige consentimiento previo, libre, inequívoco y específico del titular, salvo las excepciones que la propia ley contempla.</li>
+<li>Quien trata datos debe adoptar <strong>medidas técnicas y organizativas</strong> para evitar accesos no autorizados o alteraciones.</li>
+<li>Tú tienes derecho a que rectifiquen, actualicen o supriman tus datos, y el responsable tiene un plazo máximo de <strong>diez días hábiles</strong> desde tu reclamo.</li>
+</ul>
+<p>Lo que no encontré en las fuentes que revisé es una obligación explícita de <strong>notificar una brecha</strong> a los afectados. Si existe en algún reglamento posterior, no me topé con ella, y me parece relevante decirlo así en vez de afirmar lo contrario.</p>
+<p>Ese hueco explica bastante. Cuando no hay un reloj legal corriendo, &quot;no comentamos&quot; es una estrategia viable. En Europa no lo sería: el reglamento allá obliga a notificar en 72 horas. Aquí el incentivo apunta al otro lado.</p>
+<h2>Cómo funciona un cambio de SIM fraudulento</h2>
+<p>Vale la pena entenderlo, porque la defensa se vuelve obvia cuando ves el orden de los pasos.</p>
+<ol>
+<li><strong>Quien ataca ya sabe quién eres.</strong> Nombre, cédula, número, plan. Con eso no necesita adivinar nada.</li>
+<li><strong>Llama o se presenta como tú</strong> y pide un reemplazo de SIM: que se le perdió el teléfono, que la tarjeta se dañó. Responde las preguntas de verificación porque las respuestas están en la lista.</li>
+<li><strong>Tu teléfono se queda sin señal.</strong> Esa es la única señal de alarma que recibes, y es fácil confundirla con un problema de red. Ese detalle es el que hace que el ataque funcione de noche.</li>
+<li><strong>Ahora tus SMS llegan a otro equipo.</strong> Entra a tu correo con &quot;olvidé mi contraseña&quot;, recibe el código, y desde el correo cae todo lo demás.</li>
+</ol>
+<p>Fíjate dónde está el punto débil: no es tu contraseña, ni tu teléfono, ni siquiera tus datos. Es el mostrador donde alguien decide si el que llama eres tú. Tu seguridad depende del entrenamiento de una persona que no conoces, que atiende a cien clientes al día.</p>
+<p>Por eso mover el segundo factor fuera del SMS es la única defensa que no depende de esa persona.</p>
+<h2>Cómo leer la próxima afirmación de filtración</h2>
+<p>Va a haber otra. Conviene tener criterios antes, no durante.</p>
+<p><strong>¿Hay muestra verificable?</strong> No &quot;capturas de pantalla&quot;: registros que alguien independiente pueda cruzar con datos reales conocidos. Una captura no prueba origen; un CSV con mil filas que cuadran, sí.</p>
+<p><strong>¿Los campos son internos o de catálogo?</strong> Un teléfono y un nombre pueden salir de cualquier lado. Un ICCID, un código interno o un ciclo de facturación no aparecen en un formulario público. Los campos que solo existen dentro del sistema son la parte difícil de falsificar.</p>
+<p><strong>¿Los datos son frescos?</strong> La pregunta que más filtraciones tumba. Si en la muestra no hay una sola línea activada este año, probablemente estás viendo datos viejos, de otra brecha, revendidos con etiqueta nueva.</p>
+<p><strong>¿Alguien cruzó la muestra con filtraciones anteriores?</strong> Reempaquetar volcados viejos y venderlos como nuevos es un negocio, no una excepción. Es la explicación más aburrida y por eso la más frecuente.</p>
+<p><strong>¿Y quién lo está contando?</strong> Una cuenta que agrega filtraciones no es una fuente que las verifica. Amplificar y comprobar son dos oficios distintos.</p>
+<p>Con esos cinco filtros, la mayoría de los sustos de internet se resuelven solos en un día.</p>
+<h2>Qué debería publicar una empresa para cerrar el tema</h2>
+<p>Aquí hay una asimetría que casi nadie nota: <strong>la empresa es la única que puede cerrar esto barato.</strong></p>
+<p>Quien afirma tener los datos no puede probar el origen sin exponerse. Quien los revisa desde fuera solo puede decir &quot;parece plausible&quot;. Pero la empresa tiene el esquema de su propia base. Sabe si un campo llamado como aparece en la muestra existe en sus sistemas, sabe si ese formato de código interno es suyo, y sabe si las fechas de activación corresponden a su historia.</p>
+<p>Un comunicado útil tiene tres frases:</p>
+<ul>
+<li><strong>Revisamos la muestra</strong>, y estos campos corresponden o no corresponden a nuestro esquema.</li>
+<li><strong>Si corresponden</strong>, este es el alcance y estas son las cuentas afectadas.</li>
+<li><strong>Esto es lo que debes hacer tú</strong>, con instrucciones concretas.</li>
+</ul>
+<p>Un comunicado inútil dice que la seguridad de los clientes es prioritaria.</p>
+<p>El silencio tiene un costo que no se ve en el momento: deja a todo el mundo gestionando el peor caso por su cuenta. Y deja vivo el rumor, que es más difícil de matar en dos semanas que en dos días.</p>
+<h2>Cómo termina esto, probablemente</h2>
+<p>Hay tres finales posibles. Que alguien verifique las muestras y resulten auténticas. Que se demuestre que son datos viejos, recombinados de filtraciones anteriores —pasa más de lo que uno cree—. O que no pase nada y la historia se apague en dos semanas sin que nadie sepa.</p>
+<p>El tercero es el más probable. Y es el peor, porque deja a todo el mundo con la misma duda y sin ninguna razón para cambiar nada.</p>
+<p>Por eso el consejo de arriba no depende del final. Mover tu segundo factor fuera del SMS te conviene igual si esto resultó ser humo, igual si resultó ser cierto, e igual la próxima vez que aparezca una lista con tu nombre.</p>
+<p><strong>Fuentes:</strong> <a href="https://n.com.do/2026/09/13/usuario-asegura-haber-accedido-a-datos-de-casi-2-9-millones-de-clientes-de-claro-en-rd/">N Digital</a> · <a href="https://eyr.com.do/presunta-filtracion-datos-clientes-claro-dominicana/">EyR</a> · <a href="https://www.one.gob.do/media/u5ohmfyp/ley-172-13.pdf">Ley 172-13, texto oficial</a></p>]]></content:encoded>
+    </item>
+    <item>
       <title><![CDATA[Four CSS workarounds you can delete]]></title>
       <link>https://codewithgabo.com/four-css-workarounds-you-can-delete</link>
       <guid isPermaLink="true">https://codewithgabo.com/four-css-workarounds-you-can-delete</guid>
@@ -1357,480 +1769,6 @@ the person's actual studio, not a CGI render.</code></pre>
 <p>El mejor &quot;prompt engineering&quot; no es saber palabras mágicas. Es saber qué quieres ver, describirlo con la precisión de un director, y darle al modelo las restricciones para que no te sorprenda donde no quieres.</p>
 <p>Si tienes 25 minutos esta semana, replica el experimento con tus propios prompts. Los 3 que están arriba son un buen punto de partida —cópialos, modifícalos, comparte qué te salió—.</p>
 <p>¿Probaste alguno de los 3 prompts? Comparte el resultado en mis comentarios de Instagram <a href="https://instagram.com/codewithgabo">@codewithgabo</a> o en X <a href="https://x.com/Gabbs279">@Gabbs279</a>.</p>]]></content:encoded>
-    </item>
-    <item>
-      <title><![CDATA[Migrating an Express Backend to Vercel Functions Without Downtime]]></title>
-      <link>https://codewithgabo.com/vercel-express-node-js-serverless-ga4-migration</link>
-      <guid isPermaLink="true">https://codewithgabo.com/vercel-express-node-js-serverless-ga4-migration</guid>
-      <pubDate>Thu, 30 Apr 2026 03:56:00 GMT</pubDate>
-      <description><![CDATA[Migrating an Express Backend to Vercel Functions Without Downtime Last week I migrated the analytics backend behind this site from a long-running Express server on Railway to a set of Vercel Functions]]></description>
-      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/dc9d27737c95c1fd837f709d20f865243f1c8081-2400x1260.png" alt="Migrating an Express Backend to Vercel Functions Without Downtime" />
-<h1>Migrating an Express Backend to Vercel Functions Without Downtime</h1>
-<p>Last week I migrated the analytics backend behind this site from a long-running Express server on Railway to a set of Vercel Functions. The frontend never noticed. Cost dropped from a small monthly Railway bill to <strong>$0/month</strong> on Vercel's hobby tier. This post walks through how I did it, what broke, and when this kind of migration actually makes sense.</p>
-<h2>Why migrate at all</h2>
-<p>The backend was a tiny Express server that did two things:</p>
-<ol>
-<li>Wrap the Google Analytics 4 Data API behind an admin-only endpoint so the dashboard on this site could read GA4 metrics without exposing the service-account key.</li>
-<li>Validate an <code>ADMIN_TOKEN</code> to gate that endpoint.</li>
-</ol>
-<p>That was it. A few hundred lines of Node, three dependencies, one route. Running it as a 24/7 container on Railway was fine, but it had three quiet costs:</p>
-<ul>
-<li><strong>Money.</strong> Hobby tier on Railway isn't free anymore. Even a small workload was a recurring charge.</li>
-<li><strong>Cold starts I didn't need.</strong> The dashboard isn't visited often. The Express server sat idle 99% of the time, costing money to do nothing.</li>
-<li><strong>Deploy ceremony.</strong> Two repositories, two pipelines, two environments to keep aligned. Every backend change meant context-switching to the Railway dashboard.</li>
-</ul>
-<p>Vercel Functions felt like the right shape: stateless handlers that spin up on request, scale to zero when idle, deploy from the same <code>git push</code> flow as anything else.</p>
-<h2>The before / after</h2>
-<pre><code>BEFORE:
-  Frontend (GitHub Pages)
-        │ HTTPS
-        ▼
-  Railway: long-running Node + Express
-        ├─ /api/analytics
-        ├─ middleware: cors, helmet
-        └─ env: ADMIN_TOKEN, GA4 credentials
-
-AFTER:
-  Frontend (GitHub Pages)
-        │ HTTPS
-        ▼
-  Vercel Functions
-        ├─ api/analytics.js   (one handler per route)
-        ├─ api/health.js
-        └─ api/_utils/        (extracted helpers — auth, ga4 client)</code></pre>
-<p>Same external contract, completely different runtime model.</p>
-<h2>Step 1 — Turn each Express route into a Vercel handler</h2>
-<p>A Vercel Function is just a Node module that exports a handler matching <code>(req, res) =&gt; void | Promise&lt;void&gt;</code>. The shape is essentially <code>http.IncomingMessage</code> / <code>http.ServerResponse</code> with some extras.</p>
-<p>The Express version looked like this:</p>
-<pre><code>// Before
-app.get('/api/analytics', requireAuth, async (req, res) =&gt; {
-  const { startDate, endDate } = req.query;
-  const data = await runAnalyticsQuery(startDate, endDate);
-  res.json(data);
-});</code></pre>
-<p>The Vercel version is the same logic, no <code>app</code>, no <code>next</code>:</p>
-<pre><code>// After: api/analytics.js
-const { applyCors, requireAuth } = require('./_utils/auth');
-const { runAnalyticsQuery } = require('./_utils/ga4');
-
-module.exports = async (req, res) =&gt; {
-  if (!applyCors(req, res)) return;
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-  if (!requireAuth(req, res)) return;
-
-  const { startDate, endDate } = req.query;
-  const data = await runAnalyticsQuery(startDate, endDate);
-  res.json(data);
-};</code></pre>
-<p>Three things to notice:</p>
-<ul>
-<li><strong>No middleware chain.</strong> Each handler runs the few checks it needs explicitly. With one or two routes per file, this is clearer than a global middleware stack.</li>
-<li><strong>CORS becomes a function call.</strong> I extracted <code>applyCors</code> to share between handlers. It returns <code>false</code> and writes the response if the request was a preflight, so the handler can early-exit.</li>
-<li><strong>Auth, same.</strong> <code>requireAuth</code> reads the <code>Authorization: Bearer &lt;token&gt;</code> header, compares to <code>process.env.ADMIN_TOKEN</code>, and writes a 401 if it fails.</li>
-</ul>
-<h2>Step 2 — Extract helpers into <code>api/_utils/</code></h2>
-<p>Vercel ships every file in <code>api/</code> (excluding <code>_</code>-prefixed paths) as a public route. Anything starting with <code>_</code> is treated as a private utility. This is the convention I used for shared code:</p>
-<pre><code>api/
-├── analytics.js
-├── health.js
-└── _utils/
-    ├── auth.js
-    └── ga4.js</code></pre>
-<p>The GA4 helper memoises the client across invocations, which matters because Vercel Functions reuse warm container instances when traffic is steady:</p>
-<pre><code>// api/_utils/ga4.js
-const { BetaAnalyticsDataClient } = require('@google-analytics/data');
-
-let cached = null;
-
-function getClient() {
-  if (cached) return cached;
-  cached = new BetaAnalyticsDataClient({
-    credentials: {
-      client_email: process.env.GA4_CLIENT_EMAIL,
-      private_key: process.env.GA4_PRIVATE_KEY.replace(/\\n/g, '\n'),
-    },
-  });
-  return cached;
-}</code></pre>
-<p>That <code>replace(/\\n/g, '\n')</code> is the one consistent pain point of moving service-account keys between secret stores. Vercel preserves real newlines in multi-line env values, so if you paste with literal <code>\n</code> from a copied JSON file, you have to undo the escaping.</p>
-<h2>Step 3 — Configure <code>vercel.json</code></h2>
-<p>Vercel infers most of the project layout, but it's worth being explicit about CORS origins and Node version:</p>
-<pre><code>{
-  &quot;version&quot;: 2,
-  &quot;functions&quot;: {
-    &quot;api/**/*.js&quot;: {
-      &quot;runtime&quot;: &quot;nodejs20.x&quot;
-    }
-  },
-  &quot;headers&quot;: [
-    {
-      &quot;source&quot;: &quot;/api/(.*)&quot;,
-      &quot;headers&quot;: [
-        { &quot;key&quot;: &quot;Access-Control-Allow-Origin&quot;, &quot;value&quot;: &quot;https://codewithgabo.com&quot; }
-      ]
-    }
-  ]
-}</code></pre>
-<p>I keep the dynamic origin allowlist (which supports multiple domains during development) inside <code>applyCors</code> and use the static header here only as a defense-in-depth layer.</p>
-<h2>Step 4 — Migrate environment variables</h2>
-<p>I copied each env var from Railway's dashboard to Vercel's, set them for <strong>Production + Preview + Development</strong> so dev runs (<code>vercel dev</code>) work locally. The two non-trivial ones:</p>
-<ul>
-<li><code>GA4_PRIVATE_KEY</code> — multi-line value with real newlines. Pasted directly; no escaping.</li>
-<li><code>FRONTEND_URL</code> — a comma-separated list (<code>https://codewithgabo.com,https://gabbs27.github.io,http://localhost:3000</code>) consumed by the CORS helper. This was new — Express had it baked into a <code>cors()</code> middleware config.</li>
-</ul>
-<h2>Step 5 — Smoke-test before flipping traffic</h2>
-<p>The old Railway service was still live during the migration. I deployed Vercel to a preview URL, hit it from <code>curl</code> with a real <code>ADMIN_TOKEN</code>, confirmed the JSON response matched the Railway version, then updated the frontend's <code>VITE_ANALYTICS_API_URL</code> env to point at the new Vercel alias and redeployed.</p>
-<p>Once the dashboard rendered metrics from Vercel, I stopped the Railway service. No DNS games, no routing rules, no reverse proxy cutover. The frontend rebuild was the cutover.</p>
-<h2>Three gotchas I hit</h2>
-<p><strong>1. File uploads.</strong> A later endpoint (<code>api/upload.js</code>) accepts a multipart image and proxies it to Sanity's asset API. Express handled multipart through <code>multer</code> middleware. On Vercel I had to parse the multipart body manually because the platform's default body parser only handles JSON. Vercel exposes <code>req.body</code> as a <code>Buffer</code> for unknown content types — from there it's <code>busboy</code> or roll-your-own boundary parsing.</p>
-<p><strong>2. Cold starts on the first hit of the day.</strong> A Vercel Function that hasn't been invoked recently can take ~500–1500ms to spin up. For a dashboard that's only checked occasionally, this is fine. For a user-facing API on the critical path, it would be a real concern — pre-warming or pinning the function to a region helps, but it's a tradeoff to keep in mind.</p>
-<p><strong>3. The </strong><code>_utils/</code><strong> import path.</strong> The first time I deployed, I forgot that Vercel's build doesn't follow files outside <code>api/</code> automatically. Putting helpers under <code>api/_utils/</code> (with the leading underscore) lets the bundler find them while keeping them private.</p>
-<h2>The result</h2>
-<p>Concrete before / after:</p>
-<ul>
-<li><strong>Monthly cost:</strong> small but recurring → <strong>$0</strong></li>
-<li><strong>Cold start:</strong> ~50 ms (always warm on Railway) → 500–1500 ms on first hit, then cached</li>
-<li><strong>Deploy flow:</strong> separate Railway dashboard → <code>git push</code> from the same monorepo</li>
-<li><strong>Dependencies:</strong> <code>express</code>, <code>cors</code>, <code>helmet</code>, <code>nodemon</code> → <strong>none</strong> (the platform handles all of it)</li>
-<li><strong>Repo footprint:</strong> <code>server.js</code>, <code>routes/</code>, <code>middleware/</code> → a handful of small handlers under <code>api/</code></li>
-</ul>
-<p>For a small admin endpoint like this one, Vercel Functions are clearly the right fit. For a high-traffic API where every millisecond matters, Railway or Fly would still be the better answer.</p>
-<h2>When NOT to do this</h2>
-<p>A migration like this only makes sense if:</p>
-<ul>
-<li>Your traffic is bursty or low — cold starts won't dominate the user experience.</li>
-<li>Your handlers are stateless. Long-lived WebSocket connections, in-memory caches, or background workers don't translate cleanly.</li>
-<li>You can live with the 10-second per-invocation timeout on the hobby tier (or pay for longer on a higher tier).</li>
-</ul>
-<p>If you're running a chat server, a worker pool, or anything with sticky in-memory state, stay on a long-running container. For everything else — REST endpoints, webhooks, glue between services — serverless is hard to beat.</p>
-<h2>Closing thought</h2>
-<p>The most underrated part of this migration was deleting <code>server.js</code>, the <code>routes/</code> folder, and four packages from <code>package.json</code>. Less code is less to maintain. Less infrastructure is less to monitor. The new setup does exactly the same thing, on better terms, with fewer moving parts.</p>
-<p>If you have a small backend doing low-traffic admin work and you're paying month after month to keep it running, this is worth half a day of your time.</p>]]></content:encoded>
-    </item>
-    <item>
-      <title><![CDATA[Building a Simple Chatbot with Python and NLP: Your First Steps into Conversational AI]]></title>
-      <link>https://codewithgabo.com/building-a-simple-chatbot-with-python-and-nlp-your-first-steps-into-conversational-ai</link>
-      <guid isPermaLink="true">https://codewithgabo.com/building-a-simple-chatbot-with-python-and-nlp-your-first-steps-into-conversational-ai</guid>
-      <pubDate>Wed, 06 Dec 2023 03:37:00 GMT</pubDate>
-      <description><![CDATA[Chatbots look intimidating from the outside and turn out to be surprisingly approachable once you actually start one. In this post I want to build a small chatbot in Python using NLTK, the Natural Lan]]></description>
-      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/8881d90fcbe704667fc5444d3171bda9b7a5d197-1792x1024.png" alt="Building a Simple Chatbot with Python and NLP: Your First Steps into Conversational AI" />
-<p>Chatbots look intimidating from the outside and turn out to be surprisingly approachable once you actually start one. In this post I want to build a small chatbot in Python using NLTK, the Natural Language Toolkit. We'll start with the simplest version that works, then look honestly at where it breaks and fix it step by step.</p>
-<p>You don't need any machine learning background for this. If you can write a Python function and a <code>while</code> loop, you can follow along.</p>
-<h2>Setting up NLTK</h2>
-<p>NLTK is a library for working with human language in Python. Install it with pip:</p>
-<pre><code>pip install nltk</code></pre>
-<p>The library itself is small, but most of what makes it useful lives in separate data packages: tokenizer models, word lists, a dictionary of word forms. You download those once from Python:</p>
-<pre><code>import nltk
-
-nltk.download('popular')</code></pre>
-<p>A word of warning: <code>popular</code> is a bundle of the most commonly used datasets and it is a few hundred megabytes. It only needs to run once per machine. After that the data sits in your home directory and you can delete the <code>nltk.download</code> line from your script. If NLTK later complains about a missing resource, the error message names the exact package it wants and you download just that one. On my machine the tokenizer still asked for <code>punkt_tab</code> after installing <code>popular</code>, so I ran <code>nltk.download('punkt_tab')</code> once and moved on.</p>
-<h2>Splitting a sentence into tokens</h2>
-<p>The first thing NLTK gives you is tokenisation: turning a string into a list of words and punctuation marks.</p>
-<pre><code>from nltk.tokenize import word_tokenize
-
-text = &quot;Hello, welcome to Code With Gabo!&quot;
-print(word_tokenize(text))</code></pre>
-<p>Which prints:</p>
-<pre><code>['Hello', ',', 'welcome', 'to', 'Code', 'With', 'Gabo', '!']</code></pre>
-<p>Notice that the comma and the exclamation mark came out as their own items. That's the point. <code>text.split()</code> would have given you <code>'Gabo!'</code> as a single chunk, and <code>'Gabo!'</code> is not a word you can look up in anything. Tokenisation is what lets you compare against real words instead of against whatever the user happened to type around them.</p>
-<p>That matters more than it looks right now, so hold on to it.</p>
-<h2>The simplest chatbot that works</h2>
-<p>Here's the naive version. A dictionary of exact phrases, and a lookup with a fallback:</p>
-<pre><code>responses = {
-    &quot;hi&quot;: &quot;Hello! I am GaboBot.&quot;,
-    &quot;what is your name&quot;: &quot;My name is GaboBot.&quot;,
-    &quot;bye&quot;: &quot;See you around!&quot;,
-}
-
-def chatbot_response(user_input):
-    return responses.get(user_input, &quot;I'm not sure how to respond to that.&quot;)</code></pre>
-<p>And a loop to talk to it. This uses the <code>chatbot_response</code> defined above, so keep both in the same file:</p>
-<pre><code>print(&quot;Chatbot: Hi, I am GaboBot. Type 'quit' to exit.&quot;)
-
-while True:
-    user_input = input(&quot;You: &quot;)
-    if user_input.lower() == &quot;quit&quot;:
-        print(&quot;Chatbot: Bye!&quot;)
-        break
-    print(&quot;Chatbot:&quot;, chatbot_response(user_input))</code></pre>
-<p>Run it and type <code>hi</code>. It works. Now type <code>hi there</code>, or <code>Hi!</code>, or <code>hello</code>. All three fall through to &quot;I'm not sure how to respond to that.&quot;</p>
-<p>That's the real lesson of the naive version. A dictionary lookup asks &quot;is this string exactly equal to a key I know&quot;, and humans never type exactly the key you know. This is where tokenisation stops being a demo and starts being useful.</p>
-<h2>Matching on tokens instead of whole strings</h2>
-<p>Instead of comparing the entire sentence, break it into tokens and check whether any of them is a keyword we recognise:</p>
-<pre><code>from nltk.tokenize import word_tokenize
-
-KEYWORD_RESPONSES = {
-    &quot;hi&quot;: &quot;Hello! I am GaboBot.&quot;,
-    &quot;hello&quot;: &quot;Hello! I am GaboBot.&quot;,
-    &quot;hey&quot;: &quot;Hello! I am GaboBot.&quot;,
-    &quot;name&quot;: &quot;My name is GaboBot.&quot;,
-    &quot;help&quot;: &quot;I can greet you and tell you my name. That's about it so far.&quot;,
-    &quot;bye&quot;: &quot;See you around!&quot;,
-}
-
-DEFAULT_RESPONSE = &quot;I'm not sure how to respond to that.&quot;
-
-def chatbot_response(user_input):
-    tokens = [token.lower() for token in word_tokenize(user_input)]
-    for token in tokens:
-        if token in KEYWORD_RESPONSES:
-            return KEYWORD_RESPONSES[token]
-    return DEFAULT_RESPONSE</code></pre>
-<p>Drop this in place of the old <code>chatbot_response</code> and keep the same loop. Now <code>hi there</code> and <code>HI!</code> both get the greeting: <code>Hi!</code> tokenises to <code>['Hi', '!']</code>, lowercasing gives <code>['hi', '!']</code>, and <code>hi</code> is in the dictionary.</p>
-<p>It also shows you the next flaw, which is worth seeing rather than hiding. Type <code>Hey, what is your name?</code> and you get the greeting, not the name — the loop returns on the <em>first</em> token that matches, and <code>hey</code> comes before <code>name</code>. Whichever keyword appears earliest in the sentence wins, which is not a rule you ever meant to write. Keeping the first match is fine for a handful of rules; past that you want to score every candidate and pick the best one, which is exactly the road to intent classification further down.</p>
-<p>The bot went from matching a handful of exact sentences to matching an unlimited number of sentences that happen to contain a keyword. Same amount of code, much better behaviour.</p>
-<h2>Refining the tokens: stopwords and lemmatisation</h2>
-<p>Two more NLTK tools clean up the token list before you search it.</p>
-<p><strong>Stopwords</strong> are the extremely common words that carry almost no meaning on their own: <em>the</em>, <em>is</em>, <em>are</em>, <em>you</em>, <em>with</em>. <strong>Lemmatisation</strong> reduces a word to its dictionary form, so <em>helping</em> becomes <em>help</em> and <em>projects</em> becomes <em>project</em>.</p>
-<pre><code>from nltk.corpus import stopwords
-from nltk.stem import WordNetLemmatizer
-from nltk.tokenize import word_tokenize
-
-STOPWORDS = set(stopwords.words(&quot;english&quot;))
-lemmatizer = WordNetLemmatizer()
-
-def clean_tokens(text):
-    tokens = [token.lower() for token in word_tokenize(text) if token.isalpha()]
-    tokens = [token for token in tokens if token not in STOPWORDS]
-    return [lemmatizer.lemmatize(token, pos=&quot;v&quot;) for token in tokens]
-
-print(clean_tokens(&quot;Are you helping me with these projects?&quot;))</code></pre>
-<p>That prints:</p>
-<pre><code>['help', 'project']</code></pre>
-<p>Then swap the first line of <code>chatbot_response</code> to use it:</p>
-<pre><code>def chatbot_response(user_input):
-    for token in clean_tokens(user_input):
-        if token in KEYWORD_RESPONSES:
-            return KEYWORD_RESPONSES[token]
-    return DEFAULT_RESPONSE</code></pre>
-<p>What this buys you is fewer keys to maintain. You no longer need separate entries for <em>help</em>, <em>helping</em> and <em>helped</em> — they all collapse to <code>help</code>. What it costs you is precision, and you should know about both costs:</p>
-<ul>
-<li>Your dictionary keys now have to be in lemmatised form. <code>thanks</code> lemmatises to <code>thank</code>, so the key <code>&quot;thanks&quot;</code> will never match again.</li>
-<li>Stopword removal deletes <em>not</em>. After cleaning, &quot;I like this&quot; and &quot;I do not like this&quot; look identical to your bot.</li>
-<li>Passing <code>pos=&quot;v&quot;</code> lemmatises every token as if it were a verb, which is a blunt shortcut. The proper way is to tag each word with <code>nltk.pos_tag</code> and pass the matching part of speech. For a keyword bot, the shortcut is usually fine.</li>
-</ul>
-<h2>What this approach can't do</h2>
-<p>I want to be straight about the ceiling here, because it arrives quickly.</p>
-<ul>
-<li><strong>It has no memory.</strong> Every message is handled on its own. Ask &quot;what is your name&quot;, then &quot;and how old are you&quot; — the bot has no idea what <em>you</em> refers to, because nothing carries over between turns.</li>
-<li><strong>It doesn't understand intent, only keywords.</strong> &quot;I need help&quot; and &quot;I don't need help&quot; both contain <code>help</code> and both get the same answer.</li>
-<li><strong>First match wins.</strong> In a sentence with two keywords, the answer depends on word order, which is not a rule you ever meant to write.</li>
-<li><strong>It doesn't scale.</strong> Around a few dozen rules the dictionary starts contradicting itself and you spend more time debugging keyword collisions than adding features.</li>
-</ul>
-<p>When you outgrow it, there are two usual next steps. One is intent classification: you collect a handful of example phrasings for each intent and train a classifier to pick the intent, using the same cleaned tokens as input features. The other is calling an LLM API and letting the model handle the language, keeping your code for the actions the bot can actually take. Both are more machinery than a dictionary, and if your bot really only needs to answer ten fixed questions, the dictionary is still the right call — it's predictable, it's free, and it never invents an answer.</p>
-<h2>Where to go from here</h2>
-<p>The most fun next experiment is sentiment analysis: scoring whether a message reads as positive or negative, and having GaboBot respond differently to each. NLTK ships a rule-based scorer that needs one extra download:</p>
-<pre><code>import nltk
-nltk.download('vader_lexicon')
-
-from nltk.sentiment import SentimentIntensityAnalyzer
-
-sia = SentimentIntensityAnalyzer()
-print(sia.polarity_scores(&quot;I love this bot&quot;))</code></pre>
-<p>Wire that score into <code>chatbot_response</code> and you have a bot that reacts to <em>how</em> someone said something, not just <em>what</em> they said. That's a small change on top of everything above, and it's a good way to get a feel for how far simple tools can take you before you need the heavy ones.</p>]]></content:encoded>
-    </item>
-    <item>
-      <title><![CDATA[Introduction to Web Scraping with Python: Extracting Data with Ease]]></title>
-      <link>https://codewithgabo.com/introduction-to-web-scraping-with-python-extracting-data-with-ease</link>
-      <guid isPermaLink="true">https://codewithgabo.com/introduction-to-web-scraping-with-python-extracting-data-with-ease</guid>
-      <pubDate>Sun, 26 Nov 2023 16:04:00 GMT</pubDate>
-      <description><![CDATA[I reach for Python whenever I need data off a page that has no API. This post walks through the pieces I actually use — Requests, Beautiful Soup, robots.txt — and the habits that keep a scraper from b]]></description>
-      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/15a92bc39ccb0c5e8d86ee5bcb3e9d46070f40df-1792x1024.png" alt="Introduction to Web Scraping with Python: Extracting Data with Ease" />
-<p>I reach for Python whenever I need data off a page that has no API. This post walks through the pieces I actually use — Requests, Beautiful Soup, robots.txt — and the habits that keep a scraper from breaking or getting you blocked.</p>
-<h2>What is web scraping?</h2>
-<p>Web scraping involves programmatically gathering data from websites. This can be done for various purposes, such as analyzing content, aggregating data, or automating tasks that would otherwise require manual input.</p>
-<h2>Why Python for web scraping?</h2>
-<p>The libraries are the reason. Requests handles HTTP, Beautiful Soup parses broken HTML without complaining, and Scrapy takes over when a job outgrows a single script.</p>
-<h2>Step 1: Setting up your environment</h2>
-<p>Before we start, make sure you have Python installed on your system. You'll also need two key libraries: Beautiful Soup and Requests. Install them with pip:</p>
-<pre><code>python3 -m pip install beautifulsoup4 requests</code></pre>
-<h2>Step 2: Making your first request</h2>
-<p>Let's start by fetching the content of a webpage. We'll use the Requests library for this:</p>
-<pre><code>import requests
-
-url = &quot;https://quotes.toscrape.com/page/1/&quot;
-response = requests.get(url)
-html_content = response.text
-print(html_content[:500])</code></pre>
-<p>That works, but it has two problems that will bite you on a real site.</p>
-<h3>Send a User-Agent header</h3>
-<p>By default, Requests identifies itself with a <code>User-Agent</code> like <code>python-requests/2.x</code>. That string is a giveaway that you are not a browser, and plenty of sites either block it outright or serve a stripped-down page. Set a header that says who you are:</p>
-<pre><code>import requests
-
-HEADERS = {&quot;User-Agent&quot;: &quot;GaboScraper/1.0 (+https://codewithgabo.com)&quot;}
-
-url = &quot;https://quotes.toscrape.com/page/1/&quot;
-response = requests.get(url, headers=HEADERS, timeout=10)
-html_content = response.text</code></pre>
-<p>I prefer an honest custom string over pretending to be Chrome. If the site owner looks at their logs, they can see what hit them and where to complain. The <code>timeout</code> matters too: without it, a slow server can hang your script forever.</p>
-<h3>Check the response before you parse it</h3>
-<p>This is the mistake I see most often from beginners. A 404 or a 403 still returns HTML, so Beautiful Soup happily parses the error page, <code>find_all</code> returns an empty list, and you spend an hour debugging a selector that was fine all along. Check first:</p>
-<pre><code>response = requests.get(url, headers=HEADERS, timeout=10)
-print(response.status_code)   # 200 means OK
-response.raise_for_status()   # raises an exception on 4xx / 5xx
-html_content = response.text</code></pre>
-<p><code>raise_for_status()</code> turns a silent wrong answer into a loud error, which is exactly what you want while you are still building the thing.</p>
-<h2>Step 3: Parsing HTML with Beautiful Soup</h2>
-<p>Once you have the HTML content, use Beautiful Soup to parse and navigate the data. This snippet assumes <code>html_content</code> from the previous step:</p>
-<pre><code>from bs4 import BeautifulSoup
-
-soup = BeautifulSoup(html_content, &quot;html.parser&quot;)
-print(soup.prettify())</code></pre>
-<p><code>prettify()</code> prints the document with indentation. It is noisy, but early on it is the fastest way to see what you actually received rather than what you assumed you received.</p>
-<h2>Step 4: Extracting data</h2>
-<p>Now let's extract specific data. Suppose we want every top-level headline on a page:</p>
-<pre><code>headlines = soup.find_all(&quot;h1&quot;)
-for headline in headlines:
-    print(headline.text.strip())</code></pre>
-<p><code>.strip()</code> is not optional in practice. HTML is full of stray newlines and indentation, and without it your data ends up padded with whitespace.</p>
-<h2>Step 5: Handling more complex queries</h2>
-<p>For more complex data extraction, you can use CSS selectors. <code>select</code> returns every match, <code>select_one</code> returns the first or <code>None</code>:</p>
-<pre><code>quotes = soup.select(&quot;div.quote&quot;)
-for quote in quotes:
-    text = quote.select_one(&quot;span.text&quot;).text
-    print(text)</code></pre>
-<p>Careful: <code>select_one</code> returns <code>None</code> when nothing matches, and <code>None.text</code> raises <code>AttributeError</code>. On a page where one item is missing a heading, guard it:</p>
-<pre><code>for quote in quotes:
-    author = quote.select_one(&quot;small.author&quot;)
-    print(author.text.strip() if author else &quot;(unknown)&quot;)</code></pre>
-<h2>Step 6: Be a polite scraper</h2>
-<p>While web scraping is powerful, it's important to respect website terms and avoid overloading servers. Two concrete habits cover most of it.</p>
-<p><strong>Read robots.txt in code, not just with your eyes.</strong> Python ships with a parser, so your script can ask the question itself:</p>
-<pre><code>from urllib.parse import urljoin
-from urllib.robotparser import RobotFileParser
-
-USER_AGENT = &quot;GaboScraper/1.0 (+https://codewithgabo.com)&quot;
-BASE = &quot;https://quotes.toscrape.com&quot;
-
-rp = RobotFileParser()
-rp.set_url(urljoin(BASE, &quot;/robots.txt&quot;))
-try:
-    rp.read()
-except Exception:
-    print(&quot;could not read robots.txt - stopping&quot;)
-    raise SystemExit(1)
-
-print(rp.can_fetch(USER_AGENT, f&quot;{BASE}/page/1/&quot;))
-print(rp.crawl_delay(USER_AGENT))  # None if the site doesn't specify one</code></pre>
-<p>Read robots.txt once at startup and reuse the parser. <code>robots.txt</code> is a request, not a lock, but ignoring it is how you get your IP banned.</p>
-<p><strong>Slow down.</strong> One request per second is plenty for a hobby project and keeps you off anyone's radar:</p>
-<pre><code>import time
-
-time.sleep(1)  # between requests, every time</code></pre>
-<h2>Step 7: Pagination</h2>
-<p>Most listings span several pages. The reliable pattern is to follow the site's own &quot;next&quot; link and stop when it disappears, rather than guessing how many pages exist. Add a hard page cap so a bug can't turn into an accidental crawl of the whole internet.</p>
-<h2>Putting it all together</h2>
-<p>Here is the complete script. It reads robots.txt, sets a User-Agent, checks the status, walks the pages, and sleeps between requests. It runs against <code>quotes.toscrape.com</code>, a site built specifically for scraping practice:</p>
-<pre><code>import time
-import requests
-from bs4 import BeautifulSoup
-from urllib.parse import urljoin
-from urllib.robotparser import RobotFileParser
-
-BASE = &quot;https://quotes.toscrape.com&quot;
-USER_AGENT = &quot;GaboScraper/1.0 (+https://codewithgabo.com)&quot;
-HEADERS = {&quot;User-Agent&quot;: USER_AGENT}
-DELAY = 1.0
-MAX_PAGES = 5
-
-
-def fetch(url):
-    response = requests.get(url, headers=HEADERS, timeout=10)
-    response.raise_for_status()
-    return response.text
-
-
-def parse_page(html):
-    soup = BeautifulSoup(html, &quot;html.parser&quot;)
-    quotes = []
-    for quote in soup.select(&quot;div.quote&quot;):
-        text = quote.select_one(&quot;span.text&quot;)
-        author = quote.select_one(&quot;small.author&quot;)
-        quotes.append({
-            &quot;text&quot;: text.text.strip() if text else &quot;&quot;,
-            &quot;author&quot;: author.text.strip() if author else &quot;&quot;,
-            &quot;tags&quot;: [tag.text.strip() for tag in quote.select(&quot;a.tag&quot;)],
-        })
-    next_link = soup.select_one(&quot;li.next a&quot;)
-    next_url = urljoin(BASE, next_link[&quot;href&quot;]) if next_link else None
-    return quotes, next_url
-
-
-def main():
-    rp = RobotFileParser()
-    rp.set_url(urljoin(BASE, &quot;/robots.txt&quot;))
-    rp.read()
-
-    url = f&quot;{BASE}/page/1/&quot;
-    collected = []
-    pages = 0
-
-    while url and pages &lt; MAX_PAGES:
-        if not rp.can_fetch(USER_AGENT, url):
-            print(f&quot;robots.txt disallows {url} - stopping&quot;)
-            break
-        print(f&quot;Fetching {url}&quot;)
-        quotes, url = parse_page(fetch(url))
-        collected.extend(quotes)
-        pages += 1
-        time.sleep(DELAY)
-
-    for quote in collected:
-        print(f&quot;{quote['author']}: {quote['text']}&quot;)
-    print(f&quot;\n{len(collected)} quotes from {pages} page(s)&quot;)
-
-
-if __name__ == &quot;__main__&quot;:
-    main()</code></pre>
-<p>Save it as <code>scrape.py</code>, run <code>python3 scrape.py</code>, and you should see quotes printed one page at a time.</p>
-<h2>When not to scrape</h2>
-<p>This is the part I wish someone had told me first.</p>
-<ul>
-<li><strong>If the site has an API, use the API.</strong> It returns structured JSON, it is versioned, and it won't break because a designer renamed a CSS class. Check for <code>/api</code>, a developer subdomain, or an RSS feed before you write a single selector.</li>
-<li><strong>Scrapers are fragile by design.</strong> You are depending on markup that nobody promised to keep stable. Expect your script to break, and write it so a failure is loud rather than silently producing empty rows.</li>
-<li><strong>Some sites forbid it in their terms of service.</strong> Read them. &quot;Technically possible&quot; and &quot;allowed&quot; are different questions.</li>
-<li><strong>Personal data brings legal obligations</strong> no matter how you obtained it. Rules vary by jurisdiction and by site, and I'm a developer, not a lawyer. If you are collecting anything that identifies a person, get real advice before you collect it.</li>
-</ul>
-<p>For bigger jobs, look at <a href="https://scrapy.org/">Scrapy</a> for large crawls with retries and throttling built in, and <a href="https://playwright.dev/python/">Playwright</a> for pages whose content is rendered by JavaScript after load.</p>
-<p>Start with simple targets, keep the volume low, and let the site's own signals tell you what is fair game. Practice is key to getting comfortable with scraping, and the good habits are much easier to build on day one than to retrofit later.</p>]]></content:encoded>
-    </item>
-    <item>
-      <title><![CDATA[State Management in React – Props vs the Context API]]></title>
-      <link>https://codewithgabo.com/state-management-in-react-props-vs-the-context-api</link>
-      <guid isPermaLink="true">https://codewithgabo.com/state-management-in-react-props-vs-the-context-api</guid>
-      <pubDate>Wed, 31 May 2023 01:39:00 GMT</pubDate>
-      <description><![CDATA[State Management in React – Props vs the Context API Figuring out state management in React applications can feel like finding your way through a labyrinth. You'll constantly be searching for the most]]></description>
-      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/3821cfe1824e0d5306aeb6fbeafea3a8263aa28f-1180x664.jpg" alt="State Management in React – Props vs the Context API" />
-<h1>State Management in React – Props vs the Context API</h1>
-<p>Figuring out state management in React applications can feel like finding your way through a labyrinth. You'll constantly be searching for the most efficient, scalable, and maintainable solution. The journey often leads to two primary paths: Using Props or the Context API. As you embark on this quest for state management mastery, it's crucial to understand the intricacies, trade-offs, and use cases of each approach.</p>
-<p>In this tutorial, we'll delve into React state management, dissecting the advantages and disadvantages of using props and the Context API and providing valuable insights to help you make informed decisions for your application. You'll be able to unravel the mysteries of state management in React and discover which path will lead you to success.</p>
-<h2>Prerequisites</h2>
-<p>Before proceeding, you should have the following:</p>
-<ul>
-<li>React Fundamentals such as components, JSX syntax, props, and state.</li>
-<li>Familiarity with different state management techniques in React, such as using props and the Context API.</li>
-</ul>
-<h2>What is State Management in React?</h2>
-<p>State management refers to the methods and techniques used to handle, organize, and share data within a React application. It involves the systematic management and manipulation of data, ensuring seamless integration and synchronization across various components.</p>
-<h2>Benefits of React State Management</h2>
-<p>State management plays a pivotal role in developing dynamic and interactive applications that need to handle evolving data. This data can come from user interactions or other triggering events. By implementing robust state management techniques, React applications can maintain data integrity, enhance performance, and provide a smooth user experience.</p>
-<h2>State Management Using Props</h2>
-<p>Using props for state management is a technique where the state is managed in a parent component and passed down to child components via props. This approach is suitable for small-scale applications with simple state requirements and a shallow component hierarchy. Using props is considered a local state management method, as the state is maintained and shared within a limited scope of closely related components.</p>
-<p>To illustrate how this works, let's create a ParentComponent that maintains the state and passes it down to a ChildComponent:</p>
-<img src="https://cdn.sanity.io/images/nnt7ytcd/production/60661dd6c6c81f56e0e620454823c40a7462c505-1992x1700.png" alt="" />
-<p>While props are straightforward and intuitive for small applications, they can become cumbersome and inefficient as your app grows, leading to &quot;prop drilling&quot; where props need to be passed through multiple component levels.</p>
-<h2>Introducing the Context API</h2>
-<p>The Context API is a feature provided by React that allows you to share state and other data without having to pass props through intermediate components. Using the Context API, you can avoid the problems of &quot;prop drilling&quot;.</p>
-<p>Here's an example of the previous ParentComponent and ChildComponent using the Context API instead:</p>
-<img src="https://cdn.sanity.io/images/nnt7ytcd/production/7d952fda3f9730fa5aa623edbce10d72e3336a64-1994x1908.png" alt="" />
-<h2></h2>
-<h2>Choosing between Props and the Context API</h2>
-<p>When choosing between using props or the Context API for state management, consider the scale and complexity of your project.</p>
-<p>For small-scale projects with a simple component hierarchy, using props may be more suitable. However, as the scale of your project grows and the component tree becomes deeper, the Context API can provide a more scalable and maintainable solution. But remember to use Context sparingly, as overusing it can lead to unnecessary re-renders and lower reusability of components.</p>
-<h2>Conclusion</h2>
-<p>State management is a core concept in React and essential for building dynamic and interactive applications. Both props and the Context API are powerful tools for managing state in React, each with their own advantages and suitable scenarios. Whether you choose to use props or the Context API, understanding their implications will help you make the best choice for your application.</p>]]></content:encoded>
     </item>
   </channel>
 </rss>

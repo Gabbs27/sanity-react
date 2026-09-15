@@ -9,6 +9,8 @@
     "editor-propio-vs-sanity-studio",
     "el-email-que-envias-no-es-el-que-leen",
     "el-punto-ciego-de-la-auditoria",
+    "lo-de-claro-que-se-sabe-y-que-no",
+    "react-19-3-el-compilador-y-un-cvss-10",
     "verde-y-ciego"
   ],
   "pairs": [
@@ -39,6 +41,14 @@
     {
       "es": "cuatro-trucos-de-css-que-ya-puedes-borrar",
       "en": "four-css-workarounds-you-can-delete"
+    },
+    {
+      "es": "lo-de-claro-que-se-sabe-y-que-no",
+      "en": "the-claro-claim-what-is-known-and-what-is-not"
+    },
+    {
+      "es": "react-19-3-el-compilador-y-un-cvss-10",
+      "en": "react-19-3-the-compiler-and-a-cvss-10"
     }
   ]
 }
