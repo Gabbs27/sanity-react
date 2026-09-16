@@ -36,28 +36,20 @@ if (!KEY) throw new Error('No DEVTO_API_KEY in .env');
 // dev.to allows at most 4 tags, lowercase alphanumeric only.
 const POSTS = [
   {
-    slug: 'the-email-you-send-is-not-the-email-they-read',
-    draft: 'docs/drafts/the-email-you-send-is-not-the-email-they-read.md',
-    title: 'The Email You Send Is Not the Email They Read',
-    tags: 'webdev, css, ux, accessibility',
+    slug: 'react-19-3-the-compiler-and-a-cvss-10',
+    draft: 'docs/drafts/react-19-3-the-compiler-and-a-cvss-10.md',
+    title: "React 19.3, the Compiler, and a CVSS 10: What Changed While You Weren't Looking",
+    tags: 'react, javascript, webdev, security',
     cover:
-      'https://cdn.sanity.io/images/nnt7ytcd/production/89da166168004876d488a13a737d9f5937c3cebe-1200x630.png',
+      'https://cdn.sanity.io/images/nnt7ytcd/production/c16f623c85235aadf2a650bff375319904ed2852-1200x630.png',
   },
   {
-    slug: 'chrome-already-ships-a-model',
-    draft: 'docs/drafts/chrome-already-ships-a-model.md',
-    title: "Chrome Already Ships a Model. It Isn't the One Being Announced",
-    tags: 'javascript, ai, webdev, chrome',
+    slug: 'react-19-3-el-compilador-y-un-cvss-10',
+    draft: 'docs/drafts/react-19-3-el-compilador-y-un-cvss-10.md',
+    title: 'React 19.3, el compilador y un CVSS 10: lo que cambió mientras no mirabas',
+    tags: 'react, javascript, webdev, security',
     cover:
-      'https://cdn.sanity.io/images/nnt7ytcd/production/76e38d5d7ef26738b71efefc9b65bee3a32e5719-1200x630.png',
-  },
-  {
-    slug: 'four-css-workarounds-you-can-delete',
-    draft: 'docs/drafts/four-css-workarounds-you-can-delete.md',
-    title: 'Four CSS Workarounds You Can Delete',
-    tags: 'css, webdev, frontend, a11y',
-    cover:
-      'https://cdn.sanity.io/images/nnt7ytcd/production/5ab93b91986d79b06c5e9d7c39df745a55e4d8cf-1200x630.png',
+      'https://cdn.sanity.io/images/nnt7ytcd/production/e0ea8b80f75416891f890fc2072ec81b851de4dc-1200x630.png',
   },
 ];
 
