@@ -324,6 +324,12 @@ test('the home page lists every project without JavaScript', () => {
       has(shown, project.url),
       `home noscript is missing the link for "${project.title}"`
     );
+    if (project.urlAntes) {
+      assert.ok(
+        has(shown, project.urlAntes),
+        `home noscript is missing the 2023 link for "${project.title}"`
+      );
+    }
   }
 });
 

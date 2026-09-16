@@ -35,6 +35,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Una tarjeta puede traer un segundo enlace: una versión anterior del proyecto. */
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0 1rem;
   opacity: 0;
   transition: opacity 0.3s;
 }
@@ -56,6 +60,11 @@
 .view-project:hover {
   background: white;
   color: #0F172A;
+}
+
+.view-project--antes {
+  border-color: rgba(255, 255, 255, 0.5);
+  font-weight: 400;
 }
 
 .card-content {

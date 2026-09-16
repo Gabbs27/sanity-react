@@ -135,6 +135,7 @@ const Portfolio = () => {
                   title={project.title}
                   description={project.description}
                   url={project.url}
+                  urlAntes={project.urlAntes}
                   languages={project.languages}
                   badge={project.badge}
                 />

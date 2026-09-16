@@ -304,8 +304,9 @@ for (const [route, page] of Object.entries(staticPages)) {
 const projectList = projects
   .map(
     (p) =>
-      `<li><a href="${esc(p.url)}">${esc(p.title)}</a> — ${esc(p.description)} ` +
-      `<em>${esc((p.languages || []).join(', '))}</em></li>`
+      `<li><a href="${esc(p.url)}">${esc(p.title)}</a>` +
+      (p.urlAntes ? ` · <a href="${esc(p.urlAntes)}">2023 version</a>` : '') +
+      ` — ${esc(p.description)} <em>${esc((p.languages || []).join(', '))}</em></li>`
   )
   .join('');
 

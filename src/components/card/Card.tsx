@@ -4,6 +4,7 @@ import "./Card.css";
 interface CardProps {
   id?: number;
   url: string;
+  urlAntes?: string;
   image: string;
   title: string;
   description: string;
@@ -11,7 +12,7 @@ interface CardProps {
   badge?: string;
 }
 
-const Card = ({ url, image, title, description, languages, badge }: CardProps) => {
+const Card = ({ url, urlAntes, image, title, description, languages, badge }: CardProps) => {
   // Detectar si la URL es interna (empieza con / o #)
   const isInternalLink = url.startsWith("/") || url.startsWith("#");
 
@@ -33,6 +34,15 @@ const Card = ({ url, image, title, description, languages, badge }: CardProps) =
             rel={isInternalLink ? undefined : 'noopener noreferrer'}>
             {isInternalLink ? 'View Demo' : 'View Project'}
           </a>
+          {urlAntes && (
+            <a
+              href={urlAntes}
+              className='view-project view-project--antes'
+              target='_blank'
+              rel='noopener noreferrer'>
+              2023 version
+            </a>
+          )}
         </div>
       </div>
 

@@ -20,6 +20,8 @@ export interface Project {
   title: string;
   description: string;
   url: string;
+  /** Una versión anterior del mismo proyecto, publicada aparte. */
+  urlAntes?: string;
   languages: string[];
   badge?: string;
 }
