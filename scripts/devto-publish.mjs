@@ -36,20 +36,20 @@ if (!KEY) throw new Error('No DEVTO_API_KEY in .env');
 // dev.to allows at most 4 tags, lowercase alphanumeric only.
 const POSTS = [
   {
-    slug: 'react-19-3-the-compiler-and-a-cvss-10',
-    draft: 'docs/drafts/react-19-3-the-compiler-and-a-cvss-10.md',
-    title: "React 19.3, the Compiler, and a CVSS 10: What Changed While You Weren't Looking",
-    tags: 'react, javascript, webdev, security',
+    slug: 'the-claro-claim-what-is-known-and-what-is-not',
+    draft: 'docs/drafts/the-claro-claim-what-is-known-and-what-is-not.md',
+    title: 'The Claro Claim: What Is Known, What Is Not, and What to Do Anyway',
+    tags: 'security, privacy, webdev',
     cover:
-      'https://cdn.sanity.io/images/nnt7ytcd/production/c16f623c85235aadf2a650bff375319904ed2852-1200x630.png',
+      'https://cdn.sanity.io/images/nnt7ytcd/production/45662a9b45903ab761b272d74cd3553f7446a4db-1200x630.png',
   },
   {
-    slug: 'react-19-3-el-compilador-y-un-cvss-10',
-    draft: 'docs/drafts/react-19-3-el-compilador-y-un-cvss-10.md',
-    title: 'React 19.3, el compilador y un CVSS 10: lo que cambió mientras no mirabas',
-    tags: 'react, javascript, webdev, security',
+    slug: 'lo-de-claro-que-se-sabe-y-que-no',
+    draft: 'docs/drafts/lo-de-claro-que-se-sabe-y-que-no.md',
+    title: 'Lo de Claro: qué se sabe, qué no, y qué hacer igual',
+    tags: 'security, privacy, webdev',
     cover:
-      'https://cdn.sanity.io/images/nnt7ytcd/production/e0ea8b80f75416891f890fc2072ec81b851de4dc-1200x630.png',
+      'https://cdn.sanity.io/images/nnt7ytcd/production/311b7eb4bd22f31e1dd307ee79bf3ace4649fba5-1200x630.png',
   },
 ];
 
