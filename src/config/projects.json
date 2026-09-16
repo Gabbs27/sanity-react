@@ -124,7 +124,7 @@
     "id": 4,
     "image": "/images/calendar.webp",
     "url": "https://agenda-con-clima.vercel.app",
-    "urlAntes": "https://agenda-con-clima.vercel.app/calendar-reminder/",
+    "urlAntes": "https://agenda-con-clima.vercel.app/2023/",
     "title": "Weather Agenda",
     "description": "Reminders that carry the forecast for their own day and place: pick where something happens and the agenda tells you what the weather will be there, with a rain warning for outdoor plans. It is a January 2023 React challenge rebuilt in the same repository, and that original build is published beside it, untouched, so the two can be read against each other.",
     "languages": [
