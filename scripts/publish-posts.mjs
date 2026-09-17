@@ -28,48 +28,26 @@ const PUBLISH = process.argv.includes("--publish");
 
 const POSTS = [
   {
-    slug: "lo-de-claro-que-se-sabe-y-que-no",
-    title: "Lo de Claro: qué se sabe, qué no, y qué hacer igual",
+    slug: "la-proxima-filtracion-llego-en-cuatro-dias",
+    title: "La próxima filtración llegó en cuatro días: cómo leer lo de la Policía",
     excerpt:
-      "Una afirmación sin verificar sobre 2.9 millones de registros, por qué la " +
-      "confirmación siempre llega tarde, y las cosas que conviene hacer esta " +
-      "semana aunque al final resulte falsa.",
-    tags: ["Seguridad", "República Dominicana", "Privacidad", "2FA", "Telecomunicaciones"],
-    markdown: resolve(ROOT, "docs/drafts/lo-de-claro-que-se-sabe-y-que-no.md"),
-    cover: "scripts/covers/out/claro-es.png",
+      "Alegan 10,000 registros del sistema de denuncias de la Policía Nacional en un " +
+      "enlace. Los cinco filtros, aplicados en público: uno con evidencia parcial, " +
+      "tres sin datos, y por qué ese archivo no se baja.",
+    tags: ["Seguridad", "República Dominicana", "Privacidad", "Análisis", "Policía Nacional"],
+    markdown: resolve(ROOT, "docs/drafts/la-proxima-filtracion-llego-en-cuatro-dias.md"),
+    cover: "scripts/covers/out/filtracion-policia-es.png",
   },
   {
-    slug: "the-claro-claim-what-is-known-and-what-is-not",
-    title: "The Claro claim: what is known, what is not, and what to do anyway",
+    slug: "the-next-leak-claim-took-four-days",
+    title: "The next leak claim took four days: reading the police one",
     excerpt:
-      "An unverified claim about 2.9 million records, why confirmation always " +
-      "arrives late, and what is worth doing this week even if it turns out to " +
-      "be false.",
-    tags: ["Security", "Dominican Republic", "Privacy", "2FA", "Telecom"],
-    markdown: resolve(ROOT, "docs/drafts/the-claro-claim-what-is-known-and-what-is-not.md"),
-    cover: "scripts/covers/out/claro-en.png",
-  },
-  {
-    slug: "react-19-3-el-compilador-y-un-cvss-10",
-    title: "React 19.3, el compilador y un CVSS 10: lo que cambió mientras no mirabas",
-    excerpt:
-      "El compilador llegó a 1.0 y borra tus useMemo, Server Components tuvo una " +
-      "vulnerabilidad de puntuación máxima, y 19.3 trajo View Transitions, refs " +
-      "en Fragment y browser().",
-    tags: ["React", "React Compiler", "Server Components", "Seguridad", "Frontend"],
-    markdown: resolve(ROOT, "docs/drafts/react-19-3-el-compilador-y-un-cvss-10.md"),
-    cover: "scripts/covers/out/react-193-es.png",
-  },
-  {
-    slug: "react-19-3-the-compiler-and-a-cvss-10",
-    title: "React 19.3, the compiler, and a CVSS 10: what changed while you weren't looking",
-    excerpt:
-      "The compiler hit 1.0 and deletes your useMemo, Server Components took a " +
-      "maximum-score vulnerability, and 19.3 brought View Transitions, Fragment " +
-      "refs and browser().",
-    tags: ["React", "React Compiler", "Server Components", "Security", "Frontend"],
-    markdown: resolve(ROOT, "docs/drafts/react-19-3-the-compiler-and-a-cvss-10.md"),
-    cover: "scripts/covers/out/react-193-en.png",
+      "Someone alleges 10,000 records from the Dominican National Police's complaint " +
+      "system sit behind a link. The five filters, applied in public: one with partial " +
+      "evidence, three with no data, and why you never download that file.",
+    tags: ["Security", "Dominican Republic", "Privacy", "Analysis", "Threat Intel"],
+    markdown: resolve(ROOT, "docs/drafts/the-next-leak-claim-took-four-days.md"),
+    cover: "scripts/covers/out/filtracion-policia-en.png",
   },
 ];
 

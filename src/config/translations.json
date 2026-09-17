@@ -9,6 +9,7 @@
     "editor-propio-vs-sanity-studio",
     "el-email-que-envias-no-es-el-que-leen",
     "el-punto-ciego-de-la-auditoria",
+    "la-proxima-filtracion-llego-en-cuatro-dias",
     "lo-de-claro-que-se-sabe-y-que-no",
     "react-19-3-el-compilador-y-un-cvss-10",
     "verde-y-ciego"
@@ -49,6 +50,10 @@
     {
       "es": "react-19-3-el-compilador-y-un-cvss-10",
       "en": "react-19-3-the-compiler-and-a-cvss-10"
+    },
+    {
+      "es": "la-proxima-filtracion-llego-en-cuatro-dias",
+      "en": "the-next-leak-claim-took-four-days"
     }
   ]
 }

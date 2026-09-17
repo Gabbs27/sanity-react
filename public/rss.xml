@@ -9,6 +9,104 @@
     <language>es</language>
     <atom:link href="https://codewithgabo.com/rss.xml" rel="self" type="application/rss+xml" />
     <item>
+      <title><![CDATA[The next leak claim took four days: reading the police one]]></title>
+      <link>https://codewithgabo.com/the-next-leak-claim-took-four-days</link>
+      <guid isPermaLink="true">https://codewithgabo.com/the-next-leak-claim-took-four-days</guid>
+      <pubDate>Thu, 17 Sep 2026 17:56:18 GMT</pubDate>
+      <description><![CDATA[Someone alleges 10,000 records from the Dominican National Police's complaint system sit behind a link. The five filters, applied in public: one with partial evidence, three with no data, and why you never download that file.]]></description>
+      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/f719f08af73309cf1b8e7c1afeebc08aef994fe1-1200x630.png" alt="The next leak claim took four days: reading the police one" />
+<p>On September 15 I published <a href="https://codewithgabo.com/the-claro-claim-what-is-known-and-what-is-not">an analysis of the Claro claim</a> with a section called &quot;how to read the next leak claim.&quot; I wrote that there would be another one.</p>
+<p>It arrived today. Four days after the Claro one.</p>
+<p>An account that monitors cybercrime channels, VECERT Analyzer, published an alert: someone shared a download link that <strong>allegedly</strong> contains records from the Dominican National Police's complaint management system, the SPGD. A 10,000-line file on a temporary hosting platform.</p>
+<p>The alert itself says it in its first line: <strong>status, unconfirmed.</strong> There is visible evidence — the link exists, and whoever posted it attached the institution's crest — but the authenticity of the records, how current they are, and the extent of any compromise are all unverified.</p>
+<p>At the time of writing I could not find a single Dominican outlet covering it, nor a response from the Police.</p>
+<p>So I am going to do what I said should be done: run the five filters, in public, without knowing in advance what comes out.</p>
+<h2>Why this one matters more than Claro</h2>
+<p>Before the filters, the context. The SPGD is not a customer list.</p>
+<p>According to the National Police itself, <strong>more than four million records</strong> were migrated into the system, and it is fed from more than 170 reception centres across the country. The public portal accepts official complaints, anonymous tips and <strong>gender violence</strong> reports, and asks the citizen for personal data, a detailed account of what happened, and contact details.</p>
+<p>That same portal makes a promise, verbatim: <em>&quot;Se garantizará la protección de la identidad de la persona denunciante y/o de la persona afectada&quot;</em> — the identity of the person reporting, and of the person affected, will be protected.</p>
+<p>A leaked phone list makes scams easier. A complaints database identifies who reported, whom they reported, and what they said. If the claim were true, that exact promise is what would have been broken.</p>
+<p>Which is why this case calls for more care than the last one, not less. And why one thing comes before any filter:</p>
+<p><strong>Do not look for that file. Do not download it. Do not share it.</strong> If it is fake, it is bait — a file of criminal origin that someone wants you to open. If it is real, inside it are people who reported an abuser believing nobody else would know. I did not download it to write this, and nothing in this analysis needs it.</p>
+<h2>Filter 1: is there a verifiable sample?</h2>
+<p>There is more than in the Claro case: not a screenshot, but a link to a file. But &quot;a file exists&quot; and &quot;the file is what they say&quot; are different claims, and no independent party has verified the second. The alert itself acknowledges that.</p>
+<p>Verdict: evidence that someone posted something. Nothing more.</p>
+<h2>Filter 2: are the fields internal or catalogue?</h2>
+<p>The alert does not say which fields the file contains. No schema, no described sample, nothing to compare against. This is the filter that best separates a real leak from a rehash, and here it cannot even begin.</p>
+<p>Verdict: no data.</p>
+<h2>Filter 3: is the data fresh?</h2>
+<p>Also unknown. And there is a trap specific to this system: because millions of historical records were migrated into the SPGD, old data would not prove the claim false — the real system contains it. What would prove current access is recent records, and nobody has shown any.</p>
+<p>Verdict: no data.</p>
+<h2>Filter 4: has anyone cross-checked it against previous leaks?</h2>
+<p>Not that anyone has published. With one piece of arithmetic on top: 10,000 lines against more than four million records is <strong>0.25%</strong> of the system. That could be a sample to prove access, it could be everything someone has, or it could be a slice of something else. All three explanations produce exactly the same link.</p>
+<p>Verdict: no data.</p>
+<h2>Filter 5: who is telling you?</h2>
+<p>An aggregator. One that, to its credit, labels the alert unconfirmed from its first line. The risk comes afterwards: every time someone forwards it, that label is the first thing to fall off. &quot;Alleged leak, unconfirmed&quot; becomes &quot;the Police got hacked&quot; within two forwards.</p>
+<p>And a detail worth writing down: the alias this post is attributed to <strong>differs by one character</strong> from the one the press attributed to the Claro claim. It could be the same person, someone's transcription error, or an imitator riding the name of the moment. I do not know, and whoever tells you they do does not know either.</p>
+<p>Verdict: a source that is honest about its own uncertainty. The forwards will not be.</p>
+<h2>The scoreboard</h2>
+<p>Five filters: one with partial evidence, three with no data, one that describes the messenger. <strong>That is not &quot;false.&quot; It is &quot;unknown.&quot;</strong> And unknown is a complete answer — the only honest one today.</p>
+<h2>What to do if you filed a complaint</h2>
+<p>The advice here is not the Claro advice. There is no second factor to move.</p>
+<p><strong>If &quot;the Police&quot; call you with details of your case, that no longer proves anything.</strong> Knowing your complaint does not show the caller is an officer. If they ask for money, data, or for you to go somewhere: hang up, and verify yourself at your station or through official channels.</p>
+<p><strong>If you reported an abuser and this worries you</strong>, the Ministry of Women's Línea Mujer is <code>*212</code>: free, confidential, 24 hours, dialled from any Altice, Claro or Viva mobile in the Dominican Republic. Do not wait for anyone to confirm anything before calling.</p>
+<p><strong>And do not go looking to see whether you are in the file.</strong> It is the natural reaction, and it is exactly the one bait relies on.</p>
+<h2>What this means for those of us who build systems</h2>
+<p>The alert's technical recommendation is its most useful part, and it applies to everyone: audit the access logs to identify which user or IP recently ran mass queries or exported 10,000 records.</p>
+<p>The uncomfortable question is whether your system could answer it. Is it logged who exports? Does an alert fire when one account reads ten thousand rows in an afternoon? A system with more than 170 points of entry has more than 170 sets of credentials; the question is never whether one gets compromised, but how much it can read before anyone notices.</p>
+<p>That capability — being able to say within hours &quot;yes, that was ours&quot; or &quot;no, it was not&quot; — is the same one I asked for in the Claro post. Four days later it is the missing piece again.</p>
+<p><strong>Sources:</strong> the alert is from VECERT Analyzer, marked unconfirmed by the account itself · <a href="https://www.policianacional.gob.do/policia-nacional-moderniza-certificaciones-vehiculares-y-denuncias-con-plataforma-digital/">National Police, on the SPGD</a> · <a href="https://denuncias.policia.gob.do/">Complaints portal</a> · <a href="https://mujer.gob.do/index.php/servicios/linea-mujer-212">Línea Mujer *212</a></p>]]></content:encoded>
+    </item>
+    <item>
+      <title><![CDATA[La próxima filtración llegó en cuatro días: cómo leer lo de la Policía]]></title>
+      <link>https://codewithgabo.com/la-proxima-filtracion-llego-en-cuatro-dias</link>
+      <guid isPermaLink="true">https://codewithgabo.com/la-proxima-filtracion-llego-en-cuatro-dias</guid>
+      <pubDate>Thu, 17 Sep 2026 17:56:14 GMT</pubDate>
+      <description><![CDATA[Alegan 10,000 registros del sistema de denuncias de la Policía Nacional en un enlace. Los cinco filtros, aplicados en público: uno con evidencia parcial, tres sin datos, y por qué ese archivo no se baja.]]></description>
+      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/d1734d194793f221a174e5f64c02abc936b012ac-1200x630.png" alt="La próxima filtración llegó en cuatro días: cómo leer lo de la Policía" />
+<p>El 15 de septiembre publiqué <a href="https://codewithgabo.com/lo-de-claro-que-se-sabe-y-que-no">un análisis de lo de Claro</a> con una sección titulada &quot;cómo leer la próxima afirmación de filtración&quot;. Escribí que iba a haber otra.</p>
+<p>Llegó hoy. Cuatro días después de la de Claro.</p>
+<p>Una cuenta que monitorea canales de cibercrimen, VECERT Analyzer, publicó una alerta: alguien compartió un enlace de descarga que <strong>supuestamente</strong> contiene registros del Sistema Policial de Gestión de Denuncias, el SPGD de la Policía Nacional. Un archivo de 10,000 líneas en una plataforma de alojamiento temporal.</p>
+<p>La misma alerta lo dice en su primera línea: <strong>estado, no confirmado.</strong> Hay evidencia visible —el enlace existe, y quien lo publicó adjuntó el escudo de la institución— pero la autenticidad de los registros, su vigencia y el alcance de cualquier compromiso están sin verificar.</p>
+<p>Al momento de escribir esto no encontré un solo medio dominicano cubriéndolo, ni una respuesta de la Policía.</p>
+<p>Así que voy a hacer lo que dije que había que hacer: pasarle los cinco filtros, en público, sin saber de antemano qué sale.</p>
+<h2>Por qué esta importa más que la de Claro</h2>
+<p>Antes de los filtros, el contexto. El SPGD no es una lista de clientes.</p>
+<p>Según la propia Policía Nacional, al sistema se migraron <strong>más de cuatro millones de registros</strong>, y se alimenta desde más de 170 centros de recepción en todo el país. El portal público acepta denuncias oficiales, denuncias anónimas y denuncias de <strong>violencia de género</strong>, y le pide al ciudadano sus datos personales, el relato detallado del hecho y sus datos de contacto.</p>
+<p>Ese mismo portal hace una promesa, textual: <em>&quot;Se garantizará la protección de la identidad de la persona denunciante y/o de la persona afectada.&quot;</em></p>
+<p>Una lista de teléfonos filtrada facilita estafas. Una base de denuncias identifica a quien denunció, a quién denunció, y qué contó. Si la alegación fuera cierta, lo que se habría roto es esa promesa exacta.</p>
+<p>Por eso este caso exige más cuidado que el anterior, no menos. Y por eso hay algo que va primero que cualquier filtro:</p>
+<p><strong>No busques ese archivo. No lo bajes. No lo compartas.</strong> Si es falso, es un anzuelo — un archivo de origen criminal que alguien quiere que abras. Si es real, adentro hay personas que denunciaron a un agresor creyendo que nadie más lo sabría. Yo no lo descargué para escribir esto, y nada en este análisis lo necesita.</p>
+<h2>Filtro 1: ¿hay muestra verificable?</h2>
+<p>Hay más que en el caso de Claro: no una captura, sino un enlace a un archivo. Pero &quot;existe un archivo&quot; y &quot;el archivo es lo que dicen&quot; son afirmaciones distintas, y nadie independiente ha verificado la segunda. La propia alerta lo reconoce.</p>
+<p>Veredicto: evidencia de que alguien publicó algo. Nada más.</p>
+<h2>Filtro 2: ¿los campos son internos o de catálogo?</h2>
+<p>La alerta no dice qué campos trae el archivo. No hay esquema, no hay muestra descrita, no hay nada contra qué comparar. Este filtro es el que más separa una filtración real de un refrito, y aquí no se puede ni empezar a aplicar.</p>
+<p>Veredicto: sin datos.</p>
+<h2>Filtro 3: ¿los datos son frescos?</h2>
+<p>Tampoco se sabe. Y aquí hay una trampa específica de este sistema: como al SPGD se migraron millones de registros históricos, datos viejos no probarían que sea falso — el sistema real los contiene. Lo que haría falta para probar acceso actual son registros recientes, y nadie ha mostrado ninguno.</p>
+<p>Veredicto: sin datos.</p>
+<h2>Filtro 4: ¿alguien lo cruzó con filtraciones anteriores?</h2>
+<p>No que se haya publicado. Con una aritmética sencilla encima: 10,000 líneas contra más de cuatro millones de registros es el <strong>0.25%</strong> del sistema. Eso puede ser una muestra para probar acceso, puede ser todo lo que alguien tiene, o puede ser un recorte de otra cosa. Las tres explicaciones producen exactamente el mismo enlace.</p>
+<p>Veredicto: sin datos.</p>
+<h2>Filtro 5: ¿quién lo está contando?</h2>
+<p>Un agregador. Que, para su crédito, etiqueta la alerta como no confirmada desde la primera línea. El riesgo viene después: cada vez que alguien la reenvíe, esa etiqueta es lo primero que se cae. &quot;Alegada filtración, sin confirmar&quot; se convierte en &quot;hackearon a la Policía&quot; en dos reenvíos.</p>
+<p>Y un detalle que vale anotar: el alias al que se atribuye esta publicación <strong>difiere en un carácter</strong> del que los medios atribuyeron a lo de Claro. Puede ser la misma persona, un error de transcripción de alguien, o un imitador montado en el nombre del momento. Yo no lo sé, y quien te diga que sí tampoco lo sabe.</p>
+<p>Veredicto: fuente honesta sobre su propia incertidumbre. Los reenvíos no lo serán.</p>
+<h2>El marcador</h2>
+<p>Cinco filtros: uno con evidencia parcial, tres sin datos, uno que describe al mensajero. <strong>Eso no es &quot;falso&quot;. Es &quot;no se sabe&quot;.</strong> Y no se sabe es una respuesta completa — la única honesta hoy.</p>
+<h2>Qué hacer si tú denunciaste algo</h2>
+<p>Aquí el consejo no es el de Claro. No hay segundo factor que mover.</p>
+<p><strong>Si te llaman &quot;de la Policía&quot; con detalles de tu caso, eso ya no prueba nada.</strong> Conocer tu denuncia no demuestra que quien llama es un agente. Si te piden dinero, datos o que vayas a algún sitio: cuelga, y verifica tú en tu destacamento o por los canales oficiales.</p>
+<p><strong>Si denunciaste a un agresor y esto te preocupa</strong>, la Línea Mujer del Ministerio de la Mujer es el <code>*212</code>: gratuita, confidencial, 24 horas, y se marca desde cualquier celular de Altice, Claro o Viva. No esperes a que alguien confirme nada para llamar.</p>
+<p><strong>Y no vayas a buscar si apareces en el archivo.</strong> Es la reacción natural y es exactamente la que aprovecha un anzuelo.</p>
+<h2>Lo que nos toca a los que construimos sistemas</h2>
+<p>La recomendación técnica de la alerta es la parte más útil, y aplica a cualquiera: auditar los registros de acceso para identificar qué usuario o qué IP hizo consultas masivas o exportó 10,000 registros recientemente.</p>
+<p>La pregunta incómoda es si tu sistema puede responderla. ¿Queda registrado quién exporta? ¿Salta una alerta cuando una cuenta lee diez mil filas en una tarde? Un sistema con más de 170 puntos de entrada tiene más de 170 conjuntos de credenciales; la pregunta nunca es si una se va a comprometer, sino cuánto puede leer antes de que alguien lo note.</p>
+<p>Esa capacidad —poder decir en horas &quot;sí fue nuestro&quot; o &quot;no lo fue&quot;— es la misma que pedí en el post de Claro. Cuatro días después vuelve a ser la pieza que falta.</p>
+<p><strong>Fuentes:</strong> la alerta es de VECERT Analyzer, marcada como no confirmada por la propia cuenta · <a href="https://www.policianacional.gob.do/policia-nacional-moderniza-certificaciones-vehiculares-y-denuncias-con-plataforma-digital/">Policía Nacional, sobre el SPGD</a> · <a href="https://denuncias.policia.gob.do/">Portal de denuncias</a> · <a href="https://mujer.gob.do/index.php/servicios/linea-mujer-212">Línea Mujer *212</a></p>]]></content:encoded>
+    </item>
+    <item>
       <title><![CDATA[React 19.3, the compiler, and a CVSS 10: what changed while you weren't looking]]></title>
       <link>https://codewithgabo.com/react-19-3-the-compiler-and-a-cvss-10</link>
       <guid isPermaLink="true">https://codewithgabo.com/react-19-3-the-compiler-and-a-cvss-10</guid>
@@ -1438,337 +1536,6 @@ if (block.type &amp;&amp; !SUPPORTED.has(block.type)) {
 <p>Las tareas que antes se quedaban en la lista por pereza ahora se hacen, porque el coste de arrancarlas bajó lo suficiente. El sitemap llevaba meses pendiente. La auditoría llevaba más. Ninguna era difícil; las dos eran tediosas, y lo tedioso es exactamente lo que se me acumulaba.</p>
 <p>Lo que no cambió: sigo decidiendo qué se construye, sigo revisando cada línea que entra, y sigo siendo el responsable cuando algo se rompe en producción.</p>
 <p>Eso me parece bien. Es la parte del trabajo que me gusta.</p>]]></content:encoded>
-    </item>
-    <item>
-      <title><![CDATA[Le hice una auditoría a mi propio portfolio y encontré 20 problemas]]></title>
-      <link>https://codewithgabo.com/auditoria-portfolio-20-problemas</link>
-      <guid isPermaLink="true">https://codewithgabo.com/auditoria-portfolio-20-problemas</guid>
-      <pubDate>Thu, 20 Aug 2026 14:00:00 GMT</pubDate>
-      <description><![CDATA[Auditar el sitio de otro es fácil. Auditar el tuyo, cuando llevas dos años defendiendo cada decisión, es otra cosa. Encontré 20 problemas, y cinco me dolieron de verdad.]]></description>
-      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/af03409c120b94dfeb2d753f1365ff5770cffa58-1200x630.png" alt="Le hice una auditoría a mi propio portfolio y encontré 20 problemas" />
-<p>Auditar el sitio de otra persona es fácil. Abres las herramientas de desarrollo, señalas lo que está mal, cobras y te vas. Auditar el tuyo es otra cosa, porque cada decisión mala la tomaste tú, normalmente un martes a las once de la noche, y llevas meses convencido de que estaba bien.</p>
-<p>Eso hice con codewithgabo.com: senté a revisarlo como si fuera de un cliente. Sin excusas, sin &quot;eso lo arreglo después&quot;. Salieron <strong>20 hallazgos</strong> repartidos en cuatro áreas. Cinco me dolieron de verdad.</p>
-<p>Este post es la lista honesta: qué encontré, por qué pasó, y qué número cambió al arreglarlo.</p>
-<h2>Cómo audité</h2>
-<p>No hay magia. El método fue aburrido a propósito, porque lo aburrido es lo que encuentra cosas:</p>
-<ul>
-<li>Leí <strong>cada componente público</strong> y cada definición de ruta en <code>src/</code>.</li>
-<li>Recorrí las <strong>10 rutas públicas</strong> en el navegador, a 375px y en escritorio, anotando el <code>h1</code> de cada una, el número de caracteres, los enlaces internos y las imágenes rotas.</li>
-<li>Consulté Sanity para contar posts y palabras reales, no las que yo creía tener.</li>
-<li>Corrí <code>npm audit</code> y <code>npm outdated</code>.</li>
-<li>Analicé el tamaño del build, chunk por chunk, en <code>build/assets/</code>.</li>
-</ul>
-<p>Ese último paso es el que más duele y el que más gente se salta. Mirar el peso real de lo que sirves es como pesarte después de las fiestas: sabes que va a estar mal, pero necesitas el número.</p>
-<h2>Hallazgo 1: una ilustración de 993 KB</h2>
-<p>El peor. En <code>/gabriel-abreu</code> servía una ilustración de desarrollador en PNG sin optimizar. <strong>993 KB.</strong> Casi un megabyte para un dibujo decorativo.</p>
-<p>Y no era el único. <code>nobggabo.png</code> pesaba 358 KB y se cargaba en <strong>todas</strong> las páginas públicas, porque lo importan las tres variantes del componente <code>Greeting</code> que uso en el inicio, en los posts y en los repositorios. Cada navegación pagaba esos 358 KB otra vez.</p>
-<p>La solución no tiene ningún mérito técnico: convertir a WebP con calidad 80.</p>
-<pre><code>developer-illustration:  993 KB  -&gt;  23 KB   (-98%)
-nobggabo:                358 KB  -&gt;  45 KB   (-87%)</code></pre>
-<p>Un 98%. Casi un megabyte por un dibujo que se ve exactamente igual. El mérito no está en la conversión, está en haberme molestado en mirar.</p>
-<p><strong>La lección:</strong> si no has revisado el peso de tus imágenes, ese es tu problema más grande ahora mismo. Estadísticamente, lo es.</p>
-<h2>Hallazgo 2: el sitemap no tenía ni un solo post</h2>
-<p>Tenía 9 posts publicados. Mi <code>sitemap.xml</code> listaba <strong>7 páginas estáticas y cero posts</strong>. Las fechas de <code>lastmod</code>, además, estaban congeladas meses atrás.</p>
-<p>O sea: llevaba tiempo escribiendo contenido y luego no se lo enseñaba a Google. Todo el trabajo de escribir, ninguno del de distribuir.</p>
-<p>El problema de fondo era que el sitemap era un archivo estático que había que actualizar a mano. Y a mano significa nunca.</p>
-<p>Ahora se genera en tiempo de build, con una consulta GROQ a Sanity, corriendo como <code>prebuild</code>:</p>
-<pre><code>*[_type==&quot;post&quot; &amp;&amp; !(_id in path(&quot;drafts.**&quot;)) &amp;&amp; defined(slug.current)]{
-  &quot;slug&quot;: slug.current,
-  _updatedAt
-}</code></pre>
-<p>Cada <code>npm run build</code> escribe un <code>sitemap.xml</code> fresco, con todos los posts y con fechas reales. Ya no depende de que yo me acuerde.</p>
-<p><strong>La lección:</strong> cualquier cosa que dependa de tu memoria, ya está rota. Solo que todavía no lo sabes.</p>
-<h2>Hallazgo 3: mi página 404 no existía en la práctica</h2>
-<p>Este es el que más vergüenza me da, porque era un bug de verdad, no un descuido.</p>
-<p>Si entrabas a <code>codewithgabo.com/cualquier-cosa</code>, el sitio se quedaba colgado para siempre en <strong>&quot;Loading post...&quot;</strong>. No mostraba un 404. No mostraba un error. Se quedaba ahí, girando, hasta que te aburrías y cerrabas la pestaña.</p>
-<p>La causa: mi ruta comodín de posts, <code>/:slug</code>, capturaba cualquier URL desconocida antes de que llegara a la ruta <code>*</code> del componente <code>NotFound</code>. <code>OnePost</code> consultaba Sanity, no recibía nada, y como no distinguía entre &quot;todavía cargando&quot; y &quot;esto no existe&quot;, se quedaba en el estado de carga eternamente.</p>
-<p>El arreglo fue separar esos dos estados:</p>
-<pre><code>const [postData, setPostData] = useState&lt;SanityPostData | null&gt;(null);
-const [notFound, setNotFound] = useState(false);
-
-// ...
-
-if (notFound) return &lt;NotFound /&gt;;
-if (!postData) return &lt;LoadingSpinner message=&quot;Loading post...&quot; /&gt;;</code></pre>
-<p>Tres líneas. Un <code>useState</code> más y dos returns en el orden correcto. Ese era el arreglo de un bug que llevaba meses echando visitantes del sitio en silencio.</p>
-<p>Aproveché para darle a la página 404 un diseño real: el número grande, un encabezado bilingüe, y tres botones que llevan a algún sitio útil en vez de dejarte tirado.</p>
-<p><strong>La lección:</strong> un estado de carga que nunca termina se ve igual que &quot;lento&quot;. Por eso nadie lo reporta.</p>
-<h2>Hallazgo 4: una funcionalidad que llevaba meses sin renderizarse</h2>
-<p>En <code>data.ts</code> tengo tres proyectos marcados con <code>badge: &quot;New&quot;</code>: Analytics Dashboard, NegocioRD y A2C International. El componente <code>Card</code> acepta la prop <code>badge</code> y la renderiza como una pastilla.</p>
-<p>La pastilla no aparecía nunca. Ni una sola vez.</p>
-<p>¿Por qué? Porque <code>Portfolio.tsx</code> desestructuraba <code>image</code>, <code>title</code>, <code>description</code>, <code>url</code> y <code>languages</code> de cada proyecto... y se olvidaba de pasar <code>badge</code>. El dato existía. El componente que lo renderiza existía. Simplemente nadie los presentó.</p>
-<pre><code>  description={project.description}
-  url={project.url}
-  languages={project.languages}
-+ badge={project.badge}</code></pre>
-<p><strong>Una línea.</strong> Escribí el dato, escribí el componente, y se me olvidó el cable entre los dos. Llevaba meses así, y nunca lo noté porque nunca miré la parrilla preguntándome &quot;¿esto se ve como debería?&quot;. La miraba preguntándome &quot;¿carga?&quot;.</p>
-<p><strong>La lección:</strong> revisa tu interfaz contra lo que <em>debería</em> mostrar, no contra lo que muestra. Son preguntas distintas y solo una encuentra este bug.</p>
-<h2>Hallazgo 5: 405 KB de librería de gráficos para gente que no los quería</h2>
-<p>Tengo un dashboard de analítica en <code>/dashboard-demo</code>, público, para que se vea el trabajo. Usa recharts.</p>
-<p>Recharts es pesado. Y estaba metido dentro del chunk que se cargaba de forma eager al entrar en la ruta. Resultado: cualquiera que abriera la demo se descargaba <strong>405 KB</strong> de librería de gráficos antes de decidir si le interesaba siquiera.</p>
-<p>La solución fue envolver <code>ChartCard</code> en <code>React.lazy</code> con <code>Suspense</code>, para que recharts se convierta en su propio chunk y solo baje cuando los gráficos van a montarse de verdad:</p>
-<pre><code>antes:  useAnalyticsData chunk = 405 KB   (recharts dentro)
-después: useAnalyticsData chunk =   3 KB
-         ChartCard chunk        = 411 KB  (lazy)</code></pre>
-<p>De 405 KB a 3 KB en la carga inicial. La librería sigue pesando lo mismo, claro. La diferencia es <em>cuándo</em> la pagas, y quién.</p>
-<p><strong>La lección:</strong> el código dividido no hace tu aplicación más pequeña. Hace que la gente que rebota no pague por lo que no llegó a usar.</p>
-<h2>Los otros quince</h2>
-<p>No todos eran dramáticos. Hubo seis imágenes sin usar sumando más de un megabyte muerto en el repositorio. Una vulnerabilidad moderada en una dependencia. Una página, <code>/education</code>, que existía y renderizaba contenido pero no estaba enlazada desde ninguna parte del menú. <code>console.log</code> olvidados en cinco archivos. Ninguna página de política de privacidad ni de términos.</p>
-<p>Y también hubo cosas bien, que conviene anotar para no volverse loco: el diseño móvil estaba limpio, la densidad de contenido era buena, y la configuración de anuncios estaba correcta. Una auditoría honesta también dice qué no hay que tocar.</p>
-<h2>Cómo auditar el tuyo</h2>
-<p>Si te animas, este es el orden por el que yo iría. Está puesto de mayor a menor retorno por hora invertida:</p>
-<ol>
-<li><strong>Pesa tus imágenes.</strong> Ordena por tamaño y mira las tres primeras. Si hay algo por encima de 200 KB, ahí tienes tu tarde.</li>
-<li><strong>Escribe una URL que no exista</strong> en tu propio sitio. Mira qué pasa. Cuenta hasta diez. Si sigue cargando, tienes mi hallazgo número 3.</li>
-<li><strong>Abre tu sitemap</strong> y cuenta las URLs. ¿Está tu contenido de verdad ahí? ¿Las fechas son reales?</li>
-<li><strong>Mira el tamaño de los chunks del build.</strong> Cualquier cosa por encima de 300 KB que no sea imprescindible en la primera pintura, es candidata a carga diferida.</li>
-<li><strong>Recorre cada página preguntándote qué debería mostrar</strong>, no si carga. Ahí es donde salen los bugs como el badge.</li>
-<li><strong>Corre `npm audit` y `npm outdated`.</strong> Diez segundos.</li>
-<li><strong>Busca `console.log` en todo el proyecto.</strong> Otros diez segundos.</li>
-</ol>
-<p>Los siete pasos caben en una tarde. Yo tardé una en encontrarlos y otra en arreglar lo importante.</p>
-<h2>Lo que de verdad aprendí</h2>
-<p>Ninguno de estos problemas era difícil. Ni uno. El arreglo más complejo fueron tres líneas; el más impactante fue convertir un PNG a WebP, algo que se hace en un comando.</p>
-<p>No estaban ahí porque fueran difíciles. Estaban ahí porque <strong>nunca me senté a mirar</strong>. Construir es más divertido que revisar, así que uno sigue construyendo encima, y las cosas rotas se quedan abajo, sosteniendo el edificio con un bug de meses.</p>
-<p>Si tienes un portfolio, un blog o un proyecto paralelo que llevas tiempo sin revisar de verdad: agenda dos horas esta semana. No para añadir nada. Solo para mirar.</p>
-<p>Vas a encontrar tu propio PNG de 993 KB. Te lo prometo.</p>]]></content:encoded>
-    </item>
-    <item>
-      <title><![CDATA[Probé 3 prompts en Nano Banana 2 y los resultados me sorprendieron]]></title>
-      <link>https://codewithgabo.com/3-prompts-gemini-nano-banana-resultados</link>
-      <guid isPermaLink="true">https://codewithgabo.com/3-prompts-gemini-nano-banana-resultados</guid>
-      <pubDate>Wed, 13 May 2026 20:40:00 GMT</pubDate>
-      <description><![CDATA[Probé 3 prompts en Nano Banana 2 y los resultados me sorprendieron Llevaba un par de semanas viendo screenshots de gente sacando imágenes increíbles con Nano Banana 2 (el modelo de imagen de Gemini), ]]></description>
-      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/e269b43cf6c9f44d3cfe0e17613886b53a967a90-2160x2700.png" alt="Probé 3 prompts en Nano Banana 2 y los resultados me sorprendieron" />
-<h1>Probé 3 prompts en Nano Banana 2 y los resultados me sorprendieron</h1>
-<p>Llevaba un par de semanas viendo screenshots de gente sacando imágenes increíbles con Nano Banana 2 (el modelo de imagen de Gemini), pero la mayoría compartía el resultado sin el prompt. Decidí hacer mi propio experimento: tres prompts diseñados para sacar provecho de tres &quot;superpowers&quot; distintos del modelo, ejecutarlos en serio, y documentar todo —prompt, resultado, lo que falló, lo que aprendí—.</p>
-<p>Este post es ese registro completo. Si quieres replicar los resultados, los prompts están aquí en su forma final, listos para pegar.</p>
-<h2>Por qué Nano Banana 2 ≠ otro generador de imágenes</h2>
-<p>Antes de los prompts, vale la pena entender qué hace distinto a este modelo. Nano Banana 2 no es &quot;el Midjourney de Google&quot;. Es un modelo construido sobre el reasoning de Gemini, lo que significa tres diferencias prácticas que cambian cómo lo prompteas:</p>
-<ol>
-<li><strong>Procesa prompts conversacionales largos mejor que strings de keywords.</strong> Donde Midjourney premia listas tipo <code>cinematic, 8k, ultra-realistic, masterpiece</code>, Nano Banana premia descripciones tipo &quot;fotografía editorial estilo Kinfolk, luz golden hour, taza humeando&quot;.</li>
-<li><strong>Mantiene identidad facial al editar fotos.</strong> Esto es lo que más me sorprendió. Si le pasas una foto tuya y le pides que cambie el contexto, mantiene tu cara intacta —no te &quot;mejora&quot;, no te cambia los rasgos, no te hace genérico—.</li>
-<li><strong>Itera sobre resultados anteriores con instrucciones, no con prompts nuevos.</strong> Después del primer output puedes decirle &quot;más texturizado, menos AI-perfect&quot; y modifica el output sin empezar de cero.</li>
-</ol>
-<p>Cada uno de los 3 prompts que siguen está diseñado para demostrar uno de estos comportamientos.</p>
-<h2>El experimento</h2>
-<p>Mi setup:</p>
-<ul>
-<li>Modelo: Gemini 3 Pro con Nano Banana 2 activado</li>
-<li>Output: vertical 4:5 (1080x1350) — formato Instagram-friendly</li>
-<li>Brand visual: Editorial Zine, paleta cream + ink + terracotta</li>
-<li>Tiempo total: ~25 minutos para los 3 prompts (incluyendo iteraciones)</li>
-</ul>
-<p>Nada de hacks, nada de plugins, nada de wrappers. Solo el modelo y los prompts.</p>
-<h2>Prompt 1 — Foto cinematográfica de workspace</h2>
-<p><strong>Objetivo:</strong> generar una imagen que se vea como foto de stock premium, no como AI render genérico.</p>
-<p><strong>Superpower que demuestra:</strong> procesar prompts conversacionales largos.</p>
-<h3>El prompt completo</h3>
-<pre><code>Photograph of a minimalist developer workspace shot on
-35mm film. A vintage wooden desk by a window with golden
-hour light streaming in. On the desk: an open MacBook Pro
-displaying code in a dark editor (Catppuccin-style colors,
-purple and cyan accents), a ceramic mug with steam, a small
-notebook with a fountain pen, and a single dried flower in
-a clear glass.
-
-Background: warm cream-colored wall with subtle grain
-texture, a small framed art print partially visible.
-
-Mood: contemplative, editorial, &quot;build in public&quot; energy.
-Slight film grain, shallow depth of field, warm color
-grading with terracotta and ember accents. Vertical
-composition, 4:5 ratio.
-
-Style: editorial photography, Kinfolk magazine aesthetic,
-not generic stock. Imperfect by design.</code></pre>
-<h3>El resultado</h3>
-<img src="https://cdn.sanity.io/images/nnt7ytcd/production/e9a21cbb8659342bff577df6db44e8ccb69f451b-2160x2700.png" alt="" />
-<h3>Lo que funcionó</h3>
-<ul>
-<li>La luz golden hour real entrando por la ventana (no esa &quot;luz dorada AI&quot; plástica)</li>
-<li>El vapor de la taza se ve natural</li>
-<li>La pantalla del MacBook muestra código con sintaxis real</li>
-<li>La madera del escritorio tiene grano visible y patina</li>
-<li>El frasco de cristal con la flor seca refleja la luz</li>
-</ul>
-<h3>Lo que aprendí</h3>
-<p>Mientras más específico el prompt, menos genérico el output. &quot;MacBook Pro displaying code in a dark editor&quot; daría una pantalla negra random. &quot;Catppuccin-style colors, purple and cyan accents&quot; forzó al modelo a renderizar una paleta específica que se ve como código real.</p>
-<p>Regla: no describas la escena, descríbele al modelo qué cámara, qué luz, qué referencia visual quieres. Es la diferencia entre dirigir un set y pedir una imagen.</p>
-<h2>Prompt 2 — Poster editorial con typography</h2>
-<p><strong>Objetivo:</strong> diseñar un poster con texto, layout y elementos gráficos —sin abrir Figma—.</p>
-<p><strong>Superpower que demuestra:</strong> iteración sobre resultados anteriores.</p>
-<h3>El primer intento (el que no funcionó)</h3>
-<p>Mi primer prompt salió muy plain —tipografía limpia, sin textura, sin profundidad—. Looked like Canva. En lugar de descartarlo y empezar de cero, le pedí al modelo que iterara sobre el resultado anterior agregando capas. Eso fue el cambio de juego.</p>
-<h3>El prompt de iteración</h3>
-<pre><code>Iterate on this editorial poster. Keep the central
-composition (crossed-out &quot;M&quot; in serif italic, &quot;HTML&quot; in
-monospace below it, terracotta strikethrough), but make
-it MUCH richer and more textured:
-
-LAYERING &amp; DEPTH:
-- Add visible risograph misregistration — slight color
-  offset where the terracotta ink doesn't perfectly align
-  with the black ink. Like a real two-color print where
-  registration is intentionally imperfect.
-- Add visible paper texture: warm cream paper with
-  noticeable fiber grain, small specks, slight age marks.
-- The terracotta strikethrough should look like a real
-  brush stroke with visible texture, slight ink bleeding
-  at the edges, and a small dry-brush effect at the tail.
-- Subtle ink bleed on the serif &quot;M&quot; — like the ink soaked
-  into the paper slightly.
-
-ADDITIONAL ELEMENTS (break the symmetry):
-- Top-left corner: a faded, half-cropped photo of an old
-  computer terminal or vintage Macintosh, printed in
-  monochrome black on the cream paper. Small, like a
-  postage stamp size. Slightly rotated.
-- Right side, mid-height: a vertical strip of monospace
-  code text running sideways, very small and faded,
-  containing snippets like &quot;&lt;div&gt;&quot;, &quot;&lt;/section&gt;&quot;,
-  &quot;&lt;article&gt;&quot;. Rotated 90 degrees.
-- Bottom-left: a hand-drawn arrow pointing toward &quot;HTML&quot;
-  with a small handwritten annotation in terracotta ink
-  that reads &quot;← future&quot; in messy sans-serif.
-- Replace one of the brackets &quot;[ ]&quot; with a small circled
-  number &quot;1.&quot; in terracotta, like an editor's mark.
-- Add 2-3 small irregular ink dots/splatters scattered
-  across the composition, very subtle.
-
-OVERALL:
-- More layers, more density, more &quot;human zine&quot; feeling.
-- Less centered/symmetric, more intentional asymmetry.
-- Should look like a real printed zine page, not a digital
-  poster.
-- Vertical 4:5 composition.
-- Keep typography sharp and legible.</code></pre>
-<h3>El resultado</h3>
-<img src="https://cdn.sanity.io/images/nnt7ytcd/production/619e74c5b0bdd1793a5873247251c22db9915008-2160x2700.png" alt="" />
-<h3>Lo que funcionó</h3>
-<ul>
-<li>El misregistration de print real se ve perfectamente —esa silueta naranja detrás del &quot;M&quot; y &quot;HTML&quot;—</li>
-<li>El vintage Macintosh rotado arriba-izquierda</li>
-<li>La brush stroke del strikethrough tiene textura real, no es una línea perfecta</li>
-<li>El code strip vertical con <code>&lt;div&gt; &lt;/section&gt; &lt;article&gt;</code> rotado 90°</li>
-<li>El &quot;← future&quot; handwritten en terracotta</li>
-<li>El &quot;1.&quot; circled como editor's mark</li>
-<li>Los ink splatters scattered</li>
-<li>El paper grain visible</li>
-</ul>
-<h3>Lo que aprendí</h3>
-<p>No descartes outputs imperfectos. Itera sobre ellos. El segundo prompt no inventa la composición desde cero —respeta lo que ya estaba bien y agrega solo lo que faltaba—. Es como dirigir a un fotógrafo: &quot;esa toma estuvo bien, ahora hazla con menos luz&quot;.</p>
-<p>Esto solo funciona porque Nano Banana 2 puede ver el output anterior y editarlo, no regenerarlo. Es una capacidad única que la mayoría de generadores de imagen no tienen tan bien resuelta.</p>
-<h2>Prompt 3 — Selfie convertida en retrato editorial</h2>
-<p><strong>Objetivo:</strong> tomar una selfie y convertirla en una imagen que se vea como cover de revista —sin alterar la cara—.</p>
-<p><strong>Superpower que demuestra:</strong> mantener identidad facial al editar fotos.</p>
-<h3>El prompt completo</h3>
-<pre><code>Editorial magazine portrait, &quot;Developer Issue&quot; October
-2026 cover style. Transform this photo into a cinematic
-editorial portrait.
-
-SETTING:
-Place the person in a sun-drenched home developer studio.
-Key elements visible in the scene:
-- Warm wooden floors with visible grain
-- An olive-green accent wall behind them
-- A floating wooden shelf with dried flowers in a glass
-  vase and one small framed art print
-- A vintage wooden desk with an open MacBook (slightly
-  out of focus in foreground or mid-ground)
-- A ceramic mug
-- Natural late-afternoon golden hour light streaming
-  through an unseen window from camera-left
-
-COMPOSITION:
-- The person should be the clear focal point, slightly
-  off-center (not centered).
-- Medium portrait crop — head and upper torso visible.
-- Shallow depth of field, background slightly soft but
-  recognizable.
-- Vertical 4:5 ratio.
-
-COLOR GRADE:
-- Warm highlights with golden hour tone on skin and wood
-- Slightly desaturated shadows (not blue, just muted)
-- Terracotta and cream palette overall
-- Subtle film grain throughout
-- Slight teal-and-orange balance, very gentle
-
-MOOD:
-- Contemplative, &quot;build in public&quot; energy
-- Editorial magazine, NOT corporate headshot
-- Kinfolk magazine meets Wired profile aesthetic
-- Imperfect by design, photographic, NOT AI-perfect
-
-CRITICAL CONSTRAINTS:
-- Keep the person's face, identity, skin tone, hair,
-  beard, glasses (if any), and clothing EXACTLY as they
-  are in the source photo.
-- Do NOT alter their facial features.
-- Do NOT make them more attractive or &quot;AI-enhanced&quot;.
-- Do NOT change their ethnicity or skin tone.
-- Do NOT change their clothing.
-- Only modify the background, lighting, and color grade.
-
-This should look like a real photographer took it in
-the person's actual studio, not a CGI render.</code></pre>
-<h3>El resultado</h3>
-<img src="https://cdn.sanity.io/images/nnt7ytcd/production/e269b43cf6c9f44d3cfe0e17613886b53a967a90-2160x2700.png" alt="" />
-<h3>Lo que funcionó</h3>
-<ul>
-<li>La pared olive-green exacta, sin glitches</li>
-<li>El floating shelf de madera con lavender y eucalipto</li>
-<li>El vintage wooden desk con drawer y MacBook con código visible</li>
-<li>El golden hour real en la cara y el hombro (no luz dorada plástica)</li>
-<li>Mi cara intacta: lentes, sonrisa, rasgos, tono de piel, todo igual</li>
-<li>Tattoo del brazo preservado</li>
-<li>Apple Watch preservado</li>
-<li>Color grade warm + film grain editorial</li>
-</ul>
-<h3>Lo que aprendí</h3>
-<p>El bloque &quot;CRITICAL CONSTRAINTS&quot; al final del prompt es lo que evita que el modelo &quot;mejore&quot; tu cara —cosa que casi todos los generadores de imagen hacen por defecto—. Sin esas reglas explícitas, el modelo te haría más simétrico, te quitaría imperfecciones, te haría más AI-perfect.</p>
-<p>Regla: si estás editando fotos de personas reales, escribe las restricciones como si estuvieras hablando con un photo editor obsesivo. Cualquier cosa que no prohibas explícitamente, el modelo lo puede cambiar.</p>
-<h2>Las 3 lecciones que me llevo</h2>
-<p>Después de los 3 prompts, estos son los principios que aplicarían a cualquier prompt nuevo:</p>
-<h3>1. Conversación, no keywords</h3>
-<p>Gemini responde mejor a prompts largos y descriptivos que a strings tipo Midjourney. Olvídate del <code>8k, ultra-realistic, trending on artstation</code>. Describe la escena como se la describirías a un fotógrafo en un set.</p>
-<p>Mal: <code>developer workspace, cinematic, professional, 8k</code></p>
-<p>Bien: <code>Photograph of a minimalist developer workspace shot on 35mm film, vintage wooden desk by a window with golden hour light</code></p>
-<h3>2. Especifica el mood, no el estilo</h3>
-<p>&quot;Editorial zine, imperfecto, golden hour&quot; produce mejores resultados que &quot;professional photo, ultra-realistic, masterpiece&quot;. El primero le dice al modelo qué sentimiento debe transmitir; el segundo le dice qué adjetivos usar.</p>
-<p>Mal: <code>beautiful, stunning, masterpiece, award-winning</code></p>
-<p>Bien: <code>contemplative, build in public energy, Kinfolk magazine aesthetic</code></p>
-<h3>3. Itera con instrucciones, no con prompts nuevos</h3>
-<p>Si el primer output no te convence, no empieces de cero. Pídele al modelo que modifique lo que ya tiene: &quot;más texturizado, menos AI-perfect, agrega ink bleed, más asimetría&quot;. Vas a llegar mucho más rápido al resultado que quieres.</p>
-<h2>Lo que no funcionó (gotchas)</h2>
-<p>No todo fue perfecto:</p>
-<ul>
-<li>El primer intento del Prompt 2 salió completamente plain. Tuve que iterar 2 veces para llegar a algo decente.</li>
-<li>En el Prompt 1, el código en la pantalla del MacBook tiene typography &quot;AI&quot; (no es código real de un lenguaje específico). Si esto importa para tu use case, vas a tener que componer la imagen final con un mockup separado.</li>
-<li>Nano Banana 2 sigue luchando con texto largo dentro de las imágenes. Cualquier oración de más de 5 palabras dentro del frame puede salir warpeada o con typos. Si necesitas texto preciso, agrégalo después en Figma o Photoshop.</li>
-</ul>
-<h2>Cuándo (no) usar Nano Banana 2</h2>
-<p>Después de este experimento, mi take honesto:</p>
-<p><strong>Sí lo usaría para:</strong></p>
-<ul>
-<li>Hero images de blog posts</li>
-<li>Covers de Instagram donde necesito flexibilidad rápida</li>
-<li>Mockups iniciales de campañas</li>
-<li>Prototipos visuales de productos antes de la sesión fotográfica real</li>
-<li>Editar fotos personales con cambios de contexto (background, lighting)</li>
-</ul>
-<p><strong>No lo usaría para:</strong></p>
-<ul>
-<li>Producto final de campañas con presupuesto (sigue siendo AI, va a tener artifacts)</li>
-<li>Cualquier cosa que requiera texto preciso dentro de la imagen</li>
-<li>Imágenes que necesitan ser pixel-perfect a una guía de marca específica</li>
-<li>Reemplazar a un fotógrafo real cuando el tiempo y el budget lo permiten</li>
-</ul>
-<h2>Cierre</h2>
-<p>El mejor &quot;prompt engineering&quot; no es saber palabras mágicas. Es saber qué quieres ver, describirlo con la precisión de un director, y darle al modelo las restricciones para que no te sorprenda donde no quieres.</p>
-<p>Si tienes 25 minutos esta semana, replica el experimento con tus propios prompts. Los 3 que están arriba son un buen punto de partida —cópialos, modifícalos, comparte qué te salió—.</p>
-<p>¿Probaste alguno de los 3 prompts? Comparte el resultado en mis comentarios de Instagram <a href="https://instagram.com/codewithgabo">@codewithgabo</a> o en X <a href="https://x.com/Gabbs279">@Gabbs279</a>.</p>]]></content:encoded>
     </item>
   </channel>
 </rss>

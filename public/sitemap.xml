@@ -2,55 +2,55 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://codewithgabo.com/</loc>
-    <lastmod>2026-09-15</lastmod>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://codewithgabo.com/about</loc>
-    <lastmod>2026-09-15</lastmod>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://codewithgabo.com/allpost</loc>
-    <lastmod>2026-09-15</lastmod>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://codewithgabo.com/gabriel-abreu</loc>
-    <lastmod>2026-09-15</lastmod>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://codewithgabo.com/repositorios</loc>
-    <lastmod>2026-09-15</lastmod>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://codewithgabo.com/services</loc>
-    <lastmod>2026-09-15</lastmod>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://codewithgabo.com/education</loc>
-    <lastmod>2026-09-15</lastmod>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://codewithgabo.com/privacy</loc>
-    <lastmod>2026-09-15</lastmod>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://codewithgabo.com/terms</loc>
-    <lastmod>2026-09-15</lastmod>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -63,6 +63,12 @@
   <url>
     <loc>https://codewithgabo.com/auditoria-portfolio-20-problemas</loc>
     <lastmod>2026-08-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://codewithgabo.com/la-proxima-filtracion-llego-en-cuatro-dias</loc>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -195,6 +201,12 @@
   <url>
     <loc>https://codewithgabo.com/commons-http-errors</loc>
     <lastmod>2023-03-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://codewithgabo.com/the-next-leak-claim-took-four-days</loc>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
