@@ -36,20 +36,20 @@ if (!KEY) throw new Error('No DEVTO_API_KEY in .env');
 // dev.to allows at most 4 tags, lowercase alphanumeric only.
 const POSTS = [
   {
-    slug: 'the-claro-claim-what-is-known-and-what-is-not',
-    draft: 'docs/drafts/the-claro-claim-what-is-known-and-what-is-not.md',
-    title: 'The Claro Claim: What Is Known, What Is Not, and What to Do Anyway',
-    tags: 'security, privacy, webdev',
+    slug: 'the-next-leak-claim-took-four-days',
+    draft: 'docs/drafts/the-next-leak-claim-took-four-days.md',
+    title: 'The Next Leak Claim Took Four Days: Reading the Police One',
+    tags: 'security, privacy, webdev, cybersecurity',
     cover:
-      'https://cdn.sanity.io/images/nnt7ytcd/production/45662a9b45903ab761b272d74cd3553f7446a4db-1200x630.png',
+      'https://cdn.sanity.io/images/nnt7ytcd/production/f719f08af73309cf1b8e7c1afeebc08aef994fe1-1200x630.png',
   },
   {
-    slug: 'lo-de-claro-que-se-sabe-y-que-no',
-    draft: 'docs/drafts/lo-de-claro-que-se-sabe-y-que-no.md',
-    title: 'Lo de Claro: qué se sabe, qué no, y qué hacer igual',
-    tags: 'security, privacy, webdev',
+    slug: 'la-proxima-filtracion-llego-en-cuatro-dias',
+    draft: 'docs/drafts/la-proxima-filtracion-llego-en-cuatro-dias.md',
+    title: 'La próxima filtración llegó en cuatro días: cómo leer lo de la Policía',
+    tags: 'security, privacy, webdev, cybersecurity',
     cover:
-      'https://cdn.sanity.io/images/nnt7ytcd/production/311b7eb4bd22f31e1dd307ee79bf3ace4649fba5-1200x630.png',
+      'https://cdn.sanity.io/images/nnt7ytcd/production/d1734d194793f221a174e5f64c02abc936b012ac-1200x630.png',
   },
 ];
 
