@@ -101,11 +101,22 @@ for (const p of POSTS) {
       headers,
       body: JSON.stringify({ article: { body_markdown: markdown } }),
     });
-    out = await res.json();
-    if (res.ok) break;
-    if (res.status === 429 && attempt < 4) {
+    // Leer como texto y parsear después. dev.to contesta JSON cuando la API
+    // responde, pero cuando responde lo que tiene delante — un límite de
+    // peticiones o un 5xx servido como página HTML — `res.json()` revienta con
+    // "Unexpected token '<'" y tumba la corrida a mitad, con un post arriba y
+    // el otro no. Pasó con el segundo post de un par, a 35 s del primero.
+    const raw = await res.text();
+    try {
+      out = JSON.parse(raw);
+    } catch {
+      out = { error: `respuesta no-JSON (${raw.slice(0, 60).replace(/\s+/g, ' ')}…)` };
+    }
+    if (res.ok && out.url) break;
+    const reintentable = res.status === 429 || res.status >= 500 || !out.url;
+    if (reintentable && attempt < 4) {
       const wait = 35_000 * attempt;
-      console.log(`[wait] ${p.slug} — rate limited, retrying in ${wait / 1000}s`);
+      console.log(`[wait] ${p.slug} — HTTP ${res.status}, retrying in ${wait / 1000}s`);
       await new Promise((r) => setTimeout(r, wait));
       continue;
     }
