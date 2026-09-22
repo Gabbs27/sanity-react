@@ -9,6 +9,7 @@
     "editor-propio-vs-sanity-studio",
     "el-email-que-envias-no-es-el-que-leen",
     "el-punto-ciego-de-la-auditoria",
+    "generar-el-xml-no-es-facturar",
     "la-proxima-filtracion-llego-en-cuatro-dias",
     "lo-de-claro-que-se-sabe-y-que-no",
     "react-19-3-el-compilador-y-un-cvss-10",
@@ -54,6 +55,10 @@
     {
       "es": "la-proxima-filtracion-llego-en-cuatro-dias",
       "en": "the-next-leak-claim-took-four-days"
+    },
+    {
+      "es": "generar-el-xml-no-es-facturar",
+      "en": "generating-the-xml-is-not-invoicing"
     }
   ]
 }

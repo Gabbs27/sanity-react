@@ -9,6 +9,136 @@
     <language>es</language>
     <atom:link href="https://codewithgabo.com/rss.xml" rel="self" type="application/rss+xml" />
     <item>
+      <title><![CDATA[Generating the XML isn't invoicing: what I learned building a Dominican e-invoice issuer]]></title>
+      <link>https://codewithgabo.com/generating-the-xml-is-not-invoicing</link>
+      <guid isPermaLink="true">https://codewithgabo.com/generating-the-xml-is-not-invoicing</guid>
+      <pubDate>Tue, 22 Sep 2026 00:19:12 GMT</pubDate>
+      <description><![CDATA[Dominican businesses have until November to issue electronic fiscal receipts. I built an issuer: an official schema that breaks over one space, three misspelled URIs in the signing example, and why issuing means receiving.]]></description>
+      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/82cd7e8d875be907c94bbea9ab7b513e09952568-1200x630.png" alt="Generating the XML isn't invoicing: what I learned building a Dominican e-invoice issuer" />
+<p>On Saturday, September 12, I built an issuer of electronic fiscal receipts, the e-CF that the Dominican tax authority, the DGII, requires. It builds the invoice XML, signs it with the business's digital certificate, validates it against the official schema and prints the invoice with its QR code. It is in my portfolio, with <a href="https://invoice-generator-orpin-nine.vercel.app">a demo</a> anyone can try.</p>
+<p>Its first screen says, in Spanish, that using it does not make you an <em>emisor electrónico</em>, an authorised electronic issuer.</p>
+<p>That sentence is not modesty. It is the most important thing I learned building it, and it is exactly what gets confused now that the deadlines are close: <strong>generating the XML is not invoicing.</strong></p>
+<p>These are the deadlines:</p>
+<ul>
+<li><strong>Large local and medium taxpayers:</strong> from <strong>November 1</strong> they can only issue e-CF. Their non-electronic &quot;B&quot; sequences are valid until October 31.</li>
+<li><strong>Small, micro and unclassified taxpayers:</strong> the deadline to implement falls on <strong>November 15</strong>.</li>
+</ul>
+<h2>What the law and the regulation say</h2>
+<p>Law 32-23 gave each group a deadline counted from May 2023: 12 months for large national taxpayers, 24 for large local and medium ones, and 36 for everyone else. This is how it has played out:</p>
+<ul>
+<li><strong>Large national taxpayers:</strong> their deadline was May 15, 2024. Their B receipts were declared expired on December 31, 2025.</li>
+<li><strong>Large local and medium taxpayers:</strong> deadline May 15, 2025, extended six months for those who had already applied to become issuers. Only e-CF from November 1, 2026.</li>
+<li><strong>Small, micro and unclassified:</strong> deadline May 15, 2026, extended six months automatically, to November 15.</li>
+</ul>
+<p>Before betting on another extension, it is worth reading two articles of the law's regulation, Decree 587-24. Article 8 says the extension is a one-time measure and cannot exceed six months. The small taxpayers already got theirs, and it was exactly six months. Article 55 says that for anyone who does not implement in time, the DGII treats their receipts as expired.</p>
+<p>The two earlier groups were later given a date to stop using the B series. The small ones have not been given one yet, and that buys no extra time: November 15 is the date to be <strong>authorised as an electronic issuer</strong>. According to the extension notice, anyone who has not implemented faces the penalties in article 27 of the law, which points to the Tax Code: fines of 5 to 30 minimum wages for breaching formal duties.</p>
+<h2>What I built, and what it does not do</h2>
+<p>My issuer does the part people picture when they think of e-invoicing. It builds the XML for the tax credit invoice (type 31) and the consumer invoice (type 32), signs it, validates it and stores it. Each receipt carries a 13-character e-NCF: an <code>E</code>, two digits for the type and ten for the sequence, as in <code>E310000000001</code>.</p>
+<p>Generating, signing, validating and printing took me a Saturday, with Claude Code alongside.</p>
+<p>What it does not do is send anything to the DGII, and that changes everything. Question 1.4.12 of the DGII's own FAQ says it bluntly: if the tax authority never receives the e-CF, it <strong>has no tax validity</strong>, and the buyer cannot claim the tax credit.</p>
+<p>In other words, a PDF with its QR code, signed and validated, that the DGII never received is useless to your customer's tax credit. That is why the warning is on the first screen and not buried in the README.</p>
+<h2>What I learned building the easy part</h2>
+<p>The &quot;easy&quot; part has traps of its own, and no tutorial mentions them.</p>
+<p><strong>One space breaks the schema for the tax credit invoice.</strong> An e-CF is validated against XSD schemas the DGII publishes. The one for type 31, the invoice businesses use with each other, defines one of its types like this:</p>
+<pre><code>&lt;xs:simpleType name=&quot; IndicadorServicioTodoIncluidoType&quot;&gt;</code></pre>
+<p>Look at the space before <code>Indicador</code>. The rest of the file looks the type up by its name, without the space. The validator that ships with Java trims the space and carries on. libxml2 does not. It is the engine behind <code>xmllint</code>, <code>lxml</code> in Python, <code>DOMDocument</code> in PHP and the Node package my issuer uses, and it refuses to load the schema:</p>
+<pre><code>The QName value 'IndicadorServicioTodoIncluidoType' does not resolve to a(n) type definition.
+WXS schema e-CF 31 v.1.0.xsd failed to compile</code></pre>
+<p>The schemas for types 32, 33, 34, 44 and 45 define the same type without the space. I checked again today against what the DGII publishes, and the file is unchanged.</p>
+<p>And a confession: I was slow to see it. What I wrote in the repo is that the schema used a type it never defined. It did define it, with one space too many, and my text search could not find it because of that same space.</p>
+<p><strong>The official signing example has three misspelled URIs.</strong> The DGII publishes a document, <em>Firmado de e-CF</em>, with examples of how to sign. The XML that shows the structure of the signature has these three, with what they should say next to them:</p>
+<pre><code>http://www.w3.org/TR/2001/RECxml-c14n-20010315          → REC-xml-c14n
+http://www.w3.org/2001/04/xmldsigmore#rsa-sha256        → xmldsig-more
+http://www.w3.org/2000/09/xmldsig#envelope d-signature  → enveloped-signature</code></pre>
+<p>The TypeScript example in the same document spells them correctly. But if you build your signature by copying that XML, it fails: I tried it with <code>xml-crypto</code>, and it answers that the canonicalisation algorithm <em>&quot;is not supported&quot;</em>. A bad signature is not a cheap mistake, either. According to question 1.4.18, if the DGII rejects an e-CF over its signature, that e-NCF can never be used again.</p>
+<p><strong>The portal answers a script with a 403.</strong> The schemas are downloaded from the DGII's portal. With <code>curl</code>, the answer is 403; with a browser's User-Agent, 200. I tried it again today. For a while I assumed the DGII blocked automated downloads, and I wrote that into the project plan. It does not block them: it filters by User-Agent. That matters because the schemas have to be checked before every release. The ones for debit and credit notes changed on April 1, 2026, almost six months after the rest.</p>
+<p><strong>The real risk is not the XML, it is the sequence.</strong> Two receipts cannot share a number, and you cannot go past the range the DGII authorised. In my issuer, each invoice is saved to a file named after its e-NCF, written like this:</p>
+<pre><code>writeFileSync(`datos/facturas/${encf}.xml`, xml, { flag: 'wx' });</code></pre>
+<p>With <code>wx</code>, the write fails if the file already exists. It does the job of a unique index in a database: a duplicate blows up instead of slipping through quietly. And the next number is worked out by reading what was already issued, not from a counter that can be wrong.</p>
+<h2>Issuing means receiving</h2>
+<p>This was the big surprise, and it is the underlying reason my issuer does not get you compliant.</p>
+<p>You think of e-invoicing as something that goes out: your system signs and sends. But article 18 of the regulation says that <strong>every electronic issuer is also an electronic receiver</strong>. Your suppliers who already issue e-CF will send theirs to you, and your system has to receive them, acknowledge receipt, and approve or reject them.</p>
+<p>That is why, to certify your own system, the DGII asks for three web service addresses. One to <strong>receive</strong> the e-CF issued to you. Another to receive the <strong>commercial approvals</strong> of what you issue. And one for <strong>authentication</strong>, where a &quot;seed&quot; file is signed with the digital certificate and a token comes back. Then come the data, simulation and communication tests.</p>
+<p>My issuer only listens on <code>127.0.0.1</code>, meaning the computer it runs on. I did that on purpose, so the business's digital certificate never leaves that machine. To be certified, it would have to open three doors to the internet. That is the real tension, and a well-formed XML does not resolve it.</p>
+<h2>If you run a business: three paths and one question</h2>
+<p>The DGII recognises three ways to issue: your own system, a certified e-invoicing service provider, or its free invoicing tool, the <em>Facturador Gratuito</em>.</p>
+<ul>
+<li><strong>The Facturador Gratuito</strong> costs nothing and does not require certification. It is meant for low volume: the DGII talks about roughly 150 invoices a month. You still need a tax ID, authorisation to issue receipts, access to the DGII's online office and a digital certificate for tax procedures. That certificate goes in your name or your representative's, not your accountant's.</li>
+<li><strong>A certified provider</strong> has to offer you, by regulation, the whole package: issuing and receiving, acknowledgements of receipt, commercial approvals and storage of your receipts.</li>
+<li><strong>Building your own</strong> is the path with the three addresses and the tests above. With 55 days left, I would not start it today without a technical team behind it.</li>
+</ul>
+<p>If you go with a provider, there is one question worth more than the demo: <strong>who holds my certificate?</strong> Article 22 of the regulation allows two models. In one, signing happens on your infrastructure and the certificate stays with you. In the other, the provider sells its software as a service and <strong>keeps your certificate on its own infrastructure</strong>. For that it needs an interconnection with a certification entity authorised by INDOTEL, the Dominican telecom regulator, or an INDOTEL licence to sign on behalf of others. That certificate signs receipts in your name before the DGII. Ask which of the two models you are in, and get it in writing.</p>
+<h2>If you are a developer</h2>
+<p>If someone asks you to &quot;do the e-invoicing&quot;, ask which part first. Generating, signing and validating the XML took me a Saturday. Receiving, approving, authenticating, passing certification and keeping up every time the DGII changes a schema is a product.</p>
+<p>My issuer still says on its first screen that it does not make you an electronic issuer. Having built it, that is the sentence I am most sure of.</p>
+<p><strong>Sources (in Spanish):</strong> <a href="https://dgii.gov.do/publicacionesOficiales/avisosInformativos/Documents/2026/14-26.pdf">Notice 14-26, e-CF only</a> · <a href="https://dgii.gov.do/publicacionesOficiales/avisosInformativos/Documents/2026/06-26.pdf">Notice 06-26, extension for small, micro and unclassified taxpayers</a> · <a href="https://dgii.gov.do/publicacionesOficiales/avisosInformativos/Documents/2025/12-25.pdf">Notice 12-25</a> · <a href="https://dgii.gov.do/publicacionesOficiales/avisosInformativos/Documents/2025/25-25.pdf">Notice 25-25</a> · <a href="https://dgii.gov.do/legislacion/leyesTributarias/Documents/Otras%20Leyes%20de%20Inter%C3%A9s/32-23.pdf">Law 32-23</a> · <a href="https://dgii.gov.do/legislacion/decretos/Documents/2024/Decreto587-24.pdf">Decree 587-24</a> · <a href="https://dgii.gov.do/cicloContribuyente/facturacion/comprobantesFiscalesElectronicosE-CF/Preguntas%20frecuentes/Generales/Preguntas%20Frecuentes%20e-CF%20Generales.pdf">e-CF FAQ</a> · <a href="https://dgii.gov.do/cicloContribuyente/facturacion/comprobantesFiscalesElectronicosE-CF/Preguntas%20frecuentes/Generales/Preguntas-Frecuentes-Facturador-Gratuito.pdf">Facturador Gratuito FAQ</a> · <a href="https://dgii.gov.do/cicloContribuyente/facturacion/comprobantesFiscalesElectronicosE-CF/Paginas/documentacionSobreE-CF.aspx">Technical documentation and XSD schemas</a> · <a href="https://github.com/Gabbs27/invoice-generator">The issuer's code</a></p>]]></content:encoded>
+    </item>
+    <item>
+      <title><![CDATA[Generar el XML no es facturar: lo que aprendí construyendo un emisor de e-CF]]></title>
+      <link>https://codewithgabo.com/generar-el-xml-no-es-facturar</link>
+      <guid isPermaLink="true">https://codewithgabo.com/generar-el-xml-no-es-facturar</guid>
+      <pubDate>Tue, 22 Sep 2026 00:19:09 GMT</pubDate>
+      <description><![CDATA[El 1 de noviembre los grandes locales y medianos se quedan sin comprobantes B, y el 15 vence el plazo de los pequeños. Construí un emisor de e-CF: un esquema oficial que no compila por un espacio, tres URIs mal escritas y por qué emitir obliga a recibir.]]></description>
+      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/537bbbcec508947e7503ce73cc081574fb1703f8-1200x630.png" alt="Generar el XML no es facturar: lo que aprendí construyendo un emisor de e-CF" />
+<p>El sábado 12 de septiembre construí un emisor de comprobantes fiscales electrónicos, los e-CF de la DGII. Arma el XML de la factura, lo firma con el certificado digital del negocio, lo valida contra el esquema oficial y te imprime la representación con su código QR. Está en mi portafolio, con <a href="https://invoice-generator-orpin-nine.vercel.app">una demo</a> que cualquiera puede probar.</p>
+<p>En su primera pantalla dice, con estas palabras: <em>&quot;usar esta herramienta no te hace emisor electrónico&quot;</em>.</p>
+<p>Esa frase no es modestia. Es lo más importante que aprendí construyéndolo, y es lo que más se confunde ahora que las fechas están encima: <strong>generar el XML no es facturar.</strong></p>
+<p>Las fechas son estas:</p>
+<ul>
+<li><strong>Grandes locales y medianos:</strong> desde el <strong>1 de noviembre</strong> solo pueden emitir e-CF. Sus secuencias B valen hasta el 31 de octubre.</li>
+<li><strong>Pequeños, micro y no clasificados:</strong> el plazo para implementar vence el <strong>15 de noviembre</strong>.</li>
+</ul>
+<h2>Lo que dicen la ley y el reglamento</h2>
+<p>La Ley 32-23 le dio a cada grupo un plazo contado desde mayo de 2023: 12 meses a los grandes contribuyentes nacionales, 24 a los grandes locales y medianos, y 36 al resto. Así se ha ido cumpliendo:</p>
+<ul>
+<li><strong>Grandes nacionales:</strong> su plazo venció el 15 de mayo de 2024. Sus comprobantes B se dieron por vencidos el 31 de diciembre de 2025.</li>
+<li><strong>Grandes locales y medianos:</strong> plazo el 15 de mayo de 2025, prorrogado seis meses para quien ya había solicitado ser emisor. Solo e-CF desde el 1 de noviembre de 2026.</li>
+<li><strong>Pequeños, micro y no clasificados:</strong> plazo el 15 de mayo de 2026, prorrogado seis meses de forma automática, hasta el 15 de noviembre.</li>
+</ul>
+<p>Antes de apostar a otra prórroga, conviene leer dos artículos del reglamento de la ley, el Decreto 587-24. El artículo 8 dice que la prórroga es &quot;de carácter único&quot; y que no puede pasar de seis meses. La de los pequeños ya se dio, y fue de seis meses exactos. El artículo 55 dice que a quien no implemente a tiempo, la DGII le considera vencidos sus comprobantes.</p>
+<p>A los dos grupos anteriores, la DGII les anunció después una fecha para dejar la serie B. A los pequeños todavía no se la ha anunciado, y eso no te da tiempo extra: el 15 de noviembre es la fecha para estar <strong>autorizado como emisor electrónico</strong>. Según el aviso de la prórroga, quien no haya implementado queda expuesto a las sanciones del artículo 27 de la ley, que remite al Código Tributario: multas de 5 a 30 salarios mínimos por incumplir deberes formales.</p>
+<h2>Lo que construí, y lo que no hace</h2>
+<p>Mi emisor hace la parte que uno imagina cuando piensa en factura electrónica. Arma el XML de la factura de crédito fiscal (tipo 31) y de la factura de consumo (tipo 32), lo firma, lo valida y lo guarda. Cada comprobante lleva un e-NCF de 13 caracteres: una <code>E</code>, dos dígitos de tipo y diez de secuencia, como <code>E310000000001</code>.</p>
+<p>La parte de generar, firmar, validar e imprimir me tomó un sábado, con Claude Code al lado.</p>
+<p>Lo que no hace es enviarlo a la DGII, y eso lo cambia todo. La pregunta 1.4.12 de las preguntas frecuentes de la propia DGII lo dice sin rodeos: si Impuestos Internos no recibe el e-CF, este <strong>carece de validez tributaria</strong>, y el receptor no puede usar el crédito fiscal.</p>
+<p>O sea, un PDF con su QR, firmado y validado, que la DGII nunca recibió, no le sirve a tu cliente para su crédito fiscal. Por eso la advertencia va en la primera pantalla y no escondida en el README.</p>
+<h2>Lo que aprendí armando la parte fácil</h2>
+<p>La parte &quot;fácil&quot; también tiene trampas que no salen en ningún tutorial.</p>
+<p><strong>Un espacio rompe el esquema de la factura de crédito fiscal.</strong> Para validar un e-CF se usan los esquemas XSD que publica la DGII. El del tipo 31, la factura que se usa entre empresas, define uno de sus tipos así:</p>
+<pre><code>&lt;xs:simpleType name=&quot; IndicadorServicioTodoIncluidoType&quot;&gt;</code></pre>
+<p>Fíjate en el espacio antes de <code>Indicador</code>. El resto del archivo busca ese tipo por su nombre, sin el espacio. El validador que trae Java recorta el espacio y sigue como si nada. libxml2 no lo hace. Es el motor de <code>xmllint</code>, de <code>lxml</code> en Python, de <code>DOMDocument</code> en PHP y del paquete de Node que usa mi emisor, y se niega a cargar el esquema:</p>
+<pre><code>The QName value 'IndicadorServicioTodoIncluidoType' does not resolve to a(n) type definition.
+WXS schema e-CF 31 v.1.0.xsd failed to compile</code></pre>
+<p>Los esquemas de los tipos 32, 33, 34, 44 y 45 definen el mismo tipo sin el espacio. Hoy lo volví a comprobar contra lo que publica la DGII, y el archivo sigue igual.</p>
+<p>Y confieso algo: yo tardé en verlo. En el repo dejé escrito que el esquema usaba un tipo que nunca definía. Sí lo definía, con un espacio de más, y mi búsqueda de texto no lo encontraba por ese mismo espacio.</p>
+<p><strong>El ejemplo oficial de la firma trae tres URIs mal escritas.</strong> La DGII publica un documento, <em>Firmado de e-CF</em>, con ejemplos de cómo firmar. El XML que muestra la estructura de la firma trae estas tres, con lo que deberían decir al lado:</p>
+<pre><code>http://www.w3.org/TR/2001/RECxml-c14n-20010315          → REC-xml-c14n
+http://www.w3.org/2001/04/xmldsigmore#rsa-sha256        → xmldsig-more
+http://www.w3.org/2000/09/xmldsig#envelope d-signature  → enveloped-signature</code></pre>
+<p>El ejemplo en TypeScript del mismo documento las escribe bien. Pero si armas tu firma copiando ese XML, no pasa: lo probé con <code>xml-crypto</code>, y contesta que ese algoritmo de canonicalización <em>&quot;is not supported&quot;</em>. Además, una firma inválida no es un error barato. Según la pregunta 1.4.18, si la DGII rechaza un e-CF por la firma, ese e-NCF no se puede volver a usar.</p>
+<p><strong>El portal le contesta 403 a un script.</strong> Los esquemas se bajan del portal de la DGII. Con <code>curl</code>, la respuesta es 403; con el User-Agent de un navegador, 200. Lo volví a probar hoy. Durante un rato di por hecho que la DGII bloqueaba las descargas automáticas, y lo escribí en el plan del proyecto. No las bloquea: filtra por User-Agent. Eso importa porque los esquemas hay que revisarlos antes de cada versión. Los de las notas de débito y de crédito cambiaron el 1 de abril de 2026, casi seis meses después que los demás.</p>
+<p><strong>El riesgo de verdad no es el XML, es la secuencia.</strong> Dos comprobantes no pueden llevar el mismo número, y no te puedes pasar del rango que te autorizó la DGII. En mi emisor, cada factura se guarda en un archivo que lleva su e-NCF como nombre, y se escribe así:</p>
+<pre><code>writeFileSync(`datos/facturas/${encf}.xml`, xml, { flag: 'wx' });</code></pre>
+<p>Con <code>wx</code>, la escritura falla si el archivo ya existe. Cumple el mismo papel que un índice único en una base de datos: un duplicado explota en vez de pasar callado. Y el número siguiente se calcula leyendo lo que ya se emitió, no con un contador que se pueda equivocar.</p>
+<h2>Emitir te obliga a recibir</h2>
+<p>Esta fue la sorpresa grande, y es la razón de fondo por la que mi emisor no te pone al día.</p>
+<p>Uno piensa en la factura electrónica como algo que sale: tu sistema firma y manda. Pero el artículo 18 del reglamento dice que <strong>todo emisor electrónico será también receptor electrónico</strong>. Tus proveedores que ya emiten e-CF te los van a mandar a ti, y tu sistema tiene que recibirlos, acusar recibo y aprobarlos o rechazarlos.</p>
+<p>Por eso, para certificarte con un sistema propio, la DGII te pide tres direcciones de servicios web. Una para <strong>recibir</strong> los e-CF que te emitan. Otra para recibir las <strong>aprobaciones comerciales</strong> de lo que tú emites. Y una de <strong>autenticación</strong>, donde se firma un archivo &quot;semilla&quot; con el certificado digital y se devuelve un token. Después vienen las pruebas de datos, de simulación y de comunicación.</p>
+<p>Mi emisor solo escucha en <code>127.0.0.1</code>, es decir, en la computadora donde corre. Lo hice así a propósito, para que el certificado digital del negocio nunca salga de esa máquina. Para certificarse, tendría que abrirle tres puertas a internet. Esa es la tensión real, y no se resuelve con un XML bien hecho.</p>
+<h2>Si tienes un negocio: tres caminos y una pregunta</h2>
+<p>La DGII reconoce tres vías para emitir: un sistema de desarrollo propio, un proveedor de servicios de facturación electrónica certificado, o su Facturador Gratuito.</p>
+<ul>
+<li><strong>El Facturador Gratuito</strong> no cuesta nada y no te obliga a pasar la certificación. Está pensado para poco volumen: la DGII habla de unas 150 facturas al mes. Igual necesitas RNC, Alta NCF, acceso a la Oficina Virtual y un certificado digital para procedimientos tributarios. Ese certificado va a tu nombre o al de tu representante, no al del contador.</li>
+<li><strong>Un proveedor certificado</strong> tiene que ofrecerte, por reglamento, el paquete completo: emitir y recibir, los acuses de recibo, las aprobaciones comerciales y el resguardo de tus comprobantes.</li>
+<li><strong>El desarrollo propio</strong> es el camino de las tres direcciones y las pruebas de arriba. Con 55 días por delante, yo no lo empezaría hoy sin un equipo técnico detrás.</li>
+</ul>
+<p>Si vas con un proveedor, hay una pregunta que vale más que la demo: <strong>¿quién guarda mi certificado?</strong> El artículo 22 del reglamento permite dos modelos. En uno, la firma se hace en tu infraestructura y el certificado se queda contigo. En el otro, el proveedor te da su software como servicio y <strong>custodia tu certificado en la suya</strong>. Para eso necesita una interconexión con una entidad de certificación autorizada por el INDOTEL, o un permiso del INDOTEL para firmar en nombre de otros. Ese certificado firma comprobantes a tu nombre ante la DGII. Pregunta en cuál de los dos modelos estás, y pide que te lo pongan por escrito.</p>
+<h2>Si eres dev</h2>
+<p>Si te piden &quot;hacer la factura electrónica&quot;, pregunta primero qué parte. Generar, firmar y validar el XML me tomó un sábado. Recibir, aprobar, autenticar, pasar la certificación y mantenerte al día cada vez que la DGII cambie un esquema ya es un producto.</p>
+<p>Mi emisor sigue diciendo en su primera pantalla que no te hace emisor electrónico. Después de construirlo, es la frase de la que estoy más seguro.</p>
+<p><strong>Fuentes:</strong> <a href="https://dgii.gov.do/publicacionesOficiales/avisosInformativos/Documents/2026/14-26.pdf">Aviso 14-26, emisión exclusiva de e-CF</a> · <a href="https://dgii.gov.do/publicacionesOficiales/avisosInformativos/Documents/2026/06-26.pdf">Aviso 06-26, prórroga de pequeños, micro y no clasificados</a> · <a href="https://dgii.gov.do/publicacionesOficiales/avisosInformativos/Documents/2025/12-25.pdf">Aviso 12-25</a> · <a href="https://dgii.gov.do/publicacionesOficiales/avisosInformativos/Documents/2025/25-25.pdf">Aviso 25-25</a> · <a href="https://dgii.gov.do/legislacion/leyesTributarias/Documents/Otras%20Leyes%20de%20Inter%C3%A9s/32-23.pdf">Ley 32-23</a> · <a href="https://dgii.gov.do/legislacion/decretos/Documents/2024/Decreto587-24.pdf">Decreto 587-24</a> · <a href="https://dgii.gov.do/cicloContribuyente/facturacion/comprobantesFiscalesElectronicosE-CF/Preguntas%20frecuentes/Generales/Preguntas%20Frecuentes%20e-CF%20Generales.pdf">Preguntas frecuentes de e-CF</a> · <a href="https://dgii.gov.do/cicloContribuyente/facturacion/comprobantesFiscalesElectronicosE-CF/Preguntas%20frecuentes/Generales/Preguntas-Frecuentes-Facturador-Gratuito.pdf">Preguntas frecuentes del Facturador Gratuito</a> · <a href="https://dgii.gov.do/cicloContribuyente/facturacion/comprobantesFiscalesElectronicosE-CF/Paginas/documentacionSobreE-CF.aspx">Documentación técnica y esquemas XSD</a> · <a href="https://github.com/Gabbs27/invoice-generator">El código del emisor</a></p>]]></content:encoded>
+    </item>
+    <item>
       <title><![CDATA[The next leak claim took four days: reading the police one]]></title>
       <link>https://codewithgabo.com/the-next-leak-claim-took-four-days</link>
       <guid isPermaLink="true">https://codewithgabo.com/the-next-leak-claim-took-four-days</guid>
@@ -1388,154 +1518,6 @@ after:   useAnalyticsData chunk =   3 KB
 <p>The tasks that used to sit on the list out of inertia now get done, because the cost of starting them dropped enough. The sitemap had been pending for months. The audit for longer. Neither was hard; both were tedious, and tedious is exactly what piled up on me.</p>
 <p>What didn't change: I still decide what gets built, I still review every line that goes in, and I'm still the one responsible when something breaks in production.</p>
 <p>That seems right to me. It's the part of the job I like.</p>]]></content:encoded>
-    </item>
-    <item>
-      <title><![CDATA[Por qué construí mi propio editor de posts en vez de usar Sanity Studio]]></title>
-      <link>https://codewithgabo.com/editor-propio-vs-sanity-studio</link>
-      <guid isPermaLink="true">https://codewithgabo.com/editor-propio-vs-sanity-studio</guid>
-      <pubDate>Thu, 20 Aug 2026 14:10:00 GMT</pubDate>
-      <description><![CDATA[Sanity ya me daba un editor gratis, mantenido y con más funciones que el mío. Construí otro igualmente. Esta es la decisión, el código del conversor, y el precio que pagué por ella.]]></description>
-      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/bf7f30c887b594972cf7d3e77b9fe16ad64c9334-1200x630.png" alt="Por qué construí mi propio editor de posts en vez de usar Sanity Studio" />
-<p>Sanity viene con Studio, un editor de contenido completo, mantenido por gente que sabe más que yo del tema, gratis y ya integrado con mi esquema. Y aun así escribí el mío.</p>
-<p>Esto normalmente es mala señal. La mayoría de las veces que un desarrollador reconstruye algo que ya existía, la respuesta honesta es &quot;porque me dio la gana&quot;. Así que déjame defender la decisión con argumentos, enseñar el código de la parte interesante, y admitir lo que me costó. Al final hay una sección de cuándo <strong>no</strong> deberías hacer esto, que es probablemente la más útil.</p>
-<h2>El problema no era el editor</h2>
-<p>Studio es bueno. El problema nunca fue la calidad del editor.</p>
-<p>El problema era que publicar en mi propio blog requería salir de mi propio sitio. Studio corre aparte, con su propio despliegue, su propia interfaz y su propia sesión. Para escribir un post: abrir otra aplicación, entrar otra vez, escribir en una interfaz que no se parece en nada al sitio donde va a salir el texto, publicar, y volver a mi sitio a comprobar cómo quedó.</p>
-<p>Para un equipo de contenido con varios autores, revisiones y permisos, ese es exactamente el producto correcto. Para <strong>un blog de un solo autor que además es el desarrollador</strong>, es fricción sin contrapartida. Y la fricción en publicar tiene un efecto muy medible: publicas menos.</p>
-<p>Ya tenía sesión de administrador en mi sitio, un panel en <code>/admin</code>, y un backend con permisos de escritura sobre Sanity. Faltaba una pantalla.</p>
-<h2>Qué construí</h2>
-<p>Dos rutas:</p>
-<ul>
-<li><code>/admin/write</code> para un post nuevo</li>
-<li><code>/admin/write/:id</code> para editar uno existente</li>
-</ul>
-<p>Dentro, un editor de bloques con BlockNote, que da la experiencia tipo Notion que quería: menú de barra inclinada, arrastrar bloques, pegar imágenes directamente. Se conecta a mi tema claro/oscuro y a mi sesión de administrador, así que se siente parte del sitio y no un injerto.</p>
-<p>La subida de imágenes va al mismo endpoint que ya tenía, así que pegar una imagen en el editor la sube a Sanity y devuelve el identificador del asset sin que yo salga de la pantalla.</p>
-<p>Nada de esto es difícil. La parte difícil es otra.</p>
-<h2>La pieza interesante: traducir entre dos formatos</h2>
-<p>Aquí está el trabajo real, y es el motivo por el que este post existe.</p>
-<p>BlockNote guarda su contenido en su propio JSON de bloques. Sanity guarda el contenido enriquecido en <strong>Portable Text</strong>, que es un formato distinto con otra filosofía: en vez de HTML anidado, una lista plana de bloques donde el formato inline vive en marcas y los enlaces en definiciones separadas.</p>
-<p>No son compatibles. Hace falta un traductor, y tiene que funcionar en las dos direcciones: al guardar, de BlockNote a Portable Text; al abrir un post existente para editarlo, de Portable Text a BlockNote.</p>
-<p>Ese traductor vive en un archivo, <code>src/utils/blocknoteToPortable.ts</code>, y empieza declarando su propia tabla de equivalencias:</p>
-<pre><code>// Mapping table:
-//   BN paragraph / heading / bulletListItem / numberedListItem  -&gt;  PT block with style/listItem
-//   BN inline content (text + styles bold/italic/code, link)    -&gt;  PT spans with marks
-//   BN image                                                    -&gt;  PT type: image with asset reference</code></pre>
-<p>La conversión de formato inline es la parte que más se piensa. En BlockNote, un fragmento de texto lleva un objeto <code>styles</code> con banderas booleanas. En Portable Text, lleva un array de marcas con nombres:</p>
-<pre><code>if (styles.bold) marks.push('strong');
-if (styles.italic) marks.push('em');
-if (styles.code) marks.push('code');</code></pre>
-<p>Los enlaces son más sutiles, porque Portable Text no guarda la URL en el span. Guarda una definición aparte con una clave, y el span solo lleva esa clave entre sus marcas. Hay que generar la clave, registrar la definición, y luego pegársela a cada hijo del enlace:</p>
-<pre><code>const linkKey = makeKey();
-markDefs.push({ _type: 'link', _key: linkKey, href: node.href });
-const inner = inlineToSpans(node.content || []);
-for (const span of inner.spans) {
-  span.marks = [...(span.marks || []), linkKey];
-  spans.push(span);
-}</code></pre>
-<h2>La lección que me costó datos: nunca pierdas contenido</h2>
-<p>La primera versión hacía lo obvio con los tipos de bloque que no soportaba: ignorarlos.</p>
-<p>Eso significa que si pegabas una tabla, o un archivo incrustado, y guardabas, ese contenido <strong>desaparecía en silencio</strong>. Sin aviso, sin error. Escribías algo, le dabas a guardar, y ya no estaba.</p>
-<p>La versión actual, cuando encuentra un bloque que no sabe traducir, hace el mejor esfuerzo por rescatar el texto plano antes de rendirse:</p>
-<pre><code>// Unsupported block types (table, embed, file, audio, video, etc.) -
-// best-effort extract plain text so content isn't lost on save.
-if (block.type &amp;&amp; !SUPPORTED.has(block.type)) {
-  const fallback = Array.isArray(block.content)
-    ? block.content
-        .map((n) =&gt; (typeof n?.text === 'string' ? n.text : ''))
-        .join('')
-    : '';</code></pre>
-<p>El resultado queda feo: una tabla se convierte en un párrafo de texto corrido. Pero feo y recuperable es infinitamente mejor que limpio y perdido. Puedo arreglar un párrafo feo. No puedo recuperar un texto que se borró sin avisar.</p>
-<p>Hay una defensa parecida en el manejo de contenido inline, con un comentario que documenta por qué existe:</p>
-<pre><code>// Some BlockNote versions return objects we can't iterate (e.g. for table
-// cells, embeds). Skip rather than throw &quot;T is not iterable&quot;.</code></pre>
-<p>Ese comentario es el resumen de una tarde entera. Lo dejé escrito para no repetirla.</p>
-<p><strong>Si escribes un conversor entre dos formatos de contenido, esta es la regla:</strong> cuando no sepas qué hacer con algo, degrada. Nunca descartes. El contenido del usuario, aunque el usuario seas tú, no es tuyo para perderlo.</p>
-<h2>El precio</h2>
-<p>Toca ser honesto con los costes, porque son reales.</p>
-<p>Cuando audité este sitio, uno de los hallazgos fue que <strong>el chunk del `PostEditor` pesa 1,3 MB</strong>. BlockNote más Mantine no son ligeros. Es tanto que dispara el aviso de tamaño de chunk de Vite en cada build.</p>
-<p>El atenuante es que la ruta se carga de forma diferida, así que solo lo paga quien entra a <code>/admin/write</code>, que soy yo. Ningún visitante del blog descarga un solo byte de eso. Por eso quedó como prioridad baja y sigue ahí.</p>
-<p>Pero el coste real no es el megabyte. Es que <strong>ahora ese conversor es mío</strong>. Cuando BlockNote cambie su formato de bloques en una versión mayor, el problema es mío. Cuando aparezca un caso raro de Portable Text que no contemplé, lo arreglo yo. Studio no me habría cobrado nada de eso nunca.</p>
-<p>Escribir el código es la parte barata. Mantenerlo es la factura, y llega en cuotas.</p>
-<h2>Cuándo NO deberías hacer esto</h2>
-<p>Con lo que sé ahora, usa Studio y no mires atrás si te reconoces en algo de esto:</p>
-<ul>
-<li><strong>Hay más de un autor.</strong> En cuanto necesitas permisos, roles o saber quién cambió qué, estás reimplementando un producto entero, no una pantalla.</li>
-<li><strong>Hay revisión editorial.</strong> Borradores, estados, programación de publicaciones, historial de versiones. Studio te da todo eso; tú no lo vas a construir en un fin de semana.</li>
-<li><strong>Tu contenido no es sobre todo texto.</strong> Si tus documentos tienen referencias cruzadas, objetos anidados o campos complejos, los editores de Studio ya resuelven eso y a ti te tocaría inventarlo.</li>
-<li><strong>Quien escribe no eres tú.</strong> Si el editor lo va a usar alguien no técnico, la interfaz pulida y mantenida vale mucho más que la integración con tu tema.</li>
-<li><strong>Tu fricción para publicar no es el problema.</strong> Si publicas de forma constante y el cambio de contexto no te frena, no tienes el problema que esto resuelve. No construyas la solución.</li>
-</ul>
-<p>Mi caso cumplía justo lo contrario: un autor, sin revisión, contenido casi todo texto, y una fricción para publicar que se notaba en la cadencia. Por eso valió la pena.</p>
-<h2>Lo que haría igual</h2>
-<p>Volvería a construirlo. Pero la razón importa: no lo construí porque Studio fuera malo, sino porque mi problema no era el editor, era el cambio de contexto. Y ese, ninguna mejora de Studio me lo iba a quitar.</p>
-<p>Antes de reconstruir algo que ya existe, la pregunta útil no es &quot;¿puedo hacerlo mejor?&quot;. Casi siempre la respuesta es no. La pregunta es <strong>&quot;¿es mi problema el que esta herramienta resuelve?&quot;</strong>. Si no lo es, ninguna cantidad de calidad ajena te va a servir.</p>
-<p>Ahora escribo un post desde el mismo sitio donde se publica, con mi tema, con mi sesión, sin cambiar de aplicación. Ese era el objetivo entero. Todo lo demás fue el precio.</p>]]></content:encoded>
-    </item>
-    <item>
-      <title><![CDATA[Cómo programo con Claude Code: mi flujo real en un proyecto de verdad]]></title>
-      <link>https://codewithgabo.com/como-programo-con-claude-code-flujo-real</link>
-      <guid isPermaLink="true">https://codewithgabo.com/como-programo-con-claude-code-flujo-real</guid>
-      <pubDate>Thu, 20 Aug 2026 14:05:00 GMT</pubDate>
-      <description><![CDATA[No otro tutorial de "escribe un prompt y mira la magia". Este es el flujo real que uso sobre este mismo sitio, con tres tareas que delegué de verdad y la parte que casi nadie cuenta, que es dónde falla.]]></description>
-      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/22127458fb0f15b1d924b44b79ea03247eff07e5-1200x630.png" alt="Cómo programo con Claude Code: mi flujo real en un proyecto de verdad" />
-<p>Hay dos tipos de artículos sobre programar con IA. Los que te enseñan a generar una función de ordenamiento y concluyen que el oficio se acabó, y los que enseñan un bug tonto y concluyen que esto no sirve para nada.</p>
-<p>Ninguno de los dos se parece a mi trabajo diario.</p>
-<p>Este post es lo tercero: el flujo concreto que uso con Claude Code sobre este mismo sitio, con tres tareas que delegué de verdad, el rastro en el repositorio para probarlo, y una sección sobre dónde falla que va a ser tan larga como la de dónde funciona. Porque esa es la parte que a mí me habría servido leer.</p>
-<h2>Qué es, sin marketing</h2>
-<p>Claude Code es un agente que corre en tu terminal, dentro de tu repositorio. Lee tus archivos, corre tus comandos, edita tu código y hace tus commits. No es autocompletado en el editor y no es una ventana de chat aparte donde copias y pegas fragmentos.</p>
-<p>La diferencia importa más de lo que parece. Un asistente que ve un archivo te ayuda a escribir una función. Un agente que ve el repositorio entero, corre los tests y lee la salida puede encargarse de una tarea completa. Es la diferencia entre pedir consejo y delegar trabajo.</p>
-<h2>Mi setup</h2>
-<p>Nada exótico:</p>
-<ul>
-<li>El repositorio de este sitio, que es un frontend en React con Vite, Sanity como CMS y un backend pequeño de funciones en Vercel.</li>
-<li>Una carpeta <code>.claude/</code> en el proyecto con la configuración local y los permisos.</li>
-<li>Una carpeta <code>docs/plans/</code> donde vive todo lo que se ha diseñado y planificado. Esta es la pieza clave y ahora explico por qué.</li>
-<li>Worktrees de git cuando una tarea grande merece aislarse del árbol de trabajo actual.</li>
-</ul>
-<p>Y una regla propia, que es la que de verdad cambió mi resultado: <strong>nada grande se escribe sin un plan escrito antes.</strong></p>
-<h2>El flujo: diseñar, planificar, ejecutar</h2>
-<p>La tentación con un agente es abrir la terminal y decir &quot;añádeme un panel de administración&quot;. A veces sale. Muchas veces sale algo que funciona pero que no es lo que querías, y lo descubres cuando ya hay seiscientas líneas escritas.</p>
-<p>Así que separo en tres fases, y no dejo que se solapen:</p>
-<p><strong>Uno, diseñar.</strong> Antes de tocar código, una conversación. Qué problema resolvemos, dos o tres enfoques con sus contras, cuál elegimos y por qué. Sale un documento de diseño en <code>docs/plans/</code>. Corto, pero escrito.</p>
-<p><strong>Dos, planificar.</strong> Del diseño sale un plan por tareas. Qué archivos toca cada una, qué test se escribe primero, qué comando la verifica, dónde va el commit. En mi carpeta de planes hay archivos como <code>2026-04-28-slice-2-vercel-migration.md</code> o <code>2026-04-29-portfolio-audit-implementation.md</code>. Cada uno es un plan que se ejecutó tarea a tarea.</p>
-<p><strong>Tres, ejecutar.</strong> Ahora sí, código. Con el plan delante, la sesión no deriva. Si algo no encaja, se ve enseguida, porque hay un documento que dice qué debería estar pasando.</p>
-<p>Suena a burocracia y al principio lo pensé. No lo es. El plan escrito es lo que convierte &quot;el agente hizo algo raro&quot; en &quot;el agente se desvió del paso 4&quot;, que es un problema muy distinto y mucho más fácil de arreglar.</p>
-<h2>Tres tareas que delegué de verdad</h2>
-<h3>La auditoría del portfolio</h3>
-<p>Le pedí que auditara este sitio como si fuera de un cliente. Leer cada componente público, recorrer las rutas en celular y escritorio, medir el tamaño de los chunks del build, contar los posts reales en Sanity.</p>
-<p>Salieron <strong>20 hallazgos en cuatro áreas</strong>, cada uno con prioridad y esfuerzo estimado. Entre ellos: una ilustración de 993 KB sin optimizar, un sitemap con cero posts de nueve publicados, y una página 404 que se quedaba colgada para siempre en &quot;Loading post...&quot;.</p>
-<p>Lo escribí en detalle <a href="https://codewithgabo.com/auditoria-portfolio-20-problemas">en otro post</a>, pero lo relevante aquí es el reparto del trabajo: <strong>la máquina encontró, yo prioricé.</strong> El documento salió con hallazgos y sin arreglos, a propósito, para que yo decidiera qué tocaba y qué no. Tres de los veinte los descarté.</p>
-<h3>La migración de Express a Vercel Functions</h3>
-<p>Tenía un servidor Express pequeño en Railway envolviendo la API de Google Analytics. Funcionaba, pero costaba dinero todos los meses por estar encendido 24/7 sirviendo un dashboard que casi nadie visita.</p>
-<p>La migración a funciones sin servidor fue una tarea de manual: extraer los ayudantes a <code>api/_utils/</code>, convertir la ruta en un handler, mover las variables de entorno, verificar que el contrato externo no cambiara. El frontend nunca se enteró. La factura pasó a cero.</p>
-<p>Esta es exactamente la clase de tarea donde delegar gana: mecánica, bien definida, con un criterio de éxito objetivo. No requiere criterio, requiere no equivocarse en veinte detalles seguidos. Eso lo hace mejor una máquina que yo a las once de la noche.</p>
-<h3>El sitemap generado desde Sanity</h3>
-<p>Mi sitemap era un archivo estático que había que editar a mano cada vez que publicaba. O sea: nunca.</p>
-<p>Ahora es un script que corre en <code>prebuild</code>, consulta Sanity con GROQ, y escribe el archivo con todos los posts y sus fechas reales. Son ochenta líneas de Node sin dependencias nuevas.</p>
-<p>Tarea pequeña, y justamente por eso llevaba meses sin hacerla. Ese es el patrón que más he notado: lo que más me ha ahorrado no son las tareas grandes, sino las de cuarenta minutos que llevaban medio año en la lista porque nunca eran lo bastante urgentes.</p>
-<h2>Dónde falla</h2>
-<p>Aquí es donde la mayoría de estos artículos se ponen borrosos. Vamos al grano.</p>
-<p><strong>Acepta tu premisa demasiado rápido.</strong> Si le dices &quot;arregla este bug de CSS&quot;, va a buscar un bug de CSS. Si el problema real era el orden de las rutas, puede que te entregue un arreglo de CSS que tapa el síntoma. Ahora, cuando algo se rompe, describo el comportamiento y no mi diagnóstico. La diferencia en resultado es enorme.</p>
-<p><strong>Es demasiado agradable con tus ideas.</strong> Si propones un enfoque malo, la respuesta por defecto tiende a ser ayudarte a construirlo bien. Yo pido explícitamente que me den dos o tres opciones con contras antes de decidir nada, porque si no pido alternativas, no aparecen.</p>
-<p><strong>El contexto se degrada en sesiones largas.</strong> En una sesión de horas, las decisiones de la primera media hora se vuelven borrosas. Por eso el plan va a un archivo y no se queda en la conversación: el archivo no se olvida.</p>
-<p><strong>No sabe qué es feo.</strong> Puede escribir un componente correcto, accesible y que pasa los tests, y que se vea mal. El criterio visual sigue siendo tuyo. En este sitio he rehecho a mano bastante CSS que estaba técnicamente bien.</p>
-<p><strong>Y lo más importante: sigues siendo responsable de lo que se mergea.</strong> Reviso cada diff. No porque desconfíe más que de un compañero humano, sino exactamente igual que de un compañero humano. Un commit con mi nombre es mío, lo haya escrito quien lo haya escrito.</p>
-<p><strong>Cuándo sale más caro:</strong> tareas de menos de diez minutos que ya sé hacer, cambios de una línea, y cualquier cosa donde explicar el contexto tarde más que hacerlo. Escribir un buen prompt para un cambio trivial es trabajo neto negativo.</p>
-<h2>Cómo empezar mañana</h2>
-<p>Si quieres probar sin quemarte:</p>
-<ol>
-<li><strong>Empieza por una tarea aburrida y bien definida.</strong> Migrar un formato, escribir tests de algo que ya existe, actualizar dependencias. No empieces por la funcionalidad estrella de tu producto.</li>
-<li><strong>Pide un plan antes que código.</strong> Aunque la tarea sea pequeña. Leer el plan te dice en treinta segundos si se entendieron, y corregir un plan es gratis comparado con corregir una implementación.</li>
-<li><strong>Trabaja en una rama o en un worktree.</strong> Para poder tirarlo todo sin pensarlo si se tuerce.</li>
-<li><strong>Lee los diffs.</strong> Enteros. Si no vas a leerlos, no delegues.</li>
-<li><strong>Deja el contexto por escrito en el repositorio.</strong> Las decisiones que viven solo en una conversación se pierden. Las que viven en <code>docs/plans/</code> siguen ahí en tres meses, cuando ya no te acuerdes de por qué elegiste eso.</li>
-</ol>
-<h2>Lo que de verdad cambió</h2>
-<p>No programo más rápido. Programo con menos fricción en lo aburrido, que resulta ser la mayoría del trabajo.</p>
-<p>Las tareas que antes se quedaban en la lista por pereza ahora se hacen, porque el coste de arrancarlas bajó lo suficiente. El sitemap llevaba meses pendiente. La auditoría llevaba más. Ninguna era difícil; las dos eran tediosas, y lo tedioso es exactamente lo que se me acumulaba.</p>
-<p>Lo que no cambió: sigo decidiendo qué se construye, sigo revisando cada línea que entra, y sigo siendo el responsable cuando algo se rompe en producción.</p>
-<p>Eso me parece bien. Es la parte del trabajo que me gusta.</p>]]></content:encoded>
     </item>
   </channel>
 </rss>

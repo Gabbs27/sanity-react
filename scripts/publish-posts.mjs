@@ -28,26 +28,26 @@ const PUBLISH = process.argv.includes("--publish");
 
 const POSTS = [
   {
-    slug: "la-proxima-filtracion-llego-en-cuatro-dias",
-    title: "La próxima filtración llegó en cuatro días: cómo leer lo de la Policía",
+    slug: "generar-el-xml-no-es-facturar",
+    title: "Generar el XML no es facturar: lo que aprendí construyendo un emisor de e-CF",
     excerpt:
-      "Alegan 10,000 registros del sistema de denuncias de la Policía Nacional en un " +
-      "enlace. Los cinco filtros, aplicados en público: uno con evidencia parcial, " +
-      "tres sin datos, y por qué ese archivo no se baja.",
-    tags: ["Seguridad", "República Dominicana", "Privacidad", "Análisis", "Policía Nacional"],
-    markdown: resolve(ROOT, "docs/drafts/la-proxima-filtracion-llego-en-cuatro-dias.md"),
-    cover: "scripts/covers/out/filtracion-policia-es.png",
+      "El 1 de noviembre los grandes locales y medianos se quedan sin comprobantes B, y " +
+      "el 15 vence el plazo de los pequeños. Construí un emisor de e-CF: un esquema oficial " +
+      "que no compila por un espacio, tres URIs mal escritas y por qué emitir obliga a recibir.",
+    tags: ["Facturación Electrónica", "DGII", "República Dominicana", "XML", "Build in Public"],
+    markdown: resolve(ROOT, "docs/drafts/generar-el-xml-no-es-facturar.md"),
+    cover: "scripts/covers/out/ecf-es.png",
   },
   {
-    slug: "the-next-leak-claim-took-four-days",
-    title: "The next leak claim took four days: reading the police one",
+    slug: "generating-the-xml-is-not-invoicing",
+    title: "Generating the XML isn't invoicing: what I learned building a Dominican e-invoice issuer",
     excerpt:
-      "Someone alleges 10,000 records from the Dominican National Police's complaint " +
-      "system sit behind a link. The five filters, applied in public: one with partial " +
-      "evidence, three with no data, and why you never download that file.",
-    tags: ["Security", "Dominican Republic", "Privacy", "Analysis", "Threat Intel"],
-    markdown: resolve(ROOT, "docs/drafts/the-next-leak-claim-took-four-days.md"),
-    cover: "scripts/covers/out/filtracion-policia-en.png",
+      "Dominican businesses have until November to issue electronic fiscal receipts. I built " +
+      "an issuer: an official schema that breaks over one space, three misspelled URIs in the " +
+      "signing example, and why issuing means receiving.",
+    tags: ["E-invoicing", "Dominican Republic", "XML", "Build in Public", "Government APIs"],
+    markdown: resolve(ROOT, "docs/drafts/generating-the-xml-is-not-invoicing.md"),
+    cover: "scripts/covers/out/ecf-en.png",
   },
 ];
 
