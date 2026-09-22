@@ -52,15 +52,15 @@ The schemas for types 32, 33, 34, 44 and 45 define the same type without the spa
 
 And a confession: I was slow to see it. What I wrote in the repo is that the schema used a type it never defined. It did define it, with one space too many, and my text search could not find it because of that same space.
 
-**The official signing example has three misspelled URIs.** The DGII publishes a document, *Firmado de e-CF*, with examples of how to sign. The XML that shows the structure of the signature has these three, with what they should say next to them:
+**The official signing example has three misspelled URIs.** The DGII publishes a document, *Firmado de e-CF*, with examples of how to sign. The XML that shows the structure of the signature has these three:
 
 ```
-http://www.w3.org/TR/2001/RECxml-c14n-20010315          → REC-xml-c14n
-http://www.w3.org/2001/04/xmldsigmore#rsa-sha256        → xmldsig-more
-http://www.w3.org/2000/09/xmldsig#envelope d-signature  → enveloped-signature
+http://www.w3.org/TR/2001/RECxml-c14n-20010315
+http://www.w3.org/2001/04/xmldsigmore#rsa-sha256
+http://www.w3.org/2000/09/xmldsig#envelope d-signature
 ```
 
-The TypeScript example in the same document spells them correctly. But if you build your signature by copying that XML, it fails: I tried it with `xml-crypto`, and it answers that the canonicalisation algorithm *"is not supported"*. A bad signature is not a cheap mistake, either. According to question 1.4.18, if the DGII rejects an e-CF over its signature, that e-NCF can never be used again.
+They should read `REC-xml-c14n`, `xmldsig-more` and `enveloped-signature`. The TypeScript example in the same document spells them correctly. But if you build your signature by copying that XML, it fails: I tried it with `xml-crypto`, and it answers that the canonicalisation algorithm *"is not supported"*. A bad signature is not a cheap mistake, either. According to question 1.4.18, if the DGII rejects an e-CF over its signature, that e-NCF can never be used again.
 
 **The portal answers a script with a 403.** The schemas are downloaded from the DGII's portal. With `curl`, the answer is 403; with a browser's User-Agent, 200. I tried it again today. For a while I assumed the DGII blocked automated downloads, and I wrote that into the project plan. It does not block them: it filters by User-Agent. That matters because the schemas have to be checked before every release. The ones for debit and credit notes changed on April 1, 2026, almost six months after the rest.
 

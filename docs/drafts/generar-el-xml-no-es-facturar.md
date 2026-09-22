@@ -52,15 +52,15 @@ Los esquemas de los tipos 32, 33, 34, 44 y 45 definen el mismo tipo sin el espac
 
 Y confieso algo: yo tardé en verlo. En el repo dejé escrito que el esquema usaba un tipo que nunca definía. Sí lo definía, con un espacio de más, y mi búsqueda de texto no lo encontraba por ese mismo espacio.
 
-**El ejemplo oficial de la firma trae tres URIs mal escritas.** La DGII publica un documento, *Firmado de e-CF*, con ejemplos de cómo firmar. El XML que muestra la estructura de la firma trae estas tres, con lo que deberían decir al lado:
+**El ejemplo oficial de la firma trae tres URIs mal escritas.** La DGII publica un documento, *Firmado de e-CF*, con ejemplos de cómo firmar. El XML que muestra la estructura de la firma trae estas tres:
 
 ```
-http://www.w3.org/TR/2001/RECxml-c14n-20010315          → REC-xml-c14n
-http://www.w3.org/2001/04/xmldsigmore#rsa-sha256        → xmldsig-more
-http://www.w3.org/2000/09/xmldsig#envelope d-signature  → enveloped-signature
+http://www.w3.org/TR/2001/RECxml-c14n-20010315
+http://www.w3.org/2001/04/xmldsigmore#rsa-sha256
+http://www.w3.org/2000/09/xmldsig#envelope d-signature
 ```
 
-El ejemplo en TypeScript del mismo documento las escribe bien. Pero si armas tu firma copiando ese XML, no pasa: lo probé con `xml-crypto`, y contesta que ese algoritmo de canonicalización *"is not supported"*. Además, una firma inválida no es un error barato. Según la pregunta 1.4.18, si la DGII rechaza un e-CF por la firma, ese e-NCF no se puede volver a usar.
+Deberían decir `REC-xml-c14n`, `xmldsig-more` y `enveloped-signature`. El ejemplo en TypeScript del mismo documento las escribe bien. Pero si armas tu firma copiando ese XML, no pasa: lo probé con `xml-crypto`, y contesta que ese algoritmo de canonicalización *"is not supported"*. Además, una firma inválida no es un error barato. Según la pregunta 1.4.18, si la DGII rechaza un e-CF por la firma, ese e-NCF no se puede volver a usar.
 
 **El portal le contesta 403 a un script.** Los esquemas se bajan del portal de la DGII. Con `curl`, la respuesta es 403; con el User-Agent de un navegador, 200. Lo volví a probar hoy. Durante un rato di por hecho que la DGII bloqueaba las descargas automáticas, y lo escribí en el plan del proyecto. No las bloquea: filtra por User-Agent. Eso importa porque los esquemas hay que revisarlos antes de cada versión. Los de las notas de débito y de crédito cambiaron el 1 de abril de 2026, casi seis meses después que los demás.
 
