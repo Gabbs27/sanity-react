@@ -36,20 +36,20 @@ if (!KEY) throw new Error('No DEVTO_API_KEY in .env');
 // dev.to allows at most 4 tags, lowercase alphanumeric only.
 const POSTS = [
   {
-    slug: 'the-next-leak-claim-took-four-days',
-    draft: 'docs/drafts/the-next-leak-claim-took-four-days.md',
-    title: 'The Next Leak Claim Took Four Days: Reading the Police One',
-    tags: 'security, privacy, webdev, cybersecurity',
+    slug: 'generating-the-xml-is-not-invoicing',
+    draft: 'docs/drafts/generating-the-xml-is-not-invoicing.md',
+    title: "Generating the XML Isn't Invoicing: What I Learned Building a Dominican E-Invoice Issuer",
+    tags: 'webdev, javascript, xml, showdev',
     cover:
-      'https://cdn.sanity.io/images/nnt7ytcd/production/f719f08af73309cf1b8e7c1afeebc08aef994fe1-1200x630.png',
+      'https://cdn.sanity.io/images/nnt7ytcd/production/82cd7e8d875be907c94bbea9ab7b513e09952568-1200x630.png',
   },
   {
-    slug: 'la-proxima-filtracion-llego-en-cuatro-dias',
-    draft: 'docs/drafts/la-proxima-filtracion-llego-en-cuatro-dias.md',
-    title: 'La próxima filtración llegó en cuatro días: cómo leer lo de la Policía',
-    tags: 'security, privacy, webdev, cybersecurity',
+    slug: 'generar-el-xml-no-es-facturar',
+    draft: 'docs/drafts/generar-el-xml-no-es-facturar.md',
+    title: 'Generar el XML no es facturar: lo que aprendí construyendo un emisor de e-CF',
+    tags: 'webdev, javascript, xml, showdev',
     cover:
-      'https://cdn.sanity.io/images/nnt7ytcd/production/d1734d194793f221a174e5f64c02abc936b012ac-1200x630.png',
+      'https://cdn.sanity.io/images/nnt7ytcd/production/537bbbcec508947e7503ce73cc081574fb1703f8-1200x630.png',
   },
 ];
 
