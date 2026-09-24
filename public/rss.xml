@@ -9,6 +9,214 @@
     <language>es</language>
     <atom:link href="https://codewithgabo.com/rss.xml" rel="self" type="application/rss+xml" />
     <item>
+      <title><![CDATA[RD Inteligente: what the Dominican AI course teaches, asks for, and says in the fine print]]></title>
+      <link>https://codewithgabo.com/rd-inteligente-what-it-teaches-and-asks-for</link>
+      <guid isPermaLink="true">https://codewithgabo.com/rd-inteligente-what-it-teaches-and-asks-for</guid>
+      <pubDate>Thu, 24 Sep 2026 23:50:12 GMT</pubDate>
+      <description><![CDATA[On September 10 the Dominican Republic launched RD Inteligente, ITLA's free AI course for a million people. I read the program, the terms and the privacy policy: what it teaches, what it asks for, and three things worth knowing before handing over your ID.]]></description>
+      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/b9a0168ce3bf9dd332be35f0a04dde4e6b0b5616-1200x630.png" alt="RD Inteligente: what the Dominican AI course teaches, asks for, and says in the fine print" />
+<p>On Thursday, September 10, Dominican President Luis Abinader launched <strong>RD Inteligente</strong>, the country's National Artificial Intelligence Literacy Program. The goal is to train a million Dominicans for free, and ITLA, the Instituto Tecnológico de Las Américas, runs it.</p>
+<p>I went to <a href="https://rdinteligente.do">rdinteligente.do</a> and read what almost nobody reads: the full program, the terms of use and the privacy policy, updated on September 15. Here's what it teaches, what it asks for when you sign up, and what the fine print says.</p>
+<h2>What it teaches</h2>
+<p>The program is a three-level ladder, and each level stands on its own: whoever stops at the first one still walks away with something.</p>
+<ul>
+<li><strong>Level 1, literacy.</strong> Ten hours, the same for everyone, split into six &quot;stops&quot;. You get a digital certificate from ITLA.</li>
+<li><strong>Level 2, productivity.</strong> A track for your line of work, because, as the page puts it, &quot;a nurse and a judge don't need the same thing&quot;. You leave with an applied project.</li>
+<li><strong>Level 3, specialization.</strong> 60 to 120 hours in artificial intelligence, data science, cybersecurity or software development, with a &quot;vendor certification&quot;.</li>
+</ul>
+<p>These are the six stops of level 1, with their titles translated:</p>
+<ol>
+<li>What AI is and what it isn't (1.5 hours)</li>
+<li>Talking to an AI (2.5 hours)</li>
+<li>Distrusting well (1.5 hours)</li>
+<li>Your data and your privacy (1.5 hours)</li>
+<li>AI scams: defending yourself (1.5 hours)</li>
+<li>Your first real case (1.5 hours)</li>
+</ol>
+<p>What I liked most: four and a half of the ten hours are about distrust. Of AI answers, of who you give your data to, and of scams. Stop 5 opens with a scene anyone recognizes: a call at 2:14 a.m., your mom's voice asking you to send money right now, and it isn't your mom. According to the page, thirty seconds of your voice is enough to clone it.</p>
+<p>At the launch, the president summed it up: &quot;We don't want to turn a million Dominicans into programmers. We want a million Dominicans to be better at what they already know how to do.&quot; The curriculum goes that way.</p>
+<h2>What it asks for</h2>
+<p>Your cédula, the Dominican national ID, and an email address. According to the FAQ, it then asks for your date of birth, your province, your neighborhood and the track you want. No phone number, and it costs nothing: not the sign-up, not the content, not the certificate.</p>
+<p>The cédula serves two purposes, according to the program itself. One, checking against the voter roll of the Junta Central Electoral that the certificate goes to a real person. Two, one cédula per account, so nobody takes two spots. If the roll doesn't find you, you can enter your details by hand and keep going, but your file stays pending verification and they may ask for proof before issuing the certificate.</p>
+<p>There's no password. To log back in you type your cédula and get a one-time code by email. The page says it plainly: your email is the key to your account. If your email doesn't have two-step verification, now is a good time to turn it on.</p>
+<p>The level 1 certificate comes when you finish all six stops and answer every check. It's a certificate of participation: according to the terms, it &quot;is not equivalent to an academic degree or a vendor professional certification&quot;. List it on your résumé as what it is.</p>
+<h2>What the fine print says</h2>
+<p>For a privacy policy, this one is clear: it says what it keeps, who else sees it, where, and for how long. It keeps four kinds of data:</p>
+<ul>
+<li><strong>What you type:</strong> your cédula, your email and, optionally, the track you identify with.</li>
+<li><strong>What the voter roll returns when your cédula is verified:</strong> full name, date of birth, sex, nationality, province and municipality. It says it doesn't receive your photo or your voting history.</li>
+<li><strong>Your progress through the course:</strong> which screens you saw, what you answered and whether you got it right, your progress and your score.</li>
+<li><strong>Technical data:</strong> your IP address, the date and time of your visits, your browser and your operating system.</li>
+</ul>
+<p>On the technical side, it gets several things right:</p>
+<ul>
+<li>The cédula is stored encrypted. Only its last four digits are kept next to it, and not even program staff see the full number: it shows up masked, like <code>***-*****-5678</code>.</li>
+<li>No cookies. The session lives in your browser's local storage: if you check &quot;Remember me on this device&quot;, it lasts up to ninety days of inactivity; if you don't, it ends when you close the tab.</li>
+<li>No third-party analytics or ad cookies, and the videos are self-hosted, so watching them doesn't tell any platform what you're watching.</li>
+<li>Technical logs are kept for twelve months.</li>
+</ul>
+<p>But there are three things worth knowing before you hand over your cédula:</p>
+<ol>
+<li><strong>Your data lives in the United States.</strong> The platform and its database are on a server there, and by signing up you authorize that transfer.</li>
+<li><strong>The service that verifies your cédula isn't named.</strong> The policy says it receives only the cédula, to check it against the voter roll, but it doesn't say which company or institution it is. It does name the other two providers: Microsoft's Azure Front Door, which sees your IP like any network intermediary, and Google Fonts, which gets your IP when the page loads its fonts.</li>
+<li><strong>The certificate record is forever.</strong> You can ask them to delete your file at any time by writing to info@rdinteligente.do from the email you registered with, a right that Dominican data protection law (Ley 172-13) gives you. But if you already earned a certificate, the record that it was issued is kept permanently.</li>
+</ol>
+<h2>What doesn't add up yet</h2>
+<ul>
+<li><strong>Minors.</strong> The Presidency's announcement lists high school students among the program's audiences, but the platform requires a cédula, which Dominicans get at 18. The policy admits it: in practice the platform is for adults, and if minors are ever let in, it will be through a different mechanism and with parental permission.</li>
+<li><strong>Level 2 hours.</strong> The tracks section talks about fifteen hours after the six stops; the level ladder says 25. It adds up if they count the ten common hours, but the page doesn't say.</li>
+<li><strong>The level 3 vendor.</strong> It promises a &quot;vendor certification&quot; and doesn't say which vendor.</li>
+<li><strong>The date for the million.</strong> Neither the announcement nor the site says by when.</li>
+</ul>
+<h2>Who I'd send it to</h2>
+<p>My mom, my dad and my aunts and uncles, before my developer friends. Level 1 isn't for people who already use these tools every day. It's for people who could lose their savings to a cloned voice on the phone, and for them, stop 5 alone is worth the ten hours.</p>
+<p>And one warning straight from the policy: the program never asks for a password, bank details or health information. In its own words: &quot;If any form on the site ever asks you for them, it isn't ours.&quot; When something free gets popular, copies show up, and a lookalike link on WhatsApp asking for those things isn't theirs. The site is rdinteligente.do.</p>
+<p><strong>Sources:</strong> <a href="https://presidencia.gob.do/noticias/presidente-luis-abinader-lanza-programa-rd-inteligente-para-capacitar-un-millon-de">Presidency announcement, September 10, 2026</a> · <a href="https://rdinteligente.do/">RD Inteligente: the program and FAQ</a> · <a href="https://rdinteligente.do/terminos">Terms of use</a> · <a href="https://rdinteligente.do/privacidad">Privacy policy</a></p>]]></content:encoded>
+    </item>
+    <item>
+      <title><![CDATA[RD Inteligente: lo que enseña, lo que pide y lo que dice la letra pequeña]]></title>
+      <link>https://codewithgabo.com/rd-inteligente-lo-que-ensena-y-lo-que-pide</link>
+      <guid isPermaLink="true">https://codewithgabo.com/rd-inteligente-lo-que-ensena-y-lo-que-pide</guid>
+      <pubDate>Thu, 24 Sep 2026 23:50:09 GMT</pubDate>
+      <description><![CDATA[El 10 de septiembre arrancó RD Inteligente, el curso gratis de IA del ITLA para un millón de dominicanos. Leí el programa, los términos y la política de privacidad: qué enseña, qué pide para entrar y tres cosas que conviene saber antes de dar la cédula.]]></description>
+      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/7cdb71b05b0329500454904da82a58c8639ce94d-1200x630.png" alt="RD Inteligente: lo que enseña, lo que pide y lo que dice la letra pequeña" />
+<p>El jueves 10 de septiembre, el presidente Luis Abinader lanzó <strong>RD Inteligente</strong>, el Programa Nacional de Alfabetización en Inteligencia Artificial. La meta es capacitar gratis a un millón de dominicanos, y lo ejecuta el ITLA.</p>
+<p>Me metí a <a href="https://rdinteligente.do">rdinteligente.do</a> y leí lo que casi nadie lee: el programa completo, los términos de uso y la política de privacidad, actualizada el 15 de septiembre. Esto es lo que enseña, lo que te pide para entrar y lo que dice la letra pequeña.</p>
+<h2>Lo que enseña</h2>
+<p>El programa es una escalera de tres niveles, y cada uno se sostiene solo: quien se quede en el primero ya se lleva algo.</p>
+<ul>
+<li><strong>Nivel 1, alfabetización.</strong> Diez horas, iguales para todo el mundo, repartidas en seis &quot;paradas&quot;. Deja un certificado digital del ITLA.</li>
+<li><strong>Nivel 2, productividad.</strong> Una ruta según tu oficio, porque, como dice la página, &quot;una enfermera y un juez no necesitan lo mismo&quot;. Deja un proyecto aplicado.</li>
+<li><strong>Nivel 3, especialización.</strong> De 60 a 120 horas en inteligencia artificial, ciencia de datos, ciberseguridad o desarrollo de software, con &quot;certificación de fabricante&quot;.</li>
+</ul>
+<p>Las seis paradas del nivel 1 son estas:</p>
+<ol>
+<li>Qué es la IA y qué no es (1.5 horas)</li>
+<li>Hablarle a una IA (2.5 horas)</li>
+<li>Desconfiar bien (1.5 horas)</li>
+<li>Sus datos y su privacidad (1.5 horas)</li>
+<li>Engaños con IA: defenderse (1.5 horas)</li>
+<li>Su primer caso real (1.5 horas)</li>
+</ol>
+<p>Lo que más me gustó: de las diez horas, cuatro y media son para desconfiar. De las respuestas de la IA, de a quién le das tus datos y de las estafas. La parada 5 abre con una escena que cualquiera reconoce: una llamada a las 2:14 de la mañana, con la voz de tu mamá pidiendo que le mandes dinero ahora mismo, y no es tu mamá. Según la página, con treinta segundos de tu voz basta para clonarla.</p>
+<p>En el lanzamiento, el presidente lo resumió así: &quot;No queremos convertir a un millón de dominicanos en programadores. Queremos que un millón de dominicanos sean mejores en aquello que ya saben hacer&quot;. El temario va en esa dirección.</p>
+<h2>Lo que te pide para entrar</h2>
+<p>Tu cédula y un correo. Según las preguntas frecuentes, después te piden tu fecha de nacimiento, tu provincia, tu sector y la ruta que quieres seguir. No hace falta número de teléfono, y no cuesta nada: ni la inscripción, ni el contenido, ni el certificado.</p>
+<p>La cédula es para dos cosas, según el propio programa. Una, verificar contra el padrón de la Junta Central Electoral que el certificado sale a nombre de una persona real. Dos, que una cédula sea una sola cuenta, para que nadie ocupe dos cupos. Si el padrón no te encuentra, puedes llenar tus datos a mano y seguir con el curso, pero tu expediente queda pendiente de verificación y te pueden pedir una comprobación antes del certificado.</p>
+<p>No hay contraseña. Para volver a entrar escribes la cédula y te llega un código de un solo uso al correo. La página lo dice clarito: tu correo es la llave de tu cuenta. Si tu correo no tiene verificación en dos pasos, este es buen momento para ponérsela.</p>
+<p>El certificado del nivel 1 sale cuando completas las seis paradas y contestas todas las comprobaciones. Es un certificado de participación: según los términos, &quot;no equivale a un título académico ni a una certificación profesional de fabricante&quot;. Ponlo en tu CV como lo que es.</p>
+<h2>Lo que dice la letra pequeña</h2>
+<p>Para ser una política de privacidad, esta es clara: dice qué guarda, quién más lo ve, dónde y por cuánto tiempo. Guarda cuatro cosas:</p>
+<ul>
+<li><strong>Lo que tú escribes:</strong> cédula, correo y, si quieres, la ruta con la que te identificas.</li>
+<li><strong>Lo que devuelve el padrón al verificar tu cédula:</strong> nombres y apellidos, fecha de nacimiento, sexo, nacionalidad, provincia y municipio. Dice que no recibe tu foto ni tu historial electoral.</li>
+<li><strong>Tu paso por el curso:</strong> qué pantallas viste, qué respondiste y si acertaste, tu avance y tu puntaje.</li>
+<li><strong>Datos técnicos:</strong> tu IP, la fecha y hora de tus accesos, tu navegador y tu sistema operativo.</li>
+</ul>
+<p>En lo técnico, hace varias cosas bien:</p>
+<ul>
+<li>La cédula se guarda cifrada. Junto a ella solo se conservan los últimos cuatro dígitos, y ni el personal del programa ve el número completo: le sale enmascarado, como <code>***-*****-5678</code>.</li>
+<li>No pone cookies. La sesión vive en el almacenamiento local de tu navegador: si marcas &quot;Recordarme en este dispositivo&quot;, dura hasta noventa días sin uso; si no, se cierra con la pestaña.</li>
+<li>No usa analítica de terceros ni cookies de publicidad, y los videos están en su propio servidor, así que verlos no le avisa a ninguna plataforma qué estás mirando.</li>
+<li>Los registros técnicos se guardan doce meses.</li>
+</ul>
+<p>Pero hay tres cosas que conviene saber antes de dar la cédula:</p>
+<ol>
+<li><strong>Tus datos viven en Estados Unidos.</strong> La plataforma y su base de datos están en un servidor allá, y al registrarte autorizas esa transferencia.</li>
+<li><strong>El servicio que verifica tu cédula no tiene nombre.</strong> La política dice que recibe solo la cédula, para confirmarla contra el padrón, pero no dice qué empresa o institución es. A los otros dos proveedores sí los nombra: Azure Front Door, de Microsoft, que ve tu IP como cualquier intermediario de red, y Google Fonts, que recibe tu IP cuando la página carga sus letras.</li>
+<li><strong>La constancia del certificado es para siempre.</strong> Puedes pedir que borren tu expediente cuando quieras, escribiendo a info@rdinteligente.do desde el correo con el que te registraste, un derecho que te reconoce la Ley 172-13. Pero si ya sacaste un certificado, la constancia de que se emitió se queda guardada de forma permanente.</li>
+</ol>
+<h2>Lo que no cuadra todavía</h2>
+<ul>
+<li><strong>Los menores de edad.</strong> El anuncio de la Presidencia pone a los estudiantes de secundaria entre los públicos del programa, pero la plataforma exige cédula, que se saca a los 18 años. La política lo admite: en la práctica es para mayores de edad, y si un día entran los menores, será con otro mecanismo y con permiso de los padres.</li>
+<li><strong>Las horas del nivel 2.</strong> La sección de rutas habla de quince horas después de las seis paradas; la escalera de niveles dice 25. Cuadra si cuentan las diez del tramo común, pero la página no lo aclara.</li>
+<li><strong>El fabricante del nivel 3.</strong> Promete &quot;certificación de fabricante&quot; y no dice de cuál.</li>
+<li><strong>La fecha del millón.</strong> Ni el anuncio ni la página dicen para cuándo.</li>
+</ul>
+<h2>A quién se lo mandaría</h2>
+<p>A mi mamá, a mi papá y a mis tíos, antes que a mis panas programadores. El nivel 1 no es para quien ya usa estas herramientas todos los días. Es para la gente que puede perder sus ahorros con una voz clonada en el teléfono, y para esa gente la parada 5 sola ya vale las diez horas.</p>
+<p>Y un aviso que sale de la propia política: el programa nunca pide contraseña, ni datos bancarios, ni información de salud. Lo dice así: &quot;Si algún formulario del sitio se los pide alguna vez, no es nuestro&quot;. Cuando algo gratis se pone de moda salen las copias, y un link parecido que te llegue por WhatsApp pidiéndote esas cosas no es de ellos. El sitio es rdinteligente.do.</p>
+<p><strong>Fuentes:</strong> <a href="https://presidencia.gob.do/noticias/presidente-luis-abinader-lanza-programa-rd-inteligente-para-capacitar-un-millon-de">Anuncio de la Presidencia, 10 de septiembre de 2026</a> · <a href="https://rdinteligente.do/">RD Inteligente: el programa y las preguntas frecuentes</a> · <a href="https://rdinteligente.do/terminos">Términos de uso</a> · <a href="https://rdinteligente.do/privacidad">Política de privacidad</a></p>]]></content:encoded>
+    </item>
+    <item>
+      <title><![CDATA[The AI fixed the bug and broke everything else: how I review what an agent changes]]></title>
+      <link>https://codewithgabo.com/the-ai-fixed-the-bug-and-broke-everything-else</link>
+      <guid isPermaLink="true">https://codewithgabo.com/the-ai-fixed-the-bug-and-broke-everything-else</guid>
+      <pubDate>Thu, 24 Sep 2026 23:50:06 GMT</pubDate>
+      <description><![CDATA[Asking an AI to fix one bug makes a good joke, but 66% of developers say AI solutions are almost right, but not quite. Five checks I use to review what a coding agent changes, starting with the size of the diff.]]></description>
+      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/c03b32924ae8369bb9570dc2e20d6b0bcf6719fc-1200x630.png" alt="The AI fixed the bug and broke everything else: how I review what an agent changes" />
+<p>This week I made an Instagram reel: I ask the AI to fix a bug, &quot;just that one&quot;, and it replies that it's done, and that while it was at it, it renamed my variables, updated 14 dependencies, moved the login to another framework and deleted some failing tests. &quot;You're welcome.&quot;</p>
+<p>It's an exaggerated joke, but every piece of it really happens. In Stack Overflow's 2025 survey, the top frustration with AI tools, cited by 66% of respondents, was &quot;AI solutions that are almost right, but not quite.&quot; The second, at 45%, was that debugging AI-generated code takes more time.</p>
+<p>The test part isn't made up either. When Anthropic launched Claude 4 in May 2025, one of the improvements it announced was that the new models were 65% less likely than Sonnet 3.7 to use shortcuts or loopholes to complete a task, on the tasks most susceptible to them. If the vendor itself measures it, it happens.</p>
+<p>I code with Claude Code (<a href="https://codewithgabo.com/how-i-actually-code-with-claude-code">here's how</a>), and these are the five things I do so an agent doesn't hand me a &quot;fixed&quot; that breaks everything else.</p>
+<h2>1. I ask with a scope and a way out</h2>
+<p>&quot;Fix the login bug&quot; leaves the door open to anything. I ask like this: what's wrong, where I think it is, what not to touch, and what to do if it has to be touched. For example:</p>
+<blockquote><p>Login fails when the email has uppercase letters. Fix it in <code>auth/login.ts</code>. Don't touch the tests or the dependencies; if you think you need to, stop and tell me why.</p></blockquote>
+<p>The last part is the important one. An agent with no way to tell you &quot;this is bigger than what you asked for&quot; will solve the bigger thing on its own.</p>
+<h2>2. I look at the size before the change</h2>
+<p>Before reading a single line, I run this:</p>
+<pre><code>git diff --stat</code></pre>
+<p>If I asked for one bug and see thirty files, I don't read anything: I ask why. The size of the diff is the first check, and the cheapest.</p>
+<h2>3. I read the tests first</h2>
+<p>If the change touches tests, I read those before the code:</p>
+<pre><code>git diff -- '*.test.*'</code></pre>
+<p>A test that changed along with the code it tests is the signal I look for. Sometimes the change is right, because the behavior changed on purpose. But a test that went from failing to passing because it now expects something else, or one that disappeared, didn't fix anything.</p>
+<h2>4. I make skipping a check visible</h2>
+<p>This is the one that has helped me the most. The @codewithgabo reels come out of a suite I built in Remotion, and before exporting, a probe checks that the video changes every two seconds. If it sits still, the export is cancelled. There's a way out, and it's there on purpose: <code>&quot;allowStatic&quot;: true</code> in the piece's file. It's one line, and it shows up in the diff by name.</p>
+<p>This week, while moving two reels to a new design, the probe flagged a two-second stretch below the minimum, which is 0.6%. The short way out was that line. The agent fixed the reel instead: the closing text now writes itself by hand and gets underlined, and the stretch went up to 1.3%. I don't know if it would have taken the line on another day. What I know is that if it does, I'll see it.</p>
+<p>The same goes for any test suite:</p>
+<ul>
+<li><strong>Keep `.only` and `.skip` out of main.</strong> Playwright and Mocha have <code>--forbid-only</code>, Vitest rejects <code>.only</code> in CI by default, and the ESLint plugins for Jest and Vitest ship the <code>no-focused-tests</code> and <code>no-disabled-tests</code> rules.</li>
+<li><strong>Give the tests an owner.</strong> With a <code>CODEOWNERS</code> file on GitHub and the branch rule that requires code owner review, a change to the tests folder doesn't get in without someone looking at it.</li>
+<li><strong>Give the agent rules too.</strong> In Claude Code, a <code>PreToolUse</code> hook can block edits to certain paths, like your tests, or make it ask you first.</li>
+</ul>
+<h2>5. I don't trust how it felt</h2>
+<p>In July 2025, METR measured 16 experienced developers working on their own projects: with AI they took 19% longer, and afterwards they believed they had been 20% faster. In February 2026, METR published new data, with newer tools, suggesting they now do help. But METR itself said that, because of how the tasks ended up selected, the new data is &quot;only very weak evidence,&quot; and it's changing the study's design.</p>
+<p>So we still don't really know how much it speeds us up. What did become clear is that how it feels isn't a measurement. That's why the four rules above are checks that don't depend on how it went.</p>
+<h2>What doesn't change</h2>
+<p>AI writes fast, and it keeps writing better. Reviewing is still my job, and yours. The agent that &quot;fixed&quot; the bug by deleting the test didn't lie to you: it delivered the only thing it measured as success, a passing test.</p>
+<p><strong>Sources:</strong> <a href="https://survey.stackoverflow.co/2025/ai">Stack Overflow 2025 Developer Survey, AI section</a> · <a href="https://www.anthropic.com/news/claude-4">Anthropic, Claude 4 launch (May 22, 2025)</a> · <a href="https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/">METR, July 2025 study</a> · <a href="https://metr.org/blog/2026-02-24-uplift-update/">METR, February 2026 update</a> · <a href="https://vitest.dev/config/allowonly">Vitest: allowOnly</a> · <a href="https://playwright.dev/docs/api/class-testconfig#test-config-forbid-only">Playwright: forbidOnly</a> · <a href="https://github.com/jest-community/eslint-plugin-jest/blob/main/docs/rules/no-disabled-tests.md">ESLint for Jest: no-disabled-tests</a> · <a href="https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-disabled-tests.md">ESLint for Vitest: no-disabled-tests</a> · <a href="https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners">GitHub: CODEOWNERS</a> · <a href="https://code.claude.com/docs/en/hooks">Claude Code: hooks</a></p>]]></content:encoded>
+    </item>
+    <item>
+      <title><![CDATA[La IA arregló el bug y rompió lo demás: cómo reviso lo que me cambia un agente]]></title>
+      <link>https://codewithgabo.com/la-ia-arreglo-el-bug-y-rompio-lo-demas</link>
+      <guid isPermaLink="true">https://codewithgabo.com/la-ia-arreglo-el-bug-y-rompio-lo-demas</guid>
+      <pubDate>Thu, 24 Sep 2026 23:50:03 GMT</pubDate>
+      <description><![CDATA[Le pedí a la IA que arreglara un bug y el chiste se escribió solo. Pero el 66 % de los devs dice que la IA entrega soluciones que están casi bien. Cinco chequeos que hago para revisar lo que me cambia un agente, empezando por el tamaño del diff.]]></description>
+      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/89614cc09682de4b26d7cf6db290557e447f4395-1200x630.png" alt="La IA arregló el bug y rompió lo demás: cómo reviso lo que me cambia un agente" />
+<p>Esta semana hice un reel para Instagram: le pido a la IA que arregle un bug, &quot;solo ese&quot;, y me contesta que listo, que de paso renombró mis variables, actualizó 14 dependencias, pasó el login a otro framework y borró unos tests que fallaban. &quot;De nada.&quot;</p>
+<p>Es un chiste exagerado, pero cada pedazo pasa de verdad. En la encuesta de Stack Overflow de 2025, la frustración número uno con las herramientas de IA, para el 66 % de quienes respondieron, fueron las soluciones que están &quot;casi bien, pero no del todo&quot;. La segunda, para el 45 %, fue que depurar código generado por IA toma más tiempo.</p>
+<p>Lo de los tests tampoco es invento. Cuando Anthropic lanzó Claude 4, en mayo de 2025, una de las mejoras que anunció fue que los modelos nuevos eran 65 % menos propensos que Sonnet 3.7 a tomar atajos o aprovechar huecos para completar una tarea, en las tareas más propensas a eso. Si el propio fabricante lo mide, es porque pasa.</p>
+<p>Yo programo con Claude Code (<a href="https://codewithgabo.com/como-programo-con-claude-code-flujo-real">aquí conté cómo</a>), y estas son las cinco cosas que hago para que un agente no me entregue un &quot;arreglado&quot; que rompe todo lo demás.</p>
+<h2>1. Pido con alcance y con salida</h2>
+<p>&quot;Arregla el bug del login&quot; deja la puerta abierta a todo. Yo pido así: qué está mal, dónde creo que está, qué no se toca y qué hacer si hace falta tocarlo. Por ejemplo:</p>
+<blockquote><p>El login falla cuando el correo tiene mayúsculas. Arréglalo en <code>auth/login.ts</code>. No toques los tests ni las dependencias; si crees que hace falta, para y dime por qué.</p></blockquote>
+<p>La última parte es la importante. Un agente que no tiene cómo decirte &quot;esto es más grande de lo que pediste&quot; va a resolver lo grande por su cuenta.</p>
+<h2>2. Miro el tamaño antes que el cambio</h2>
+<p>Antes de leer una sola línea, corro esto:</p>
+<pre><code>git diff --stat</code></pre>
+<p>Si pedí un bug y veo treinta archivos, no leo nada: pregunto por qué. El tamaño del diff es la primera prueba y la más barata.</p>
+<h2>3. Leo los tests primero</h2>
+<p>Si el cambio toca tests, esos los leo antes que el código:</p>
+<pre><code>git diff -- '*.test.*'</code></pre>
+<p>Un test que cambió junto con el código que prueba es la señal que busco. A veces el cambio es correcto, porque el comportamiento cambió a propósito. Pero un test que pasó de fallar a pasar porque ahora espera otra cosa, o que desapareció, no arregló nada.</p>
+<h2>4. Hago que saltarse una prueba se vea</h2>
+<p>Esta es la que más me ha servido. Los reels de @codewithgabo salen de una suite que armé en Remotion, y antes de exportar, un probe revisa que el video cambie cada dos segundos. Si se queda quieto, el export se cancela. Hay una salida, y está puesta a propósito: <code>&quot;allowStatic&quot;: true</code> en el archivo de la pieza. Es una línea, y queda en el diff con su nombre.</p>
+<p>Esta semana, pasando dos reels a un diseño nuevo, el probe marcó un tramo de dos segundos por debajo del mínimo, que es 0.6 %. La salida corta era esa línea. El agente arregló el reel: el texto del final ahora se escribe a mano y se subraya, y el tramo subió a 1.3 %. No sé si otro día habría tomado la línea. Lo que sé es que, si la toma, la veo.</p>
+<p>Lo mismo vale para cualquier suite de tests:</p>
+<ul>
+<li><strong>Que `.only` y `.skip` no lleguen a main.</strong> Playwright y Mocha tienen <code>--forbid-only</code>, Vitest no deja pasar un <code>.only</code> en CI por defecto, y los plugins de ESLint para Jest y Vitest traen las reglas <code>no-focused-tests</code> y <code>no-disabled-tests</code>.</li>
+<li><strong>Que los tests tengan dueño.</strong> Con un archivo <code>CODEOWNERS</code> en GitHub y la regla de rama que exige la revisión del dueño, un cambio en la carpeta de tests no entra sin que alguien lo mire.</li>
+<li><strong>Que el agente también tenga reglas.</strong> En Claude Code, un hook <code>PreToolUse</code> puede bloquear que edite ciertas rutas, como tus tests, o hacer que te pida permiso antes.</li>
+</ul>
+<h2>5. No me fío de cómo me sentí</h2>
+<p>En julio de 2025, METR midió a 16 programadores con experiencia trabajando en sus propios proyectos: con IA tardaron 19 % más, y al terminar creían que habían ido 20 % más rápido. En febrero de 2026, METR publicó datos nuevos, con herramientas más recientes, que apuntan a que ahora sí ayudan. Pero el mismo METR dijo que, por cómo quedaron seleccionadas las tareas, esos datos son &quot;evidencia muy débil&quot;, y está cambiando el diseño del estudio.</p>
+<p>O sea, todavía no sabemos bien cuánto nos acelera. Lo que sí quedó claro es que lo que uno siente no es una medida. Por eso las cuatro reglas de arriba son chequeos que no dependen de cómo me fue.</p>
+<h2>Lo que no cambia</h2>
+<p>La IA escribe rápido, y cada vez escribe mejor. Revisar sigue siendo mi trabajo, y el tuyo. El agente que &quot;arregló&quot; el bug borrando el test no te engañó: cumplió con lo único que midió como éxito, que el test pasara.</p>
+<p><strong>Fuentes:</strong> <a href="https://survey.stackoverflow.co/2025/ai">Encuesta de Stack Overflow 2025, sección de IA</a> · <a href="https://www.anthropic.com/news/claude-4">Anthropic, lanzamiento de Claude 4 (22 de mayo de 2025)</a> · <a href="https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/">METR, estudio de julio de 2025</a> · <a href="https://metr.org/blog/2026-02-24-uplift-update/">METR, actualización de febrero de 2026</a> · <a href="https://vitest.dev/config/allowonly">Vitest: allowOnly</a> · <a href="https://playwright.dev/docs/api/class-testconfig#test-config-forbid-only">Playwright: forbidOnly</a> · <a href="https://github.com/jest-community/eslint-plugin-jest/blob/main/docs/rules/no-disabled-tests.md">ESLint para Jest: no-disabled-tests</a> · <a href="https://github.com/vitest-dev/eslint-plugin-vitest/blob/main/docs/rules/no-disabled-tests.md">ESLint para Vitest: no-disabled-tests</a> · <a href="https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners">GitHub: CODEOWNERS</a> · <a href="https://code.claude.com/docs/en/hooks">Claude Code: hooks</a></p>]]></content:encoded>
+    </item>
+    <item>
       <title><![CDATA[Generating the XML isn't invoicing: what I learned building a Dominican e-invoice issuer]]></title>
       <link>https://codewithgabo.com/generating-the-xml-is-not-invoicing</link>
       <guid isPermaLink="true">https://codewithgabo.com/generating-the-xml-is-not-invoicing</guid>
@@ -46,11 +254,11 @@
 WXS schema e-CF 31 v.1.0.xsd failed to compile</code></pre>
 <p>The schemas for types 32, 33, 34, 44 and 45 define the same type without the space. I checked again today against what the DGII publishes, and the file is unchanged.</p>
 <p>And a confession: I was slow to see it. What I wrote in the repo is that the schema used a type it never defined. It did define it, with one space too many, and my text search could not find it because of that same space.</p>
-<p><strong>The official signing example has three misspelled URIs.</strong> The DGII publishes a document, <em>Firmado de e-CF</em>, with examples of how to sign. The XML that shows the structure of the signature has these three, with what they should say next to them:</p>
-<pre><code>http://www.w3.org/TR/2001/RECxml-c14n-20010315          → REC-xml-c14n
-http://www.w3.org/2001/04/xmldsigmore#rsa-sha256        → xmldsig-more
-http://www.w3.org/2000/09/xmldsig#envelope d-signature  → enveloped-signature</code></pre>
-<p>The TypeScript example in the same document spells them correctly. But if you build your signature by copying that XML, it fails: I tried it with <code>xml-crypto</code>, and it answers that the canonicalisation algorithm <em>&quot;is not supported&quot;</em>. A bad signature is not a cheap mistake, either. According to question 1.4.18, if the DGII rejects an e-CF over its signature, that e-NCF can never be used again.</p>
+<p><strong>The official signing example has three misspelled URIs.</strong> The DGII publishes a document, <em>Firmado de e-CF</em>, with examples of how to sign. The XML that shows the structure of the signature has these three:</p>
+<pre><code>http://www.w3.org/TR/2001/RECxml-c14n-20010315
+http://www.w3.org/2001/04/xmldsigmore#rsa-sha256
+http://www.w3.org/2000/09/xmldsig#envelope d-signature</code></pre>
+<p>They should read <code>REC-xml-c14n</code>, <code>xmldsig-more</code> and <code>enveloped-signature</code>. The TypeScript example in the same document spells them correctly. But if you build your signature by copying that XML, it fails: I tried it with <code>xml-crypto</code>, and it answers that the canonicalisation algorithm <em>&quot;is not supported&quot;</em>. A bad signature is not a cheap mistake, either. According to question 1.4.18, if the DGII rejects an e-CF over its signature, that e-NCF can never be used again.</p>
 <p><strong>The portal answers a script with a 403.</strong> The schemas are downloaded from the DGII's portal. With <code>curl</code>, the answer is 403; with a browser's User-Agent, 200. I tried it again today. For a while I assumed the DGII blocked automated downloads, and I wrote that into the project plan. It does not block them: it filters by User-Agent. That matters because the schemas have to be checked before every release. The ones for debit and credit notes changed on April 1, 2026, almost six months after the rest.</p>
 <p><strong>The real risk is not the XML, it is the sequence.</strong> Two receipts cannot share a number, and you cannot go past the range the DGII authorised. In my issuer, each invoice is saved to a file named after its e-NCF, written like this:</p>
 <pre><code>writeFileSync(`datos/facturas/${encf}.xml`, xml, { flag: 'wx' });</code></pre>
@@ -111,11 +319,11 @@ http://www.w3.org/2000/09/xmldsig#envelope d-signature  → enveloped-signature<
 WXS schema e-CF 31 v.1.0.xsd failed to compile</code></pre>
 <p>Los esquemas de los tipos 32, 33, 34, 44 y 45 definen el mismo tipo sin el espacio. Hoy lo volví a comprobar contra lo que publica la DGII, y el archivo sigue igual.</p>
 <p>Y confieso algo: yo tardé en verlo. En el repo dejé escrito que el esquema usaba un tipo que nunca definía. Sí lo definía, con un espacio de más, y mi búsqueda de texto no lo encontraba por ese mismo espacio.</p>
-<p><strong>El ejemplo oficial de la firma trae tres URIs mal escritas.</strong> La DGII publica un documento, <em>Firmado de e-CF</em>, con ejemplos de cómo firmar. El XML que muestra la estructura de la firma trae estas tres, con lo que deberían decir al lado:</p>
-<pre><code>http://www.w3.org/TR/2001/RECxml-c14n-20010315          → REC-xml-c14n
-http://www.w3.org/2001/04/xmldsigmore#rsa-sha256        → xmldsig-more
-http://www.w3.org/2000/09/xmldsig#envelope d-signature  → enveloped-signature</code></pre>
-<p>El ejemplo en TypeScript del mismo documento las escribe bien. Pero si armas tu firma copiando ese XML, no pasa: lo probé con <code>xml-crypto</code>, y contesta que ese algoritmo de canonicalización <em>&quot;is not supported&quot;</em>. Además, una firma inválida no es un error barato. Según la pregunta 1.4.18, si la DGII rechaza un e-CF por la firma, ese e-NCF no se puede volver a usar.</p>
+<p><strong>El ejemplo oficial de la firma trae tres URIs mal escritas.</strong> La DGII publica un documento, <em>Firmado de e-CF</em>, con ejemplos de cómo firmar. El XML que muestra la estructura de la firma trae estas tres:</p>
+<pre><code>http://www.w3.org/TR/2001/RECxml-c14n-20010315
+http://www.w3.org/2001/04/xmldsigmore#rsa-sha256
+http://www.w3.org/2000/09/xmldsig#envelope d-signature</code></pre>
+<p>Deberían decir <code>REC-xml-c14n</code>, <code>xmldsig-more</code> y <code>enveloped-signature</code>. El ejemplo en TypeScript del mismo documento las escribe bien. Pero si armas tu firma copiando ese XML, no pasa: lo probé con <code>xml-crypto</code>, y contesta que ese algoritmo de canonicalización <em>&quot;is not supported&quot;</em>. Además, una firma inválida no es un error barato. Según la pregunta 1.4.18, si la DGII rechaza un e-CF por la firma, ese e-NCF no se puede volver a usar.</p>
 <p><strong>El portal le contesta 403 a un script.</strong> Los esquemas se bajan del portal de la DGII. Con <code>curl</code>, la respuesta es 403; con el User-Agent de un navegador, 200. Lo volví a probar hoy. Durante un rato di por hecho que la DGII bloqueaba las descargas automáticas, y lo escribí en el plan del proyecto. No las bloquea: filtra por User-Agent. Eso importa porque los esquemas hay que revisarlos antes de cada versión. Los de las notas de débito y de crédito cambiaron el 1 de abril de 2026, casi seis meses después que los demás.</p>
 <p><strong>El riesgo de verdad no es el XML, es la secuencia.</strong> Dos comprobantes no pueden llevar el mismo número, y no te puedes pasar del rango que te autorizó la DGII. En mi emisor, cada factura se guarda en un archivo que lleva su e-NCF como nombre, y se escribe así:</p>
 <pre><code>writeFileSync(`datos/facturas/${encf}.xml`, xml, { flag: 'wx' });</code></pre>
@@ -1236,288 +1444,6 @@ slot 2970675007  (in-article)
 <p>No tengo una solución general. No voy a terminar esto con una filosofía de testing, porque me la estaría inventando en el momento para que el post parezca terminado.</p>
 <p>Lo que sí tengo es una costumbre: abrir un navegador, buscar el elemento específico y medirlo. No la idea que el framework tiene del elemento: el elemento. Hacerle <code>curl</code> a la URL en vez de confiar en el componente que escribe la etiqueta. Leer la altura de la caja en vez de confiar en el estado que decide la altura.</p>
 <p>Así fue como aparecieron los dos: uno a la vez, a mano, porque se me ocurrió mirar. No habría encontrado un tercero.</p>]]></content:encoded>
-    </item>
-    <item>
-      <title><![CDATA[The Audit's Blind Spot: I Weighed the Build, Not the Page]]></title>
-      <link>https://codewithgabo.com/the-audits-blind-spot</link>
-      <guid isPermaLink="true">https://codewithgabo.com/the-audits-blind-spot</guid>
-      <pubDate>Mon, 24 Aug 2026 20:29:07 GMT</pubDate>
-      <description><![CDATA[I audited my own portfolio and called weighing the build output the step most people skip. It was also the step that guaranteed I would never see the 9.88 MB the blog index was actually serving.]]></description>
-      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/4ad742d6442c1570328186b2971ca047753e1c37-1200x630.png" alt="The Audit's Blind Spot: I Weighed the Build, Not the Page" />
-<p>I published a post called &quot;I Audited My Own Portfolio and Found 20 Problems.&quot; It was an inventory: I went through my own site — a React 19 + Vite SPA with Sanity as the CMS — wrote down everything that was wrong with it, fixed what mattered, and put the before and after numbers next to each item. If you haven't read it, the only part that matters here is the methodology, and one line of it in particular:</p>
-<blockquote><p>I went through the build output chunk by chunk in <code>build/assets/</code>.</p></blockquote>
-<p>I called that the step that hurts and the one most people skip. I still think that is true. It is also the step that guaranteed I would miss the largest thing wrong with the site.</p>
-<h2>The step that worked</h2>
-<p>Weighing the build output worked exactly as advertised. Finding 1 of that audit was an unoptimized PNG of a developer illustration on <code>/gabriel-abreu</code>, my contact page, 993 KB, sent to every visitor who landed there. It went to 23 KB. A second image, the cutout of me that sits in three different greetings, went from 358 KB to 45 KB.</p>
-<p>Those two are bundled assets. A component imports one:</p>
-<pre><code>import p from &quot;../assets/developer-illustration.webp&quot;;</code></pre>
-<p>Vite follows that import, hashes the file, and emits it into <code>build/assets/</code>. After the build it is a file on disk with a size. Listing the directory finds it. Sorting the listing by size finds it first. There is no way to ship it and not have it show up in that step.</p>
-<p>So the method was sound within its domain: both of those images are bundled assets, and the step found both.</p>
-<p>On August 23 I opened the blog index in a browser and watched what it actually requested. Sixteen post covers, 9.88 MB.</p>
-<p>None of that could have appeared in the audit. Not because I was sloppy that day — because of where those bytes come from.</p>
-<h2>Two lifecycles</h2>
-<p>A bundled asset exists at build time. An import makes it a build input, the bundler makes it a build output, and anything that reads the build output sees it.</p>
-<p>A CMS image is never a build input. Nothing imports it. It arrives as a string in a query result, after the page has already loaded. This is the query that feeds the blog index:</p>
-<pre><code>*[_type == &quot;post&quot;] | order(publishedAt desc){
-  title,
-  slug,
-  mainImage{ asset-&gt;{ _id, url } },
-  publishedAt
-}</code></pre>
-<p>That runs in a <code>useEffect</code> after mount. The <code>url</code> that comes back points at <code>cdn.sanity.io</code>, React puts it in an <code>img src</code>, and the browser fetches it from a CDN I do not build. At no point in the lifecycle of that image does a file land in <code>build/assets/</code>.</p>
-<p>Two different lifecycles, and my audit's most rigorous step could only observe one of them. Not &quot;did not happen to observe.&quot; Could not, by construction. The scale was accurate. It was not weighing the whole load.</p>
-<h2>What was actually on the page</h2>
-<p>Once I measured with a browser's real Accept header instead of a directory listing:</p>
-<pre><code>/allpost, 16 post covers ........ 9.88 MB
-one post page, 4 images ......... 4.54 MB
-worst single image .............. 3.13 MB  (2160x2700 PNG, rendered ~250px wide)
-another cover ................... 2.27 MB  (rendered at 433x227)</code></pre>
-<p>The two images the audit caught came to 1,351 KB between them. One route was serving 9.88 MB.</p>
-<p>Every one of my dev.to cross-posts closes with a link to <code>/allpost</code>. The heaviest route I measured was the page I send people to.</p>
-<h2><code>urlFor</code> was called once</h2>
-<p>Sanity ships an image-URL builder, <code>urlFor</code>, that applies CDN transformations — width, fit, format. Before the fix, <code>urlFor</code> was called exactly once in the application. Not once per component. Once. It was in <code>OnePost.tsx</code>, inside the PortableText serializer for images embedded in the body of an article:</p>
-<pre><code>const src = value?.asset
-  ? urlFor(value).width(1600).fit(&quot;max&quot;).auto(&quot;format&quot;).url()
-  : value?.url;</code></pre>
-<p>Width capped, <code>fit: max</code> so nothing upscales, <code>auto: format</code> so modern browsers get WebP. That is the correct call. It applies to images an author dropped into the middle of a paragraph — the images a reader is least likely to notice.</p>
-<p><code>AllPosts.tsx</code> contained zero references to it. So did the post header. Those cards rendered <code>mainImage.asset.url</code> — the original upload, straight from the CDN — and let CSS scale it into a 250px box. The browser downloads all 3.13 MB first and then paints it small.</p>
-<p>It made the site look like a site that sized its images.</p>
-<h2>The fix</h2>
-<p>The queries feeding those cards project <code>asset-&gt;{url}</code>, not the reference object <code>urlFor</code> wants, so going through the builder meant rewriting the queries. Instead the helper takes the URL the query already returns:</p>
-<pre><code>export function sizedImage(url: string | undefined | null, width: number): string {
-  if (!url) return &quot;&quot;;
-  // Non-Sanity URLs (the BlockNote editor stores upload-endpoint URLs directly)
-  // do not understand these parameters.
-  if (!url.includes(&quot;cdn.sanity.io&quot;)) return url;
-  const sep = url.includes(&quot;?&quot;) ? &quot;&amp;&quot; : &quot;?&quot;;
-  return `${url}${sep}w=${width}&amp;fit=max&amp;auto=format&amp;q=75`;
-}</code></pre>
-<p><code>auto=format</code> negotiates on the request's Accept header, so a modern browser gets WebP and an older one gets the original format. <code>fit=max</code> only ever scales down, so a small source is never blown up. The <code>cdn.sanity.io</code> check is there because my BlockNote editor stores upload-endpoint URLs directly and those do not understand the parameters — appending them would have broken images that were working.</p>
-<p>Measured the same way afterward, those sixteen covers came to 182 KB, 56 times less than before. The 2160x2700 PNG is 24 KB.</p>
-<p>That is the number for those images on those routes, measured with one browser on one day. I have not measured load time on a real connection, and I am not going to tell you the site is fast now.</p>
-<h2>The scope is the claim I did not audit</h2>
-<p>An audit answers the question you point it at. Mine asked: what is heavy in what I ship? The answer was correct.</p>
-<p>But &quot;what I ship&quot; is a boundary drawn by the bundler, and the browser does not know that boundary exists. It requests what the page tells it to request, from wherever. My method treated a build artifact as a stand-in for a page load, and those two things overlap on a site like this without being the same set.</p>
-<p>What made that step feel rigorous is the same thing that made it narrow: it was mechanical. A directory, a list of files, sizes, sorted. A measurement that can be exhaustive is exhaustive over its own domain and silent about everything else, and it does not feel silent — it feels finished. Twenty findings, all real, and 9.88 MB still going out on the route I advertise.</p>
-<p>The list of findings is the part of an audit that gets checked. The scope is a claim too — a claim about where problems are allowed to be — and it is the one that ships unexamined. Next time I will write that claim down next to the method, in the same document: here is what I measured, and here is what this measurement cannot see.</p>]]></content:encoded>
-    </item>
-    <item>
-      <title><![CDATA[Green and Blind: When a Passing Check Means Nothing]]></title>
-      <link>https://codewithgabo.com/green-and-blind</link>
-      <guid isPermaLink="true">https://codewithgabo.com/green-and-blind</guid>
-      <pubDate>Mon, 24 Aug 2026 20:29:04 GMT</pubDate>
-      <description><![CDATA[A commit message that was accurate and a site serving the opposite. Two failures from this site in one week: one check watching the wrong surface, and one slot nothing was watching at all.]]></description>
-      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/1c0dd1fa59cae44a7fe1987e7c1dd4f35a4565eb-1200x630.png" alt="Green and Blind: When a Passing Check Means Nothing" />
-<p>I wrote a commit message that says <code>SEO.tsx</code> &quot;sets documentElement.lang&quot; and &quot;emits hreflang links&quot;. I opened a Spanish post in the browser, looked at the document, and there it was: <code>documentElement.lang === &quot;es&quot;</code>, and three <code>&lt;link rel=&quot;alternate&quot; hreflang&gt;</code> tags for <code>es</code>, <code>en</code>, and <code>x-default</code>. Right language, right pairs, right default.</p>
-<p>The commit message was accurate. The site was also serving <code>&lt;html lang=&quot;en&quot;&gt;</code> on every Spanish post, with zero hreflang annotations.</p>
-<p>Both of those sentences are true. They are true of different surfaces.</p>
-<h2>The annotation that was there and wasn't</h2>
-<p>This site is a React 19 SPA on Vercel with a build-time prerender step. The prerender writes the <code>&lt;head&gt;</code> into the static HTML so that crawlers get titles and meta tags without executing anything. <code>SEO.tsx</code> is a React component. It runs in the browser, after React mounts, and it does exactly what its commit message claims.</p>
-<p><code>scripts/prerender.mjs</code> writes the HTML the server actually sends. At that commit:</p>
-<pre><code>$ git show 86569b0:scripts/prerender.mjs | grep -c hreflang
-0</code></pre>
-<p>The prerender rewrote only the <code>&lt;head&gt;</code> element. It never touched the <code>&lt;html&gt;</code> tag at all, so the <code>lang</code> attribute stayed at whatever <code>index.html</code> had baked in, which was <code>en</code>. And it emitted no alternates, because nothing in it knew the translation table existed.</p>
-<p>I confirmed it with <code>curl</code> on all four paired URLs — English original and Spanish translation, both directions. Then I tried again with a Googlebot user-agent, in case Vercel was doing something clever for crawlers. Byte-identical response. There was no second delivery path. The sitemap had no <code>xhtml:link</code> alternates either.</p>
-<p>There is a trap in this one worth naming, because it is what lets the mistake survive for a while. Every page on the site serves this:</p>
-<pre><code>&lt;link rel=&quot;alternate&quot; type=&quot;application/rss+xml&quot; ...&gt;</code></pre>
-<p>Grep the served HTML for <code>alternate</code> and you find a hit. If you are checking quickly, and you are already fairly sure the feature works because you watched it work, a hit is enough. The string you searched for was present. It was the feed.</p>
-<p>The practical consequence is narrower than it sounds. Google renders JavaScript, so for Google this was a delay rather than a loss. The exposure was to engines that do not render, which saw Spanish posts declared as English with no indication that a translation existed.</p>
-<p>Fixed on 21 August. <code>prerender.mjs</code> now sets <code>lang</code> on the <code>&lt;html&gt;</code> element and emits the alternates, reading <code>src/config/translations.json</code> — the same file <code>src/config/translations.ts</code> reads. The table lives in JSON because a <code>.mjs</code> build script cannot import a <code>.ts</code> module, and keeping two copies of it is precisely how the two halves would drift apart again.</p>
-<p>Verified after: <code>lang=&quot;es&quot;</code> on the two Spanish posts, <code>lang=&quot;en&quot;</code> on the two English ones, three hreflang links on each of the four paired posts, and zero on an unpaired post like <code>/tailwind-css</code> — which is the correct number, since an hreflang pointing at a translation that doesn't exist is a false claim.</p>
-<p>I did not verify the wrong thing here. I verified a real thing on the surface that was easier to reach.</p>
-<h2>The slot no test was watching</h2>
-<p>The second one isn't about checking the wrong surface. There was no surface to check.</p>
-<p>Every post carries two ad units: one in-article, one at the foot of the post. On 20 August at 22:48 I shipped this line:</p>
-<pre><code>setStatus(ins.getAttribute('data-ad-status') ?? 'no-response');</code></pre>
-<p>Three seconds after mount, if AdSense had not written a verdict onto the element, the code invented one. The CSS collapsed the container on <code>no-response</code>, so the slot went <code>display: none</code> — while AdSense was still measuring it. An ad cannot be placed into a hidden, zero-width box. The guess made itself come true.</p>
-<p>That was live for about ten hours. The fix, at 08:46 the next morning, removed the timeout entirely: only AdSense's own verdict changes the state, and a missing verdict means &quot;pending&quot;, which reserves space instead of collapsing it.</p>
-<p>That installed the exact mirror of the bug it fixed.</p>
-<p>In production, the end-of-post unit reaches <code>data-adsbygoogle-status=&quot;done&quot;</code> and then never receives <code>data-ad-status</code> at all. Under the new rule, &quot;never&quot; is indistinguishable from &quot;not yet&quot;. It sat in <code>pending</code> permanently. Measured in a real browser on 23 August, on /portfolio-audit-20-problems, both slots at the same moment:</p>
-<pre><code>slot 9344511662  (end of post)
-  data-adsbygoogle-status   &quot;done&quot;
-  data-ad-status            null
-  iframes                   0
-  height                    303px
-  display                   block
-  &quot;Advertisement&quot; label     visible
-
-slot 2970675007  (in-article)
-  data-adsbygoogle-status   &quot;done&quot;
-  data-ad-status            &quot;unfilled&quot;
-  height                    0px
-  display                   none</code></pre>
-<p>Same page, same load. The asymmetry was in my state machine, not in AdSense.</p>
-<p>So for two and a half days, every post on this site ended with an empty rectangle labeled &quot;Advertisement&quot; — 303 pixels tall on the page I measured. Nothing was red. No test failed. The build passed, the page rendered.</p>
-<p>The real fix: the grace period now starts only once AdSense itself reports <code>done</code>, and the observer stays attached afterward so a late verdict still wins. It also reads the attribute once immediately on attach, because a <code>MutationObserver</code> tells you nothing about what happened before you called <code>observe()</code>. Verified after: both slots 0px, <code>display: none</code>.</p>
-<h2>Green because nothing is asking</h2>
-<p>The two failures are not the same shape.</p>
-<p>In the hreflang case there was a check and it was watching the browser DOM instead of the response body. Wrong surface, honest mistake, findable.</p>
-<p>In the ad case there was no check. Not a weak one — none. And from outside, &quot;no check&quot; and &quot;check passed&quot; produce the identical signal: a build that goes green. Absence of a failing test looks exactly like presence of a passing one when all you can see is the color. A missing assertion doesn't announce itself the way a broken one does.</p>
-<p>That is why the empty box lasted two and a half days and the hreflang bug lasted until I happened to run <code>curl</code>.</p>
-<h2>The thread this came from</h2>
-<p>I'm writing this because of a comment. On the dev.to cross-post of &quot;How I Actually Code with Claude Code&quot;, Heinrich Neb put it better than I can: a check can be green and blind. His example was a test asserting that a benchmark number appeared in his server's output — where the number was a hardcoded string. The check guarded the sentence, not the measurement. It stayed green for weeks. Debashish Ghosal, in the same thread, suggested writing an outcome note onto each plan file after execution, which is a different attack on the same problem: make the record say what happened, not what was intended.</p>
-<p>I don't have a general solution. I'm not going to end this with a testing philosophy, because I'd be inventing one on the spot to make the post feel finished.</p>
-<p>What I actually have is a habit: open a browser, find the specific element, and measure it. Not the framework's idea of the element — the element. <code>curl</code> the URL instead of trusting the component that writes the tag. Read the height off the box instead of trusting the state that decides the height.</p>
-<p>That is how both of these turned up: one at a time, by hand, because I happened to look. It would not have found a third.</p>]]></content:encoded>
-    </item>
-    <item>
-      <title><![CDATA[I Audited My Own Portfolio and Found 20 Problems]]></title>
-      <link>https://codewithgabo.com/portfolio-audit-20-problems</link>
-      <guid isPermaLink="true">https://codewithgabo.com/portfolio-audit-20-problems</guid>
-      <pubDate>Fri, 21 Aug 2026 20:25:06 GMT</pubDate>
-      <description><![CDATA[Auditing someone else's site is easy. Auditing your own, after two years of defending every decision, is another thing entirely. I found 20 problems, and five of them actually hurt.]]></description>
-      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/3b48195a58198fdf72ecfb4ef87426ae01114c0e-1200x630.png" alt="I Audited My Own Portfolio and Found 20 Problems" />
-<p>Auditing someone else's site is easy. You open devtools, point at what's broken, send the invoice, leave. Auditing your own is a different job, because every bad decision in it is yours, most of them made around eleven at night on a Tuesday, and you have spent months certain they were fine.</p>
-<p>So I sat down with codewithgabo.com and reviewed it like it belonged to a client. No excuses, no &quot;I'll get to that later.&quot; The review turned up <strong>20 findings</strong> across four areas. Five of them stung.</p>
-<p>This post is the honest list: what I found, why it was there, and which number moved when I fixed it.</p>
-<h2>How I audited</h2>
-<p>There's no trick to it. The method was boring on purpose, because boring is what actually finds things.</p>
-<ul>
-<li>I read <strong>every public component</strong> and every route definition in <code>src/</code>.</li>
-<li>I walked the <strong>10 public routes</strong> in a browser, at 375px and on desktop, writing down each page's <code>h1</code>, its character count, its internal links, and any broken image.</li>
-<li>I queried Sanity to count the posts and words I actually had, not the ones I assumed I had.</li>
-<li>I ran <code>npm audit</code> and <code>npm outdated</code>.</li>
-<li>I went through the build output chunk by chunk in <code>build/assets/</code>.</li>
-</ul>
-<p>That last step is the one that hurts and the one most people skip. Looking at the real weight of what you ship is like stepping on a scale in January: you already know it's bad, but you need the number.</p>
-<h2>Finding 1: a 993 KB illustration</h2>
-<p>The worst of the twenty. On <code>/gabriel-abreu</code> I was serving an unoptimized PNG of a developer illustration. <strong>993 KB.</strong> Almost a megabyte of decoration.</p>
-<p>It had company. <code>nobggabo.png</code> weighed 358 KB and shipped on the home page, the blog index and the repos page, because all three variants of my <code>Greeting</code> component import it. So those 358 KB sat on the critical path of the three pages people land on first.</p>
-<p>The fix has no technical merit whatsoever: convert to WebP at quality 80.</p>
-<pre><code>developer-illustration:  993 KB  -&gt;  23 KB   (-98%)
-nobggabo:                358 KB  -&gt;  45 KB   (-87%)</code></pre>
-<p>Ninety-eight percent. Nearly a megabyte, for a drawing that looks identical. The credit isn't in the conversion. It's in finally bothering to look.</p>
-<p><strong>The lesson:</strong> if you've never checked what your images weigh, that is your biggest problem right now. Statistically, it just is.</p>
-<h2>Finding 2: the sitemap contained zero posts</h2>
-<p>I had 9 published posts. My <code>sitemap.xml</code> listed <strong>7 static pages and no posts at all</strong>. The <code>lastmod</code> dates were frozen months in the past on top of that.</p>
-<p>Which means I'd been writing content and then not showing it to Google. All of the writing work, none of the distribution work.</p>
-<p>The root cause was that the sitemap was a static file I had to update by hand. By hand means never.</p>
-<p>It's now generated at build time from a GROQ query against Sanity, running as <code>prebuild</code>:</p>
-<pre><code>*[_type==&quot;post&quot; &amp;&amp; !(_id in path(&quot;drafts.**&quot;)) &amp;&amp; defined(slug.current)]{
-  &quot;slug&quot;: slug.current,
-  _updatedAt
-}</code></pre>
-<p>Every <code>npm run build</code> writes a fresh <code>sitemap.xml</code> with all the posts and real dates. It no longer depends on me remembering.</p>
-<p><strong>The lesson:</strong> anything that depends on your memory is already broken. You just haven't found out yet.</p>
-<h2>Finding 3: my 404 page didn't exist in practice</h2>
-<p>This is the one I'm most embarrassed by, because it was a real bug and not an oversight.</p>
-<p>If you typed <code>codewithgabo.com/anything</code>, the site hung forever on <strong>&quot;Loading post...&quot;</strong>. No 404. No error message. Just a spinner, until you got bored and closed the tab.</p>
-<p>The cause: my post route, <code>/:slug</code>, caught any unknown URL before it could ever reach the <code>*</code> route that renders <code>NotFound</code>. <code>OnePost</code> queried Sanity, got nothing back, and since it didn't distinguish &quot;still loading&quot; from &quot;this doesn't exist,&quot; it sat in the loading state indefinitely.</p>
-<p>The fix was separating those two states:</p>
-<pre><code>const [postData, setPostData] = useState&lt;SanityPostData | null&gt;(null);
-const [notFound, setNotFound] = useState(false);
-
-// ...
-
-if (notFound) return &lt;NotFound /&gt;;
-if (!postData) return &lt;LoadingSpinner message=&quot;Loading post...&quot; /&gt;;</code></pre>
-<p>Three lines. One extra <code>useState</code> and two returns in the right order. That was the fix for a bug that had spent months quietly turning visitors away.</p>
-<p>While I was in there I gave the 404 page an actual design: the big number, a bilingual heading, and three buttons that take you somewhere useful instead of leaving you stranded.</p>
-<p><strong>The lesson:</strong> a loading state that never resolves looks exactly like &quot;slow.&quot; That's why nobody reports it.</p>
-<h2>Finding 4: a feature that hadn't rendered in months</h2>
-<p>In <code>data.ts</code> I have three projects tagged <code>badge: &quot;New&quot;</code>: Analytics Dashboard, NegocioRD and A2C International. The <code>Card</code> component accepts a <code>badge</code> prop and renders it as a pill.</p>
-<p>The pill never appeared. Not once.</p>
-<p>Why? Because <code>Portfolio.tsx</code> destructured <code>image</code>, <code>title</code>, <code>description</code>, <code>url</code> and <code>languages</code> off each project, and forgot <code>badge</code>. The data existed. The component that renders it existed. Nobody had ever introduced the two to each other.</p>
-<pre><code>  description={project.description}
-  url={project.url}
-  languages={project.languages}
-+ badge={project.badge}</code></pre>
-<p><strong>One line.</strong> I wrote the data, I wrote the component, and I left out the wire between them. It sat like that for months, and I never noticed because I never looked at the project grid asking &quot;does this look the way it should?&quot; I looked at it asking &quot;does it load?&quot;</p>
-<p><strong>The lesson:</strong> check your UI against what it's <em>supposed</em> to show, not against what it shows. Those are different questions and only one of them catches this bug.</p>
-<h2>Finding 5: 405 KB of charting library for people who hadn't asked for charts</h2>
-<p>I keep an analytics dashboard at <code>/dashboard-demo</code>, public, so the work is visible. It uses recharts.</p>
-<p>Recharts is heavy. And it was sitting inside the chunk loaded eagerly when you hit the route. So anyone who opened the demo downloaded <strong>405 KB</strong> of charting library before deciding whether they even cared.</p>
-<p>The fix was wrapping <code>ChartCard</code> in <code>React.lazy</code> with <code>Suspense</code>, so recharts becomes its own chunk and only comes down when the charts are actually about to mount:</p>
-<pre><code>before:  useAnalyticsData chunk = 405 KB   (recharts inside)
-after:   useAnalyticsData chunk =   3 KB
-         ChartCard chunk        = 411 KB   (lazy)</code></pre>
-<p>405 KB down to 3 KB on initial load. The library still weighs what it weighs, obviously. What changed is <em>when</em> you pay for it, and who does.</p>
-<p><strong>The lesson:</strong> code splitting doesn't make your app smaller. It stops the people who bounce from paying for what they never used.</p>
-<h2>The other fifteen</h2>
-<p>Not all of them were dramatic. Six unused images sitting in the repo, more than a megabyte of dead weight. One moderate vulnerability in a dependency. A page, <code>/education</code>, that existed and rendered content but wasn't linked from anywhere in the menu. Forgotten <code>console.log</code> and <code>console.warn</code> calls in five files. No privacy policy page and no terms page.</p>
-<p>There were also things that were fine, which is worth writing down so you don't drive yourself crazy: the mobile layout was clean, the content density was good, and the ad configuration was correct. An honest audit also tells you what to leave alone.</p>
-<h2>How to audit yours</h2>
-<p>If you're up for it, this is the order I'd go in. It's sorted by return per hour spent:</p>
-<ol>
-<li><strong>Weigh your images.</strong> Sort by size and look at the top three. If anything is over 200 KB, there's your afternoon.</li>
-<li><strong>Type a URL that doesn't exist</strong> on your own site. Watch what happens. Count to ten. If it's still loading, you have my finding number 3.</li>
-<li><strong>Open your sitemap</strong> and count the URLs. Is your actual content in there? Are the dates real?</li>
-<li><strong>Look at your build chunk sizes.</strong> Anything over 300 KB that isn't required for the first paint is a candidate for lazy loading.</li>
-<li><strong>Walk every page asking what it should be showing</strong>, not whether it loads. That's where bugs like the badge one turn up.</li>
-<li><strong>Run `npm audit` and `npm outdated`.</strong> Ten seconds.</li>
-<li><strong>Grep the project for `console.log`.</strong> Another ten seconds.</li>
-</ol>
-<p>All seven steps fit in an afternoon. It took me one afternoon to find these and another to fix the ones that mattered.</p>
-<h2>What I actually learned</h2>
-<p>None of these problems were hard. Not one. The most complex fix was three lines; the highest-impact one was converting a PNG to WebP, which is a single command.</p>
-<p>They weren't there because they were difficult. They were there because <strong>I never sat down and looked.</strong> Building is more fun than reviewing, so you keep building on top, and the broken things stay underneath, holding up the building with a months-old bug.</p>
-<p>If you have a portfolio, a blog or a side project you haven't honestly looked at in a while: put two hours on the calendar this week. Not to add anything. Just to look.</p>
-<p>You'll find your own 993 KB PNG. I promise.</p>]]></content:encoded>
-    </item>
-    <item>
-      <title><![CDATA[How I Actually Code with Claude Code: My Real Workflow on a Real Project]]></title>
-      <link>https://codewithgabo.com/how-i-actually-code-with-claude-code</link>
-      <guid isPermaLink="true">https://codewithgabo.com/how-i-actually-code-with-claude-code</guid>
-      <pubDate>Fri, 21 Aug 2026 20:25:03 GMT</pubDate>
-      <description><![CDATA[Not another "write a prompt and watch the magic" tutorial. This is the real workflow I use on this very site — three tasks I actually delegated, and the part almost nobody writes about: where it fails.]]></description>
-      <content:encoded><![CDATA[<img src="https://cdn.sanity.io/images/nnt7ytcd/production/7fd3232dc85c4dde59f786dcc78d0d405dca7119-1200x630.png" alt="How I Actually Code with Claude Code: My Real Workflow on a Real Project" />
-<p>There are two kinds of articles about coding with AI. The ones that generate a sorting function and conclude the profession is over, and the ones that show a dumb bug and conclude none of this works.</p>
-<p>Neither one looks anything like my actual workday.</p>
-<p>This is the third kind: the concrete workflow I use with Claude Code on this very site, three tasks I actually delegated, the trail in the repository to back it up, and a section on where it fails that runs as long as the section on where it works. That's the part I would have wanted to read.</p>
-<h2>What it is, without the marketing</h2>
-<p>Claude Code is an agent that runs in your terminal, inside your repository. It reads your files, runs your commands, edits your code, makes your commits. It isn't editor autocomplete, and it isn't a separate chat window where you paste fragments back and forth.</p>
-<p>That difference matters more than it sounds. An assistant that sees one file helps you write a function. An agent that sees the whole repo, runs the tests and reads the output can take a complete task off your hands. It's the difference between asking for advice and delegating work.</p>
-<h2>My setup</h2>
-<p>Nothing exotic:</p>
-<ul>
-<li>The repo for this site: a React frontend on Vite, Sanity as the CMS, and a small backend of Vercel Functions.</li>
-<li>A <code>.claude/</code> folder in the project with the local config and permissions.</li>
-<li>A <code>docs/plans/</code> folder where every design and plan lives. This is the key piece, and I'll explain why in a second.</li>
-<li>Git worktrees when a big task deserves isolation from the current working tree.</li>
-</ul>
-<p>And one rule of my own, which is what actually changed my results: <strong>nothing big gets written without a written plan first.</strong></p>
-<h2>The workflow: design, plan, execute</h2>
-<p>The temptation with an agent is to open the terminal and say &quot;add me an admin panel.&quot; Sometimes that works. Often it produces something that runs but isn't what you wanted, and you find out after six hundred lines are already on disk.</p>
-<p>So I split it into three phases, and I don't let them overlap.</p>
-<p><strong>One: design.</strong> Before touching code, a conversation. What problem are we solving, two or three approaches with their downsides, which one we pick and why. Out comes a design document in <code>docs/plans/</code>. Short, but written.</p>
-<p><strong>Two: plan.</strong> The design turns into a task-by-task plan. Which files each task touches, which test gets written first, which command verifies it, where the commit goes. My plans folder has files like <code>2026-04-28-slice-2-vercel-migration.md</code> and <code>2026-04-29-portfolio-audit-implementation.md</code>. Each one is a plan that got executed task by task.</p>
-<p><strong>Three: execute.</strong> Now the code. With the plan in front of it, the session doesn't drift. If something doesn't fit, it shows up right away, because there's a document saying what should be happening.</p>
-<p>It sounds like bureaucracy, and I thought so at first. It isn't. The written plan is what turns &quot;the agent did something weird&quot; into &quot;the agent went off script at step 4,&quot; which is a very different problem and a much easier one to fix.</p>
-<h2>Three tasks I actually delegated</h2>
-<h3>The portfolio audit</h3>
-<p>I asked it to audit this site as if it belonged to a client. Read every public component, walk the routes on mobile and desktop, measure the build chunk sizes, count the real posts in Sanity.</p>
-<p>It came back with <strong>20 findings across four areas</strong>, each with a priority and an effort estimate. Among them: a 993 KB unoptimized illustration, a sitemap containing zero of nine published posts, and a 404 page that hung forever on &quot;Loading post...&quot;.</p>
-<p>I wrote that one up in detail <a href="https://codewithgabo.com/portfolio-audit-20-problems">in a separate post</a>, but what matters here is the division of labor: <strong>the machine found, I prioritized.</strong> The document came back with findings and no fixes, on purpose, so I would be the one deciding what got touched and what didn't. Three of the twenty I threw out.</p>
-<h3>Migrating Express to Vercel Functions</h3>
-<p>I had a small Express server on Railway wrapping the Google Analytics API. It worked, but it cost money every month to sit there 24/7 serving a dashboard almost nobody visits.</p>
-<p>Moving it to serverless functions was textbook work: pull the helpers into <code>api/_utils/</code>, turn the route into a handler, move the environment variables, verify the external contract didn't change. The frontend never noticed. The bill went to zero.</p>
-<p>This is exactly the kind of task where delegating wins: mechanical, well defined, with an objective success criterion. It doesn't take judgment, it takes not getting twenty details in a row wrong. A machine does that better than I do at eleven at night.</p>
-<h3>The sitemap generated from Sanity</h3>
-<p>My sitemap was a static file I had to edit by hand every time I published. Which is to say: never.</p>
-<p>Now it's a script that runs on <code>prebuild</code>, queries Sanity with GROQ, and writes the file with every post and its real date. Eighty lines of Node, no new dependencies.</p>
-<p>Small task, and that's exactly why it sat there for months. That's the pattern I've noticed most: what has saved me the most time isn't the big tasks, it's the forty-minute ones that had been on the list for half a year because they were never urgent enough.</p>
-<h2>Where it fails</h2>
-<p>This is where most of these articles go blurry. Straight to it.</p>
-<p><strong>It accepts your premise too fast.</strong> If you say &quot;fix this CSS bug,&quot; it will go looking for a CSS bug. If the real problem was route ordering, you may get a CSS fix that covers the symptom. Now, when something breaks, I describe the behavior and not my diagnosis. The difference in outcome is enormous.</p>
-<p><strong>It's too agreeable about your ideas.</strong> If you propose a bad approach, the default response tends to be helping you build it well. I explicitly ask for two or three options with their downsides before anything gets decided, because if I don't ask for alternatives, they don't show up.</p>
-<p><strong>Context degrades in long sessions.</strong> Over a session of several hours, the decisions from the first half hour get fuzzy. That's why the plan goes into a file instead of staying in the conversation: the file doesn't forget.</p>
-<p><strong>It doesn't know what ugly looks like.</strong> It can write a component that is correct, accessible, passes the tests, and looks bad. Visual judgment is still yours. On this site I've redone by hand a fair amount of CSS that was technically fine.</p>
-<p><strong>And the big one: you are still responsible for what gets merged.</strong> I read every diff. Not because I trust it less than a human colleague, but exactly as much as I'd check a human colleague. A commit with my name on it is mine, no matter who typed it.</p>
-<p><strong>When it costs more than it saves:</strong> tasks under ten minutes that I already know how to do, one-line changes, and anything where explaining the context takes longer than doing the thing. Writing a good prompt for a trivial change is net negative work.</p>
-<h2>How to start tomorrow</h2>
-<p>If you want to try this without getting burned:</p>
-<ol>
-<li><strong>Start with a boring, well-defined task.</strong> Migrating a format, writing tests for something that already exists, updating dependencies. Don't start with your product's flagship feature.</li>
-<li><strong>Ask for a plan before code.</strong> Even when the task is small. Reading the plan tells you in thirty seconds whether you were understood, and fixing a plan is free compared to fixing an implementation.</li>
-<li><strong>Work on a branch or a worktree.</strong> So you can throw it all away without thinking twice if it goes sideways.</li>
-<li><strong>Read the diffs.</strong> All of them. If you're not going to read them, don't delegate.</li>
-<li><strong>Leave the context in the repository, in writing.</strong> Decisions that live only in a conversation get lost. The ones in <code>docs/plans/</code> are still there three months later, when you no longer remember why you chose that.</li>
-</ol>
-<h2>What actually changed</h2>
-<p>I don't code faster. I code with less friction on the boring parts, which turn out to be most of the work.</p>
-<p>The tasks that used to sit on the list out of inertia now get done, because the cost of starting them dropped enough. The sitemap had been pending for months. The audit for longer. Neither was hard; both were tedious, and tedious is exactly what piled up on me.</p>
-<p>What didn't change: I still decide what gets built, I still review every line that goes in, and I'm still the one responsible when something breaks in production.</p>
-<p>That seems right to me. It's the part of the job I like.</p>]]></content:encoded>
     </item>
   </channel>
 </rss>

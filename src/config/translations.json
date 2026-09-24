@@ -10,8 +10,10 @@
     "el-email-que-envias-no-es-el-que-leen",
     "el-punto-ciego-de-la-auditoria",
     "generar-el-xml-no-es-facturar",
+    "la-ia-arreglo-el-bug-y-rompio-lo-demas",
     "la-proxima-filtracion-llego-en-cuatro-dias",
     "lo-de-claro-que-se-sabe-y-que-no",
+    "rd-inteligente-lo-que-ensena-y-lo-que-pide",
     "react-19-3-el-compilador-y-un-cvss-10",
     "verde-y-ciego"
   ],
@@ -59,6 +61,14 @@
     {
       "es": "generar-el-xml-no-es-facturar",
       "en": "generating-the-xml-is-not-invoicing"
+    },
+    {
+      "es": "la-ia-arreglo-el-bug-y-rompio-lo-demas",
+      "en": "the-ai-fixed-the-bug-and-broke-everything-else"
+    },
+    {
+      "es": "rd-inteligente-lo-que-ensena-y-lo-que-pide",
+      "en": "rd-inteligente-what-it-teaches-and-asks-for"
     }
   ]
 }

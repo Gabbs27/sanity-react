@@ -28,26 +28,48 @@ const PUBLISH = process.argv.includes("--publish");
 
 const POSTS = [
   {
-    slug: "generar-el-xml-no-es-facturar",
-    title: "Generar el XML no es facturar: lo que aprendí construyendo un emisor de e-CF",
+    slug: "la-ia-arreglo-el-bug-y-rompio-lo-demas",
+    title: "La IA arregló el bug y rompió lo demás: cómo reviso lo que me cambia un agente",
     excerpt:
-      "El 1 de noviembre los grandes locales y medianos se quedan sin comprobantes B, y " +
-      "el 15 vence el plazo de los pequeños. Construí un emisor de e-CF: un esquema oficial " +
-      "que no compila por un espacio, tres URIs mal escritas y por qué emitir obliga a recibir.",
-    tags: ["Facturación Electrónica", "DGII", "República Dominicana", "XML", "Build in Public"],
-    markdown: resolve(ROOT, "docs/drafts/generar-el-xml-no-es-facturar.md"),
-    cover: "scripts/covers/out/ecf-es.png",
+      "Le pedí a la IA que arreglara un bug y el chiste se escribió solo. Pero el 66 % de los " +
+      "devs dice que la IA entrega soluciones que están casi bien. Cinco chequeos que hago para " +
+      "revisar lo que me cambia un agente, empezando por el tamaño del diff.",
+    tags: ["Inteligencia Artificial", "Claude Code", "Testing", "Code Review", "Git"],
+    markdown: resolve(ROOT, "docs/drafts/la-ia-arreglo-el-bug-y-rompio-lo-demas.md"),
+    cover: "scripts/covers/out/agente-bug-es.png",
   },
   {
-    slug: "generating-the-xml-is-not-invoicing",
-    title: "Generating the XML isn't invoicing: what I learned building a Dominican e-invoice issuer",
+    slug: "the-ai-fixed-the-bug-and-broke-everything-else",
+    title: "The AI fixed the bug and broke everything else: how I review what an agent changes",
     excerpt:
-      "Dominican businesses have until November to issue electronic fiscal receipts. I built " +
-      "an issuer: an official schema that breaks over one space, three misspelled URIs in the " +
-      "signing example, and why issuing means receiving.",
-    tags: ["E-invoicing", "Dominican Republic", "XML", "Build in Public", "Government APIs"],
-    markdown: resolve(ROOT, "docs/drafts/generating-the-xml-is-not-invoicing.md"),
-    cover: "scripts/covers/out/ecf-en.png",
+      "Asking an AI to fix one bug makes a good joke, but 66% of developers say AI solutions " +
+      "are almost right, but not quite. Five checks I use to review what a coding agent " +
+      "changes, starting with the size of the diff.",
+    tags: ["AI", "Claude Code", "Testing", "Code Review", "Git"],
+    markdown: resolve(ROOT, "docs/drafts/the-ai-fixed-the-bug-and-broke-everything-else.md"),
+    cover: "scripts/covers/out/agente-bug-en.png",
+  },
+  {
+    slug: "rd-inteligente-lo-que-ensena-y-lo-que-pide",
+    title: "RD Inteligente: lo que enseña, lo que pide y lo que dice la letra pequeña",
+    excerpt:
+      "El 10 de septiembre arrancó RD Inteligente, el curso gratis de IA del ITLA para un " +
+      "millón de dominicanos. Leí el programa, los términos y la política de privacidad: qué " +
+      "enseña, qué pide para entrar y tres cosas que conviene saber antes de dar la cédula.",
+    tags: ["Inteligencia Artificial", "República Dominicana", "Privacidad", "Educación", "ITLA"],
+    markdown: resolve(ROOT, "docs/drafts/rd-inteligente-lo-que-ensena-y-lo-que-pide.md"),
+    cover: "scripts/covers/out/rd-inteligente-es.png",
+  },
+  {
+    slug: "rd-inteligente-what-it-teaches-and-asks-for",
+    title: "RD Inteligente: what the Dominican AI course teaches, asks for, and says in the fine print",
+    excerpt:
+      "On September 10 the Dominican Republic launched RD Inteligente, ITLA's free AI course " +
+      "for a million people. I read the program, the terms and the privacy policy: what it " +
+      "teaches, what it asks for, and three things worth knowing before handing over your ID.",
+    tags: ["AI", "Dominican Republic", "Privacy", "Education", "Government"],
+    markdown: resolve(ROOT, "docs/drafts/rd-inteligente-what-it-teaches-and-asks-for.md"),
+    cover: "scripts/covers/out/rd-inteligente-en.png",
   },
 ];
 
