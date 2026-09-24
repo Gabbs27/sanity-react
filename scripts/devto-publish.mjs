@@ -36,20 +36,36 @@ if (!KEY) throw new Error('No DEVTO_API_KEY in .env');
 // dev.to allows at most 4 tags, lowercase alphanumeric only.
 const POSTS = [
   {
-    slug: 'generating-the-xml-is-not-invoicing',
-    draft: 'docs/drafts/generating-the-xml-is-not-invoicing.md',
-    title: "Generating the XML Isn't Invoicing: What I Learned Building a Dominican E-Invoice Issuer",
-    tags: 'webdev, javascript, xml, showdev',
+    slug: 'la-ia-arreglo-el-bug-y-rompio-lo-demas',
+    draft: 'docs/drafts/la-ia-arreglo-el-bug-y-rompio-lo-demas.md',
+    title: 'La IA arregló el bug y rompió lo demás: cómo reviso lo que me cambia un agente',
+    tags: 'ai, testing, git, productivity',
     cover:
-      'https://cdn.sanity.io/images/nnt7ytcd/production/82cd7e8d875be907c94bbea9ab7b513e09952568-1200x630.png',
+      'https://cdn.sanity.io/images/nnt7ytcd/production/89614cc09682de4b26d7cf6db290557e447f4395-1200x630.png',
   },
   {
-    slug: 'generar-el-xml-no-es-facturar',
-    draft: 'docs/drafts/generar-el-xml-no-es-facturar.md',
-    title: 'Generar el XML no es facturar: lo que aprendí construyendo un emisor de e-CF',
-    tags: 'webdev, javascript, xml, showdev',
+    slug: 'the-ai-fixed-the-bug-and-broke-everything-else',
+    draft: 'docs/drafts/the-ai-fixed-the-bug-and-broke-everything-else.md',
+    title: 'The AI Fixed the Bug and Broke Everything Else: How I Review What an Agent Changes',
+    tags: 'ai, testing, git, productivity',
     cover:
-      'https://cdn.sanity.io/images/nnt7ytcd/production/537bbbcec508947e7503ce73cc081574fb1703f8-1200x630.png',
+      'https://cdn.sanity.io/images/nnt7ytcd/production/c03b32924ae8369bb9570dc2e20d6b0bcf6719fc-1200x630.png',
+  },
+  {
+    slug: 'rd-inteligente-lo-que-ensena-y-lo-que-pide',
+    draft: 'docs/drafts/rd-inteligente-lo-que-ensena-y-lo-que-pide.md',
+    title: 'RD Inteligente: lo que enseña, lo que pide y lo que dice la letra pequeña',
+    tags: 'ai, privacy, education, news',
+    cover:
+      'https://cdn.sanity.io/images/nnt7ytcd/production/7cdb71b05b0329500454904da82a58c8639ce94d-1200x630.png',
+  },
+  {
+    slug: 'rd-inteligente-what-it-teaches-and-asks-for',
+    draft: 'docs/drafts/rd-inteligente-what-it-teaches-and-asks-for.md',
+    title: 'RD Inteligente: What the Dominican AI Course Teaches, Asks For, and Says in the Fine Print',
+    tags: 'ai, privacy, education, news',
+    cover:
+      'https://cdn.sanity.io/images/nnt7ytcd/production/b9a0168ce3bf9dd332be35f0a04dde4e6b0b5616-1200x630.png',
   },
 ];
 
