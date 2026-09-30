@@ -80,8 +80,11 @@ function description(post) {
   return text.length > 300 ? `${text.slice(0, 297).trimEnd()}…` : text;
 }
 
+// Newest first, like Portfolio.tsx and AllPosts.tsx. Unordered, GROQ returned
+// Sanity's default order and the no-JS home listed a 2023 tutorial first: the
+// first thing a crawler that doesn't run the bundle saw of the blog.
 const posts = await client.fetch(
-  `*[_type == "post" && defined(slug.current) && !(_id in path("drafts.**"))]{
+  `*[_type == "post" && defined(slug.current) && !(_id in path("drafts.**"))] | order(publishedAt desc){
      "slug": slug.current,
      title,
      excerpt,
