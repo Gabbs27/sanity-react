@@ -28,48 +28,26 @@ const PUBLISH = process.argv.includes("--publish");
 
 const POSTS = [
   {
-    slug: "la-ia-arreglo-el-bug-y-rompio-lo-demas",
-    title: "La IA arregló el bug y rompió lo demás: cómo reviso lo que me cambia un agente",
+    slug: "diez-segundos-de-tu-voz",
+    title: "Diez segundos de tu voz ya bastan para clonarla: qué hacer en tu casa",
     excerpt:
-      "Le pedí a la IA que arreglara un bug y el chiste se escribió solo. Pero el 66 % de los " +
-      "devs dice que la IA entrega soluciones que están casi bien. Cinco chequeos que hago para " +
-      "revisar lo que me cambia un agente, empezando por el tamaño del diff.",
-    tags: ["Inteligencia Artificial", "Claude Code", "Testing", "Code Review", "Git"],
-    markdown: resolve(ROOT, "docs/drafts/la-ia-arreglo-el-bug-y-rompio-lo-demas.md"),
-    cover: "scripts/covers/out/agente-bug-es.png",
+      "ElevenLabs ya clona una voz con diez segundos de audio, lo que dura una nota de voz " +
+      "cortica. Qué cambió, cómo funciona la estafa sobre la que alertó la DICAT y la palabra " +
+      "clave que recomienda el FBI para tu familia.",
+    tags: ["Inteligencia Artificial", "Seguridad", "Estafas", "República Dominicana", "ElevenLabs"],
+    markdown: resolve(ROOT, "docs/drafts/diez-segundos-de-tu-voz.md"),
+    cover: "scripts/covers/out/voz-clonada-es.png",
   },
   {
-    slug: "the-ai-fixed-the-bug-and-broke-everything-else",
-    title: "The AI fixed the bug and broke everything else: how I review what an agent changes",
+    slug: "ten-seconds-of-your-voice",
+    title: "Ten seconds of your voice is now enough to clone it: what to do at home",
     excerpt:
-      "Asking an AI to fix one bug makes a good joke, but 66% of developers say AI solutions " +
-      "are almost right, but not quite. Five checks I use to review what a coding agent " +
-      "changes, starting with the size of the diff.",
-    tags: ["AI", "Claude Code", "Testing", "Code Review", "Git"],
-    markdown: resolve(ROOT, "docs/drafts/the-ai-fixed-the-bug-and-broke-everything-else.md"),
-    cover: "scripts/covers/out/agente-bug-en.png",
-  },
-  {
-    slug: "rd-inteligente-lo-que-ensena-y-lo-que-pide",
-    title: "RD Inteligente: lo que enseña, lo que pide y lo que dice la letra pequeña",
-    excerpt:
-      "El 10 de septiembre arrancó RD Inteligente, el curso gratis de IA del ITLA para un " +
-      "millón de dominicanos. Leí el programa, los términos y la política de privacidad: qué " +
-      "enseña, qué pide para entrar y tres cosas que conviene saber antes de dar la cédula.",
-    tags: ["Inteligencia Artificial", "República Dominicana", "Privacidad", "Educación", "ITLA"],
-    markdown: resolve(ROOT, "docs/drafts/rd-inteligente-lo-que-ensena-y-lo-que-pide.md"),
-    cover: "scripts/covers/out/rd-inteligente-es.png",
-  },
-  {
-    slug: "rd-inteligente-what-it-teaches-and-asks-for",
-    title: "RD Inteligente: what the Dominican AI course teaches, asks for, and says in the fine print",
-    excerpt:
-      "On September 10 the Dominican Republic launched RD Inteligente, ITLA's free AI course " +
-      "for a million people. I read the program, the terms and the privacy policy: what it " +
-      "teaches, what it asks for, and three things worth knowing before handing over your ID.",
-    tags: ["AI", "Dominican Republic", "Privacy", "Education", "Government"],
-    markdown: resolve(ROOT, "docs/drafts/rd-inteligente-what-it-teaches-and-asks-for.md"),
-    cover: "scripts/covers/out/rd-inteligente-en.png",
+      "ElevenLabs now clones a voice from ten seconds of audio, the length of a short voice " +
+      "note. What changed, how the scam the Dominican police warned about works, and the " +
+      "family code word the FBI recommends.",
+    tags: ["AI", "Security", "Scams", "Dominican Republic", "ElevenLabs"],
+    markdown: resolve(ROOT, "docs/drafts/ten-seconds-of-your-voice.md"),
+    cover: "scripts/covers/out/voz-clonada-en.png",
   },
 ];
 
