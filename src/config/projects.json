@@ -16,6 +16,22 @@
     "badge": "New"
   },
   {
+    "id": 12,
+    "image": "/images/tinta.webp",
+    "title": "Tinta",
+    "description": "Local macOS app that translates whole EPUB and PDF books between 15 languages without sending a page anywhere. It runs Meta's NLLB-200 model on the Mac's own GPU, so there is no API key, no token bill and no upload; the first launch downloads the model once, about 5 GB. EPUBs keep their structure, images and styling and only the text changes, with live progress per chapter; PDFs come back as plain translated text, layout not preserved. It is machine translation: a readable draft, not a literary edition.",
+    "url": "https://github.com/Gabbs27/tinta",
+    "languages": [
+      "Python",
+      "FastAPI",
+      "PyTorch",
+      "NLLB-200",
+      "pywebview",
+      "py2app"
+    ],
+    "badge": "New"
+  },
+  {
     "id": 10,
     "image": "/images/aparta-buscador-rd.webp",
     "title": "ApartaSearch",
