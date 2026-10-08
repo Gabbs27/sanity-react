@@ -220,7 +220,7 @@ const isSanityQuery = (url) => isSanity(url) && url.includes('/data/query/');
 // request and records the attempt (see sanityGaveUp); a reachable run lets it
 // through, or holds it while a scenario needs the answer not to have arrived
 // yet (see holdSanity).
-async function open(route, { blockSanity = true, viewport = null } = {}) {
+async function open(route, { blockSanity = true, viewport = null, init = null } = {}) {
   const target = await (
     await fetch(`http://127.0.0.1:${CDP}/json/new?about:blank`, { method: 'PUT' })
   ).json();
@@ -249,6 +249,10 @@ async function open(route, { blockSanity = true, viewport = null } = {}) {
   await client.send('Network.setCacheDisabled', { cacheDisabled: true });
   if (viewport) await client.send('Emulation.setDeviceMetricsOverride', viewport);
   await client.send('Page.enable');
+  // `init` runs in the new document before any of the page's own scripts: the
+  // way to put state where the app will find it from its first line, rather
+  // than racing its effects from outside.
+  if (init) await client.send('Page.addScriptToEvaluateOnNewDocument', { source: init });
   await client.send('Page.navigate', { url: `${ORIGIN}${route}` });
 
   const evaluate = async (expression) => {
@@ -340,7 +344,20 @@ async function open(route, { blockSanity = true, viewport = null } = {}) {
     await fetch(`http://127.0.0.1:${CDP}/json/close/${target.id}`);
   };
 
-  return { evaluate, waitFor, close, sanityGaveUp, holdSanity, heldSanity, releaseSanity };
+  // The same page at another size, without a reload: what a rule that depends
+  // on the viewport does when the viewport changes under it.
+  const setViewport = (metrics) => client.send('Emulation.setDeviceMetricsOverride', metrics);
+
+  return {
+    evaluate,
+    waitFor,
+    close,
+    sanityGaveUp,
+    holdSanity,
+    heldSanity,
+    releaseSanity,
+    setViewport,
+  };
 }
 
 const head = async (page) => ({
@@ -563,6 +580,260 @@ test(
         `cover box is ${width}x${height} (ratio ${ratio.toFixed(3)}), expected ${COVER_RATIO.toFixed(3)} +/- 0.03`
       );
     } finally {
+      await page.close();
+    }
+  }
+);
+
+// ── the install prompt ──────────────────────────────────────────────────────
+// InstallPWA listens for Chrome's beforeinstallprompt and, five seconds later,
+// slides a card up from the bottom of the screen. Three things were wrong
+// with it:
+//
+//   1. The card was centred with `left: 50%; transform: translateX(-50%)`, and
+//      motion animates `y` by writing its own inline `transform`. The inline
+//      one won, the translateX was gone, and the card started at the middle of
+//      the screen and ran off its right edge: on a 412px phone it covered the
+//      title of the post and half of it could not be reached.
+//
+//   2. The X stored the moment of the dismissal "for 7 days", and the only
+//      code that read it back ran once, on mount, to set a flag that was
+//      already false. The timer then showed the card anyway. Closing it bought
+//      one page load.
+//
+//   3. Every offer starts its own five-second timer, and a timer that was
+//      already running when the visitor closed the card opened it again. That
+//      one was found by these tests misbehaving: Chrome's own event lands
+//      100 to 700 ms after load, next to the one a test dispatches, so there
+//      were two timers, and the card came back 50 to 400 ms after the X.
+//
+// The five seconds are the component's own, so each scenario that needs the
+// card pays them.
+//
+// Chrome fires the real event by itself on some loads, early, before a test
+// can do anything to the page. So whatever a scenario needs in localStorage
+// goes in through `init`, before the app's first line. Setting it afterwards
+// looked equivalent and was not: the "older than a week" control wrote its
+// eight-day-old dismissal after mount, Chrome's own event had already been
+// heard with nothing stored, and the card came up on that event's timer. The
+// control passed with the expiry deleted from the component. It was measuring
+// who got to the listener first.
+const INSTALL = '.install-pwa-container';
+const DISMISSED_KEY = 'pwa-install-dismissed';
+// The opening about:blank has an opaque origin, where touching localStorage
+// throws; the script runs there too.
+const storeDismissal = (value) =>
+  `try { ${
+    value === null
+      ? `localStorage.removeItem('${DISMISSED_KEY}')`
+      : `localStorage.setItem('${DISMISSED_KEY}', '${value}')`
+  }; } catch {}`;
+const DESKTOP = { width: 1280, height: 800, deviceScaleFactor: 1, mobile: false };
+const MOUNTED = `!!document.getElementById('main-content')`;
+
+// Dispatches the event the component waits for, and says whether anyone heard
+// it. preventDefault() is the first thing the component's listener does, so a
+// prevented event proves its effect has run, and polling this until it is true
+// delivers exactly one event to it: the earlier ones had no listener.
+const OFFER_INSTALL = `(() => {
+  const e = new Event('beforeinstallprompt', { cancelable: true });
+  window.dispatchEvent(e);
+  return e.defaultPrevented;
+})()`;
+
+// The card's box as JSON once it has stopped moving on a viewport at least
+// `minWidth` wide: two reads in a row that agree, at full opacity. The spring
+// that slides it in is still travelling for a while after the node exists.
+const installBoxAtRest = (minWidth) => `(() => {
+  const el = document.querySelector('${INSTALL}');
+  const viewportWidth = document.documentElement.clientWidth;
+  if (!el || viewportWidth < ${minWidth}) return '';
+  const r = el.getBoundingClientRect();
+  const round = (n) => Math.round(n * 10) / 10;
+  const box = JSON.stringify({
+    left: round(r.left),
+    right: round(r.right),
+    top: round(r.top),
+    bottom: round(r.bottom),
+    viewportWidth,
+    viewportHeight: window.innerHeight,
+  });
+  const still = window.__installBox === box && getComputedStyle(el).opacity === '1';
+  window.__installBox = box;
+  return still ? box : '';
+})()`;
+
+function assertInsideAndCentred(box, where) {
+  const span = `it spans ${box.left}px to ${box.right}px of a ${box.viewportWidth}px viewport`;
+  assert.ok(
+    box.left >= 0 && box.right <= box.viewportWidth,
+    `on ${where} the install prompt runs off the screen: ${span}`
+  );
+  const offCentre = (box.left + box.right) / 2 - box.viewportWidth / 2;
+  assert.ok(
+    Math.abs(offCentre) <= 1,
+    `on ${where} the install prompt is ${offCentre}px off centre: ${span}`
+  );
+  assert.ok(
+    box.top >= 0 && box.bottom <= box.viewportHeight,
+    `on ${where} the install prompt is not fully on screen vertically: ` +
+      `${box.top}px to ${box.bottom}px of ${box.viewportHeight}px`
+  );
+}
+
+test(
+  'the install prompt sits inside the viewport and centred, on a phone and on a desktop',
+  { skip: SKIP, timeout: 60_000 },
+  async () => {
+    const page = await open('/about', {
+      blockSanity: true,
+      viewport: PHONE,
+      init: storeDismissal(null),
+    });
+    try {
+      await page.waitFor(MOUNTED, 'the app', 8000);
+      await page.waitFor(OFFER_INSTALL, 'a listener for beforeinstallprompt', 8000);
+
+      const phone = JSON.parse(
+        await page.waitFor(installBoxAtRest(0), 'the install prompt at rest on a phone', 9000)
+      );
+      assert.equal(phone.viewportWidth, PHONE.width, 'harness: the phone viewport did not apply');
+      assertInsideAndCentred(phone, `a ${PHONE.width}px phone`);
+
+      // Same card, same page, a wide screen: the centring must not be a
+      // property of one breakpoint.
+      await page.setViewport(DESKTOP);
+      const desktop = JSON.parse(
+        await page.waitFor(installBoxAtRest(1000), 'the install prompt at rest on a desktop', 5000)
+      );
+      assertInsideAndCentred(desktop, `a ${DESKTOP.width}px desktop`);
+      const width = desktop.right - desktop.left;
+      assert.ok(width <= 600.5, `on a desktop the install prompt is ${width}px wide, over its 600px cap`);
+    } finally {
+      await page.evaluate(`localStorage.removeItem('${DISMISSED_KEY}')`).catch(() => {});
+      await page.close();
+    }
+  }
+);
+
+test(
+  'a closed install prompt stays closed when another offer was already on its way',
+  { skip: SKIP, timeout: 60_000 },
+  async () => {
+    const page = await open('/about', {
+      blockSanity: true,
+      viewport: PHONE,
+      init: storeDismissal(null),
+    });
+    try {
+      await page.waitFor(MOUNTED, 'the app', 8000);
+      await page.waitFor(OFFER_INSTALL, 'a listener for beforeinstallprompt', 8000);
+      // A second offer, a second timer, due 1.5 s after the first. Not left to
+      // Chrome's own event, which arrives when it likes.
+      await sleep(1500);
+      assert.equal(
+        await page.evaluate(OFFER_INSTALL),
+        true,
+        'harness: the second offer was not heard'
+      );
+
+      await page.waitFor(`!!document.querySelector('${INSTALL}')`, 'the install prompt', 9000);
+      await page.evaluate(`document.querySelector('${INSTALL} .dismiss-btn').click()`);
+      const closedAt = Date.now();
+      // The second timer is due about 1.5 s from now. Watch well past it.
+      while (Date.now() - closedAt < 3500) {
+        const shown = await page.evaluate(`!!document.querySelector('${INSTALL}')`);
+        assert.equal(
+          shown,
+          false,
+          `the install prompt was back on screen ${Date.now() - closedAt} ms after the visitor closed it`
+        );
+        await sleep(100);
+      }
+    } finally {
+      await page.evaluate(`localStorage.removeItem('${DISMISSED_KEY}')`).catch(() => {});
+      await page.close();
+    }
+  }
+);
+
+test(
+  'a dismissed install prompt does not come back on the next visit',
+  { skip: SKIP, timeout: 60_000 },
+  async () => {
+    const first = await open('/about', {
+      blockSanity: true,
+      viewport: PHONE,
+      init: storeDismissal(null),
+    });
+    let next;
+    try {
+      await first.waitFor(MOUNTED, 'the app', 8000);
+      await first.waitFor(OFFER_INSTALL, 'a listener for beforeinstallprompt', 8000);
+      await first.waitFor(`!!document.querySelector('${INSTALL}')`, 'the install prompt', 9000);
+
+      // Whether the card then stays closed on this page is the test above.
+      // What this one takes from the click is what it left in storage.
+      await first.evaluate(`document.querySelector('${INSTALL} .dismiss-btn').click()`);
+      const storedAt = Number(await first.evaluate(`localStorage.getItem('${DISMISSED_KEY}')`));
+      assert.ok(
+        storedAt > Date.now() - 60_000,
+        `harness: the X did not record the dismissal (stored "${storedAt}")`
+      );
+
+      // The next visit, in a new tab of the same browser, with no `init`:
+      // what is stored is what the X stored. The event arrives, the listener
+      // hears it, and for longer than the component's five seconds nothing
+      // may slide up.
+      next = await open('/about', { blockSanity: true, viewport: PHONE });
+      await next.waitFor(MOUNTED, 'the app', 8000);
+      await next.waitFor(OFFER_INSTALL, 'a listener for beforeinstallprompt', 8000);
+      const heardAt = Date.now();
+      while (Date.now() - heardAt < 6500) {
+        const shown = await next.evaluate(`!!document.querySelector('${INSTALL}')`);
+        assert.equal(
+          shown,
+          false,
+          `the install prompt came back ${Date.now() - heardAt} ms into the next visit, ` +
+            `${Math.round((Date.now() - storedAt) / 1000)} s after the visitor closed it`
+        );
+        await sleep(250);
+      }
+    } finally {
+      await first.evaluate(`localStorage.removeItem('${DISMISSED_KEY}')`).catch(() => {});
+      await first.close();
+      if (next) await next.close();
+    }
+  }
+);
+
+test(
+  'a dismissal older than a week no longer hides the install prompt',
+  { skip: SKIP, timeout: 60_000 },
+  async () => {
+    // The control for the test above: "dismissed" must expire, or closing the
+    // card once would hide it for good.
+    const eightDaysAgo = Date.now() - 8 * 24 * 60 * 60 * 1000;
+    const page = await open('/about', {
+      blockSanity: true,
+      viewport: PHONE,
+      init: storeDismissal(eightDaysAgo),
+    });
+    try {
+      await page.waitFor(MOUNTED, 'the app', 8000);
+      assert.equal(
+        Number(await page.evaluate(`localStorage.getItem('${DISMISSED_KEY}')`)),
+        eightDaysAgo,
+        'harness: the eight-day-old dismissal is not what the page found in storage'
+      );
+      await page.waitFor(OFFER_INSTALL, 'a listener for beforeinstallprompt', 8000);
+      await page.waitFor(
+        `!!document.querySelector('${INSTALL}')`,
+        'the install prompt, eight days after it was dismissed',
+        9000
+      );
+    } finally {
+      await page.evaluate(`localStorage.removeItem('${DISMISSED_KEY}')`).catch(() => {});
       await page.close();
     }
   }

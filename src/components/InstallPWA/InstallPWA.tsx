@@ -14,6 +14,20 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
+const DISMISSED_KEY = "pwa-install-dismissed";
+const DISMISSED_FOR_MS = 7 * 24 * 60 * 60 * 1000;
+
+// Whether the visitor closed the prompt within the last week.
+//
+// It used to be asked once, on mount, by an effect whose only move was to set
+// `showInstallPrompt` to false while it was already false; the timer below
+// then showed the prompt regardless, so closing it bought exactly one page
+// load.
+function dismissedRecently(): boolean {
+  const at = Number(localStorage.getItem(DISMISSED_KEY));
+  return at > 0 && Date.now() - at < DISMISSED_FOR_MS;
+}
+
 const InstallPWA = () => {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
@@ -28,13 +42,19 @@ const InstallPWA = () => {
 
     // Listen for the beforeinstallprompt event
     const handleBeforeInstallPrompt = (e: Event) => {
+      // Keeps Chrome from showing an install bar of its own. That stands when
+      // the card below stays hidden too: a visitor who closed it said no.
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
-      
-      // Show install prompt after a delay
+
+      // Show the prompt five seconds later, unless the visitor has closed it.
+      // Asked when the timer fires, not when it is set: the browser can make
+      // this offer more than once, each offer starts a timer of its own, and
+      // one that was already running when the X was clicked used to open the
+      // card again a moment after it closed.
       setTimeout(() => {
-        setShowInstallPrompt(true);
-      }, 5000); // Show after 5 seconds
+        if (!dismissedRecently()) setShowInstallPrompt(true);
+      }, 5000);
     };
 
     const handleAppInstalled = () => {
@@ -71,20 +91,9 @@ const InstallPWA = () => {
   const handleDismiss = () => {
     setShowInstallPrompt(false);
     
-    // Don't show again for 7 days
-    localStorage.setItem('pwa-install-dismissed', Date.now().toString());
+    // Don't show again for 7 days. Read back by dismissedRecently().
+    localStorage.setItem(DISMISSED_KEY, Date.now().toString());
   };
-
-  // Check if user dismissed recently
-  useEffect(() => {
-    const dismissedTime = localStorage.getItem('pwa-install-dismissed');
-    if (dismissedTime) {
-      const daysSinceDismissed = (Date.now() - parseInt(dismissedTime)) / (1000 * 60 * 60 * 24);
-      if (daysSinceDismissed < 7) {
-        setShowInstallPrompt(false);
-      }
-    }
-  }, []);
 
   if (isInstalled || !showInstallPrompt) {
     return null;

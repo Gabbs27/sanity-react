@@ -3,8 +3,15 @@
 .install-pwa-container {
   position: fixed;
   bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
+  /* Centred with auto margins between the two edges, not with left: 50% and
+     translateX(-50%). motion slides this element in by writing an inline
+     `transform` for its `y`, and an inline transform replaces the stylesheet's
+     instead of adding to it: the translateX was gone, the card began at the
+     middle of the screen and ran off its right edge. On a 412px phone it
+     spanned 206px to 586px. Nothing here may depend on `transform`. */
+  left: 0;
+  right: 0;
+  margin-inline: auto;
   z-index: 1000;
   max-width: 600px;
   width: calc(100% - 40px);
