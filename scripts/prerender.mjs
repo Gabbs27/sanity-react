@@ -91,13 +91,49 @@ const posts = await client.fetch(
      publishedAt,
      "image": mainImage.asset->url,
      "plainBody": pt::text(body),
-       body[]{..., _type == "image" => { ..., "asset": asset->{url} }}
+       body[]{..., _type == "image" => { ..., "asset": asset->{url} }},
+     "embed": {
+       title, slug, mainImage{ asset->{ _id, url } }, body, excerpt,
+       "name": author->name, publishedAt, sponsored, affiliateDisclosure
+     }
    }`
 );
+
+// The post as OnePost.tsx fetches it, field for field, serialised into an inert
+// <script type="application/json"> in the page's head.
+//
+// WHY: on 2026-09-29 Search Console marked /chrome-ya-trae-un-modelo-adentro a
+// Soft 404. Googlebot had rendered the page eleven minutes after a deploy, the
+// Sanity fetch did not resolve in time, and OnePost treated a failed request
+// exactly like an empty one: it rendered <NotFound />, which writes a 404
+// title and a noindex into the head. Googlebot executes JavaScript and ignores
+// <noscript>, so the full body baked below for the crawlers that do not run
+// the bundle was no help to the one that does. Any hiccup of the fetch during
+// Google's render turned a real post into a self-declared 404.
+//
+// With the data in the page, the first render is the article, before any
+// request leaves the browser. The fetch still runs and replaces it, so an edit
+// in Sanity shows up without a deploy; the embed only decides what the page
+// says while the answer is on its way, or if it never arrives.
+//
+// JSON, not HTML: esc() must NOT touch this. The one character that matters is
+// "<", because "</script>" inside a post would end the element early and hand
+// the rest of the body to the HTML parser. JSON.parse reads \u003c back as
+// "<". U+2028 and U+2029 are valid inside a JSON string but are line
+// terminators to a JavaScript parser, so they are escaped too: it costs
+// nothing and keeps the payload safe should it ever be read as script.
+const embedJson = (embed) =>
+  JSON.stringify(embed)
+    .replace(/</g, '\\u003c')
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029');
 
 const shell = readFileSync(join(BUILD, 'index.html'), 'utf8');
 
 let written = 0;
+// The heaviest embedded payload, so growth shows up in the build log rather
+// than in a slower first paint six months from now.
+let largestEmbed = { bytes: 0, slug: '' };
 for (const post of posts) {
   if (!post.slug || !post.title) continue;
 
@@ -121,6 +157,10 @@ for (const post of posts) {
   const image = post.image
     ? `${post.image}?w=1200&h=630&fit=crop&fm=jpg&q=80`
     : FALLBACK_IMAGE;
+
+  const data = embedJson(post.embed);
+  const dataBytes = Buffer.byteLength(data);
+  if (dataBytes > largestEmbed.bytes) largestEmbed = { bytes: dataBytes, slug: post.slug };
 
   const head = `
     <meta charset="utf-8" />
@@ -150,6 +190,7 @@ for (const post of posts) {
       mainEntityOfPage: url,
       author: { '@type': 'Person', name: 'Gabriel Abreu', url: `${ORIGIN}/gabriel-abreu` },
     })}</script>
+    <script id="post-data" type="application/json">${data}</script>
 `;
 
   // Keep everything the shell's head already carries that is not metadata —
@@ -197,10 +238,18 @@ for (const post of posts) {
   </nav>
 </noscript>`;
 
+  // Function replacers, not replacement strings: String.prototype.replace
+  // reads "$1", "$&", "$`" and "$'" in a string as substitution patterns, and
+  // the post body travels through these calls twice, in the noscript and in
+  // the JSON above. `echo "$1"` in a bash snippet is ordinary content here;
+  // as a pattern it is the first group of the <head> regex, which the shell
+  // leaves empty, and "$'" is the rest of the document. A function's return
+  // value is taken as it is. The static routes and the shell below follow
+  // suit, so there is one rule to remember.
   const out = shell
-    .replace(/<head([^>]*)>[\s\S]*?<\/head>/i, `<head$1>${head}${kept}</head>`)
-    .replace(/<html([^>]*)\slang="[^"]*"/i, `<html$1 lang="${lang}"`)
-    .replace(/<noscript>[\s\S]*?<\/noscript>/i, noscript);
+    .replace(/<head([^>]*)>[\s\S]*?<\/head>/i, (_, attrs) => `<head${attrs}>${head}${kept}</head>`)
+    .replace(/<html([^>]*)\slang="[^"]*"/i, (_, attrs) => `<html${attrs} lang="${lang}"`)
+    .replace(/<noscript>[\s\S]*?<\/noscript>/i, () => noscript);
 
   const dir = join(BUILD, post.slug);
   mkdirSync(dir, { recursive: true });
@@ -287,8 +336,8 @@ for (const [route, page] of Object.entries(staticPages)) {
     .replace(/<meta\s+name="viewport"[^>]*>/gi, '');
 
   const out = shell
-    .replace(/<head([^>]*)>[\s\S]*?<\/head>/i, `<head$1>${head}${kept}</head>`)
-    .replace(/<noscript>[\s\S]*?<\/noscript>/i, `<noscript>${page.html}${extra}</noscript>`);
+    .replace(/<head([^>]*)>[\s\S]*?<\/head>/i, (_, attrs) => `<head${attrs}>${head}${kept}</head>`)
+    .replace(/<noscript>[\s\S]*?<\/noscript>/i, () => `<noscript>${page.html}${extra}</noscript>`);
 
   const dir = join(BUILD, route.replace(/^\//, ''));
   mkdirSync(dir, { recursive: true });
@@ -330,7 +379,10 @@ const shellNoscript = `<noscript>
 
 writeFileSync(
   join(BUILD, 'index.html'),
-  shell.replace(/<noscript>[\s\S]*?<\/noscript>/i, shellNoscript)
+  shell.replace(/<noscript>[\s\S]*?<\/noscript>/i, () => shellNoscript)
 );
 
-console.log(`[prerender] ${written} pages written (${posts.length} posts + ${Object.keys(staticPages).length} static)`);
+console.log(
+  `[prerender] ${written} pages written (${posts.length} posts + ${Object.keys(staticPages).length} static); ` +
+    `largest embedded post payload ${(largestEmbed.bytes / 1024).toFixed(1)} KB (${largestEmbed.slug})`
+);

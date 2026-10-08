@@ -10,6 +10,8 @@ import AdSlot from "./Ads/AdSlot";
 import { AD_SLOTS } from "../config/adsense";
 import { alternatesForSlug, langForSlug, translationOf } from "../config/translations";
 import NotFound from "./NotFound";
+import PostUnavailable from "./PostUnavailable";
+import { readEmbeddedPost } from "../lib/embeddedPost";
 import "./OnePost.css";
 import usePageTracking from "../hooks/useAnalytics";
 
@@ -100,16 +102,51 @@ const portableTextComponents: any = {
   },
 };
 
+// What the page knows about the post. "missing" is the only state that renders
+// <NotFound />, and only Sanity's empty answer reaches it: a request that
+// failed says nothing about whether the post exists, and treating the two
+// alike is how a real post got marked a Soft 404 (the story is in
+// scripts/prerender.mjs). "failed" is reachable only when the page carries no
+// embedded copy to fall back on; with one, a failed fetch leaves the article
+// standing.
+type Status = "loading" | "ready" | "missing" | "failed";
+
 const OnePost = () => {
   usePageTracking();
-  const [postData, setPostData] = useState<SanityPostData | null>(null);
-  const [notFound, setNotFound] = useState(false);
-  const [related, setRelated] = useState<RelatedPost[]>([]);
   const { slug } = useParams();
+  // The prerender bakes the post into build/<slug>/index.html, so the first
+  // render can be the article, before any request has left the browser.
+  const [postData, setPostData] = useState<SanityPostData | null>(() =>
+    readEmbeddedPost<SanityPostData>(slug)
+  );
+  const [status, setStatus] = useState<Status>(() => (postData ? "ready" : "loading"));
+  // Bumped by the Retry control; re-runs the fetch below.
+  const [attempt, setAttempt] = useState(0);
+  const [related, setRelated] = useState<RelatedPost[]>([]);
+
+  // /:slug renders one <OnePost /> with no key (see useAnalytics.ts), so moving
+  // between posts reuses this instance. Reset for the new slug here, during
+  // render, rather than in the effect: React re-renders at once with the new
+  // state, and the previous post is never painted under the new URL. The
+  // related list resets with it: an embedded copy paints the new post at
+  // once, and for the time its own related query takes, the three cards
+  // under it would otherwise be the previous post's, which can include the
+  // very post being read.
+  const [shownSlug, setShownSlug] = useState(slug);
+  if (slug !== shownSlug) {
+    const embedded = readEmbeddedPost<SanityPostData>(slug);
+    setShownSlug(slug);
+    setPostData(embedded);
+    setStatus(embedded ? "ready" : "loading");
+    setRelated([]);
+  }
 
   useEffect(() => {
-    setNotFound(false);
-    setPostData(null);
+    // A slug change while a fetch is in flight: the late answer belongs to the
+    // previous post and must not land on this one.
+    let cancelled = false;
+    const embedded = readEmbeddedPost<SanityPostData>(slug);
+
     sanityClient
       .fetch(
         `*[slug.current == $slug]{
@@ -131,14 +168,28 @@ const OnePost = () => {
         { slug }
       )
       .then((data: SanityPostData[]) => {
+        if (cancelled) return;
         if (!data || data.length === 0) {
-          setNotFound(true);
+          // Sanity answered and the post is not there: the one way to a 404.
+          setPostData(null);
+          setStatus("missing");
         } else {
           setPostData(data[0]);
+          setStatus("ready");
         }
       })
-      .catch(() => setNotFound(true));
-  }, [slug]);
+      .catch(() => {
+        if (cancelled) return;
+        // No answer. With an embedded copy the article stays up; without one,
+        // say so and leave the head alone, because nothing is known about
+        // the post either way.
+        if (!embedded) setStatus("failed");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [slug, attempt]);
 
   // Every post links to three others. Without this the only path between posts
   // was /allpost, so a reader who finished an article had nowhere to go — and
@@ -193,8 +244,20 @@ const OnePost = () => {
       .catch(() => setRelated([]));
   }, [slug]);
 
-  if (notFound) return <NotFound />;
-  if (!postData) return <LoadingSpinner message="Loading post..." />;
+  if (status === "missing") return <NotFound />;
+  if (status === "failed") {
+    return (
+      <PostUnavailable
+        onRetry={() => {
+          setStatus("loading");
+          setAttempt((n) => n + 1);
+        }}
+      />
+    );
+  }
+  if (status !== "ready" || !postData) {
+    return <LoadingSpinner message="Loading post..." />;
+  }
 
   return (
     <>

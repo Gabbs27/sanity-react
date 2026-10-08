@@ -427,7 +427,7 @@ test('every captured static page still matches its source component', () => {
 });
 
 test('every static route is prerendered with its own head', () => {
-  for (const [route, page] of Object.entries(staticPages)) {
+  for (const route of Object.keys(staticPages)) {
     const file = join(BUILD, route.replace(/^\//, ''), 'index.html');
     assert.ok(existsSync(file), `${route}: not prerendered`);
     const html = read(file);
@@ -453,3 +453,163 @@ test('every static route is prerendered with its own head', () => {
   }
 });
 
+
+// ── surface 8: the data the first render reads ──────────────────────────────
+// Search Console marked /chrome-ya-trae-un-modelo-adentro a Soft 404 on
+// 2026-09-29: Googlebot rendered the page eleven minutes after a deploy, the
+// Sanity fetch did not resolve, and OnePost answered a failed request the same
+// way it answers an empty one — with a 404 title and a noindex. Googlebot runs
+// the bundle and ignores <noscript>, so the body baked in there was no help to
+// it. Every post page now carries its own data in an inert JSON script, and
+// the first render reads that before asking Sanity for anything.
+const DATA_SCRIPT = /<script id="post-data" type="application\/json">([\s\S]*?)<\/script>/g;
+const STATIC_ROUTES = new Set(Object.keys(staticPages).map((r) => r.replace(/^\//, '')));
+// `slugs` is every directory with an index.html, static routes included.
+const postSlugs = () => slugs.filter((s) => !STATIC_ROUTES.has(s));
+
+test('every prerendered post embeds its own data for the first render', () => {
+  const posts = postSlugs();
+  assert.ok(posts.length > 0, 'no post directories left after removing the static routes');
+  for (const slug of posts) {
+    const html = read(join(BUILD, slug, 'index.html'));
+    const scripts = [...html.matchAll(DATA_SCRIPT)];
+    assert.equal(
+      scripts.length,
+      1,
+      `${slug}: ${scripts.length} post-data scripts, want exactly one`
+    );
+    const raw = scripts[0][1];
+
+    // A raw "<" is how "</script>" inside the payload would end the element
+    // early and hand the rest of the post to the HTML parser as markup.
+    assert.ok(!raw.includes('<'), `${slug}: the post-data payload contains a raw "<"`);
+
+    let data;
+    try {
+      data = JSON.parse(raw);
+    } catch (e) {
+      assert.fail(`${slug}: post-data is not valid JSON (${e.message})`);
+    }
+    assert.equal(
+      data?.slug?.current,
+      slug,
+      `${slug}: post-data belongs to "${data?.slug?.current}"`
+    );
+    assert.ok(
+      typeof data.title === 'string' && data.title.trim().length > 0,
+      `${slug}: post-data has no title`
+    );
+    assert.ok(
+      Array.isArray(data.body) && data.body.length > 0,
+      `${slug}: post-data has no body blocks`
+    );
+    assert.ok(data.publishedAt, `${slug}: post-data has no publishedAt`);
+  }
+});
+
+test('negative control: the shell and the static routes carry no post-data', () => {
+  // The marker has to exist somewhere or this control proves nothing: rename
+  // the id and every page passes. Same move as the doppelganger test above.
+  assert.ok(
+    postSlugs().some((s) => has(read(join(BUILD, s, 'index.html')), 'id="post-data"')),
+    'no page carries id="post-data" at all, so this control is vacuous'
+  );
+
+  const pages = [['/', join(BUILD, 'index.html')]].concat(
+    Object.keys(staticPages).map((route) => [
+      route,
+      join(BUILD, route.replace(/^\//, ''), 'index.html'),
+    ])
+  );
+  for (const [route, file] of pages) {
+    assert.ok(
+      !has(read(file), 'id="post-data"'),
+      `${route}: carries a post's data, and it is not a post`
+    );
+  }
+});
+
+// The top-level field names of a GROQ projection body. Nested braces collapse,
+// so `mainImage{ asset->{ _id, url } }` is the field "mainImage", and an
+// aliased `"name": author->name` is the field "name".
+function projectionFields(body) {
+  let depth = 0;
+  let flat = '';
+  for (const ch of body) {
+    if (ch === '{') depth++;
+    else if (ch === '}') depth--;
+    else if (depth === 0) flat += ch;
+  }
+  return flat
+    .split(',')
+    .map((f) => f.trim())
+    .filter(Boolean)
+    .map((f) => f.match(/^"([^"]+)"\s*:/)?.[1] ?? f.match(/^[A-Za-z_]\w*/)?.[0])
+    .filter(Boolean)
+    .sort();
+}
+
+// The text between the brace that follows `marker` and its matching close.
+function projectionAfter(src, marker, file) {
+  const at = src.indexOf(marker);
+  assert.notEqual(at, -1, `${file}: no "${marker}" in the source`);
+  const open = src.indexOf('{', at + marker.length);
+  let depth = 0;
+  for (let i = open; i < src.length; i++) {
+    if (src[i] === '{') depth++;
+    else if (src[i] === '}' && --depth === 0) return src.slice(open + 1, i);
+  }
+  return assert.fail(`${file}: unbalanced braces after "${marker}"`);
+}
+
+const EMBED_FIELDS = [
+  'affiliateDisclosure', 'body', 'excerpt', 'mainImage', 'name',
+  'publishedAt', 'slug', 'sponsored', 'title',
+].sort();
+
+test('the prerenderer embeds exactly the fields OnePost fetches', () => {
+  // Same shape as "data.ts and the prerenderer read the same project list":
+  // two files describe one thing, and the only defence against drift is a test
+  // that reads both. A field OnePost renders that the embed lacks shows up as
+  // a post missing that field until the fetch resolves, which is the first
+  // render Googlebot sees; a field the embed carries that OnePost never asks
+  // for is dead weight on every post page.
+  const prerender = read(join(ROOT, 'scripts/prerender.mjs'));
+  const onePost = read(join(ROOT, 'src/components/OnePost.tsx'));
+
+  const embedded = projectionFields(projectionAfter(prerender, '"embed":', 'prerender.mjs'));
+  const fetched = projectionFields(
+    projectionAfter(onePost, '*[slug.current == $slug]', 'OnePost.tsx')
+  );
+
+  assert.deepEqual(embedded, EMBED_FIELDS, 'prerender.mjs embeds a different set of fields');
+  assert.deepEqual(fetched, EMBED_FIELDS, 'OnePost.tsx fetches a different set of fields');
+});
+
+test('the prerenderer splices page content with function replacers, never replacement strings', () => {
+  // String.prototype.replace reads "$1", "$&", "$`" and "$'" inside a
+  // replacement STRING as substitution patterns. The <head> regex has a
+  // capture group and the shell's <head> has no attributes, so a "$1" in a
+  // post body came out of the embedded JSON as nothing (`echo "$1"` as
+  // `echo ""`, "US$1,000" as "US,000"), and a "$'" spliced the rest of the
+  // document into the payload, </script> included. Bash snippets where "$1"
+  // is ordinary text are ordinary content for this blog, and nothing upstream
+  // escapes "$": not md-to-portable, not JSON.stringify, not embedJson. A
+  // function replacer returns its text as it is, patterns and all.
+  const src = read(join(ROOT, 'scripts/prerender.mjs'));
+  const splices = [
+    ...src.matchAll(/\.replace\(\s*(\/<(?:head|html|noscript)\b[^\n]*?\/[a-z]*)\s*,\s*([^\n]*)/g),
+  ];
+  assert.ok(
+    splices.length > 0,
+    'no content splice found in prerender.mjs: the shape this test looks for has drifted'
+  );
+  for (const [, regex, replacement] of splices) {
+    const arg = replacement.trim();
+    assert.match(
+      arg,
+      /^(?:\([^)]*\)|[A-Za-z_$][\w$]*)\s*=>/,
+      `prerender.mjs: .replace(${regex}, ${arg} takes a replacement string, so a "$1" or "$'" in a post is read as a pattern, not as text`
+    );
+  }
+});
