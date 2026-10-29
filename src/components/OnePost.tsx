@@ -170,7 +170,14 @@ const OnePost = () => {
       .then((data: SanityPostData[]) => {
         if (cancelled) return;
         if (!data || data.length === 0) {
-          // Sanity answered and the post is not there: the one way to a 404.
+          // Sanity answered and the post is not there. That is a 404 only when
+          // the page has nothing of its own: an embedded copy means this page
+          // was built from the post, so an empty answer about it is a bad
+          // answer (a cold CDN edge, a hiccup), not proof that it is gone. It
+          // used to 404 anyway, and Search Console marked /tailwind-css and
+          // /react-19-3-the-compiler-and-a-cvss-10 as Soft 404 on 20 and 24
+          // October, after the fix for failed fetches and with no deploy.
+          if (embedded) return;
           setPostData(null);
           setStatus("missing");
         } else {

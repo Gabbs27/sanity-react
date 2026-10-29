@@ -48,7 +48,10 @@ const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 // scenario needs Sanity to actually answer. CDP is distinct from
 // capture-static.mjs (9335) and byte-budget.mjs (9333).
 const HOST = 'localhost';
-const PORT = 3000;
+// RENDER_TEST_PORT moves the server when 3000 is taken by something else. Only
+// the scenarios that block or fake Sanity are meaningful there: the ones that
+// need Sanity's real answer fail CORS on any other port.
+const PORT = Number(process.env.RENDER_TEST_PORT ?? 3000);
 const CDP = 9337;
 const ORIGIN = `http://${HOST}:${PORT}`;
 
@@ -220,7 +223,7 @@ const isSanityQuery = (url) => isSanity(url) && url.includes('/data/query/');
 // request and records the attempt (see sanityGaveUp); a reachable run lets it
 // through, or holds it while a scenario needs the answer not to have arrived
 // yet (see holdSanity).
-async function open(route, { blockSanity = true, viewport = null, init = null } = {}) {
+async function open(route, { blockSanity = true, viewport = null, init = null, emptySanity = false } = {}) {
   const target = await (
     await fetch(`http://127.0.0.1:${CDP}/json/new?about:blank`, { method: 'PUT' })
   ).json();
@@ -231,6 +234,24 @@ async function open(route, { blockSanity = true, viewport = null, init = null } 
   client.on(({ method, params }) => {
     if (method !== 'Fetch.requestPaused') return;
     const { requestId, request } = params;
+    // `emptySanity`: every GROQ query is answered 200 with an empty result,
+    // which is what a cold or misbehaving CDN edge returning [] looks like.
+    if (emptySanity && isSanityQuery(request.url)) {
+      sanity.attempts.push(Date.now());
+      const body = Buffer.from(JSON.stringify({ query: '', result: [], ms: 1 })).toString('base64');
+      client
+        .send('Fetch.fulfillRequest', {
+          requestId,
+          responseCode: 200,
+          responseHeaders: [
+            { name: 'Content-Type', value: 'application/json' },
+            { name: 'Access-Control-Allow-Origin', value: '*' },
+          ],
+          body,
+        })
+        .catch(() => {});
+      return;
+    }
     if (isSanity(request.url) && !blockSanity) {
       if (sanity.holding && isSanityQuery(request.url)) {
         sanity.held.push(requestId);
@@ -431,6 +452,34 @@ test(
         `(document.querySelector('.post-content')?.innerText ?? '').length`
       );
       assert.ok(bodyLength > 200, `.post-content is ${bodyLength} characters of text`);
+    } finally {
+      await page.close();
+    }
+  }
+);
+
+test(
+  'Sanity answers empty: a prerendered post still renders from its embedded data',
+  { skip: SKIP, timeout: 60_000 },
+  async () => {
+    // The Soft 404s of 20 and 24 October came after the fix for a failed
+    // fetch, with no deploy in between. The remaining road to <NotFound />
+    // was an answer that arrives and is empty. A page that carries its own
+    // embedded copy was built from that post: an empty answer about it is
+    // a bad answer, not proof that it is gone.
+    const { slug, embedded, bakedTitle } = pickPost();
+    const page = await open(`/${slug}`, { blockSanity: false, emptySanity: true });
+    const H1 = `document.querySelector('h1.post-title')?.textContent ?? ''`;
+    try {
+      await page.waitFor(H1, 'h1.post-title', 8000);
+      // Wait until the empty answers have landed and been acted on.
+      await page.sanityGaveUp({ quietMs: 1500 });
+      await sleep(500);
+      assert.equal(await page.evaluate(H1), embedded.title, 'the empty answer replaced the article');
+      const { title, robots } = await head(page);
+      assert.ok(!title.includes('404'), `the page calls itself a 404: "${title}"`);
+      assert.equal(title, bakedTitle, 'document.title is not the title the prerender baked');
+      assert.ok(!robots.includes('noindex'), `robots says "${robots}"`);
     } finally {
       await page.close();
     }
