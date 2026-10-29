@@ -83,22 +83,6 @@
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <!-- GitHub Pages SPA redirect handler (rafgraph URL-query approach).
-         Pairs with public/404.html which redirects /deep/path → /?/deep/path.
-         This decoder reverses that, restoring the path so BrowserRouter
-         sees the real route. -->
-    <script>
-      (function(l){
-        if (l.search[1] === '/' && l.pathname === '/') {
-          var decoded = l.search.slice(1).split('&').map(function(s){
-            return s.replace(/~and~/g, '&');
-          }).join('?');
-          window.history.replaceState(null, null,
-            l.pathname.slice(0, -1) + decoded + l.hash
-          );
-        }
-      }(window.location));
-    </script>
     <div id="root"></div>
     <script type="module" src="/src/index.tsx"></script>
   </body>

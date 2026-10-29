@@ -613,3 +613,24 @@ test('the prerenderer splices page content with function replacers, never replac
     );
   }
 });
+
+// ── surface 8: the error page Vercel serves ─────────────────────────────────
+// Anything the catch-all rewrite does not answer (a missing /assets/ file,
+// mostly) gets build/404.html with a real 404 status. Until October 2026 that
+// file was the GitHub Pages SPA shim: a script that bounced every 404 to
+// /?/the/path, which index.html then decoded back. GitHub Pages was gone since
+// August, so the page a 404 served was a redirect to the home page. The shim
+// and its decoder go; what stays is a plain error page that asks not to be
+// indexed and offers a way back.
+test('the 404 page is a plain error page, not the GitHub Pages redirect', () => {
+  const page = read(join(BUILD, '404.html'));
+  assert.ok(!/location\.replace|l\.replace\(/.test(page), '404.html still redirects with a script');
+  assert.ok(!has(page, 'spa-github-pages'), '404.html is still the GitHub Pages shim');
+  assert.ok(/<meta name="robots" content="noindex/.test(page), '404.html does not ask to stay out of the index');
+  assert.ok(has(page, 'href="/"'), '404.html offers no way back home');
+});
+
+test('the shell no longer decodes GitHub Pages redirects', () => {
+  const shell = read(join(BUILD, 'index.html'));
+  assert.ok(!has(shell, '~and~'), 'index.html still carries the /?/ decoder');
+});
